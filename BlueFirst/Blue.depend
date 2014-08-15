@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1408058743 source:/home/asantos/code/Blue/blue.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<sys/socket.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/hci.h>
+	<bluetooth/hci_lib.h>
+	<signal.h>
+
