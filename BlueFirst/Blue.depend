@@ -9,3 +9,13 @@
 	<bluetooth/hci_lib.h>
 	<signal.h>
 
+1408108340 source:/home/asantos/git/BlueLE/BlueFirst/blue.c
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<sys/socket.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/hci.h>
+	<bluetooth/hci_lib.h>
+	<signal.h>
+

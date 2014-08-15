@@ -148,18 +148,25 @@ int main(int argc, char **argv)
 	while (x--) {
 		evt_le_meta_event *meta;
 		char addr[18];
+		int j;
 
 		while ((len = read(sock, buf, sizeof(buf))) < 0) {
 			if (signal_received == SIGINT) {
 				len = 0;
 				goto done;
 			}
-
 			goto done;
 		}
 
-		ptr = buf + (1 + HCI_EVENT_HDR_SIZE);
-		len -= (1 + HCI_EVENT_HDR_SIZE);
+		// ptr = buf + (1 + HCI_EVENT_HDR_SIZE);
+		// len -= (1 + HCI_EVENT_HDR_SIZE);
+
+		printf("\n (%03d) <<<", len);
+		for(j=0; j<len; j++)
+		{
+		    printf(" %02X", buf[j]);
+		}
+		printf("\n");
 
 		meta = (void *) ptr;
 
@@ -182,16 +189,16 @@ int main(int argc, char **argv)
 
 done:
 	printf("Disable Le %d\n", hci_le_set_scan_enable(sock, 0x00, 0x00, 1000));
-	//setsockopt(sock, SOL_HCI, HCI_FILTER, &of, sizeof(of));
+	// setsockopt(sock, SOL_HCI, HCI_FILTER, &of, sizeof(of));
 
-	//own_bdaddr_type = 0x00;
-    //info = &a;
+	// own_bdaddr_type = 0x00;
+    // info = &a;
     interval = htobs(0x0060);
 	window = htobs(0x0030);
 
-    //The connection handle is invalid. The valid range is 0x0000..0x0eff
-    //The maximum interval is invalid. The valid range is 0x0002..0xfffe
-    //The minimum interval is invalid. The valid range is 0x0002..maxinterval.
+    // The connection handle is invalid. The valid range is 0x0000..0x0eff
+    // The maximum interval is invalid. The valid range is 0x0002..0xfffe
+    // The minimum interval is invalid. The valid range is 0x0002..maxinterval.
 
 	uint16_t min_interval = htobs(0x0028);
 	uint16_t max_interval = htobs(0x0038);
@@ -223,7 +230,8 @@ done:
             err = hci_read_remote_version(sock, handle, &ver, 2500);
             if(err >= 0)
             {
-                printf("Ver: %04X %04X %04X %04X %04X\n", ver.hci_rev, ver.hci_ver, ver.lmp_subver, ver.lmp_ver, ver.manufacturer);
+                printf("Rev:%04X HciVer:%04X LmpSubVer:%04X LmpVer:%04X Man:%04X\n",
+                       ver.hci_rev, ver.hci_ver, ver.lmp_subver, ver.lmp_ver, ver.manufacturer);
             }
             else
                 printf("Version Error\n");
@@ -243,6 +251,15 @@ done:
             }
             else
                 printf("Ext Features Error\n");
+
+            char name[100];
+            err = hci_read_remote_name(handle, &info->bdaddr, 99, name, 5000);
+            if(err >= 0)
+            {
+                printf("Name: %s\n", name);
+            }
+            else
+                printf("Name Error\n");
 
 
 
