@@ -31,11 +31,40 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include" />
+			<Add directory="/usr/include/glib-2.0/" />
 		</Compiler>
 		<Linker>
 			<Add library="bluetooth" />
 		</Linker>
-		<Unit filename="blue.c">
+		<Unit filename="blue.cpp" />
+		<Unit filename="btDevice.cpp" />
+		<Unit filename="btDevice.h" />
+		<Unit filename="../bluez-5.22/attrib/att-database.h" />
+		<Unit filename="../bluez-5.22/attrib/att.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/att.h" />
+		<Unit filename="../bluez-5.22/attrib/gatt-service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/gatt-service.h" />
+		<Unit filename="../bluez-5.22/attrib/gatt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/gatt.h" />
+		<Unit filename="../bluez-5.22/attrib/gattrib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/gattrib.h" />
+		<Unit filename="../bluez-5.22/attrib/gatttool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/gatttool.h" />
+		<Unit filename="../bluez-5.22/attrib/interactive.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../bluez-5.22/attrib/utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="blue.c" open="1" top="0" tabpos="1">
-		<Cursor position="6385" topLine="219" />
+	<File name="blue.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="4200" topLine="180" />
+	</File>
+	<File name="btDevice.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="7858" topLine="234" />
+	</File>
+	<File name="btDevice.h" open="1" top="0" tabpos="4">
+		<Cursor position="1151" topLine="8" />
+	</File>
+	<File name="../bluez-5.22/attrib/att.c" open="1" top="1" tabpos="9">
+		<Cursor position="1061" topLine="17" />
 	</File>
 </CodeBlocks_layout_file>
