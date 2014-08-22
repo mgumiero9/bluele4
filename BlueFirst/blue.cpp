@@ -8,21 +8,21 @@ int err;
 
 
 
-
-
-
 int main(int argc, char **argv)
 {
+    int len = 0;
+
     btDevice bt;
 
     bt.init();
 
-    printf("Find %d devices\n", bt.findDevices());
+    printf("Find %d devices\n", len = bt.findDevices());
 
     for(int i=0; i<bt.getDevicesFound(); i++)
     {
         bt.openDevice(i);
     }
+    printf("Finishing\n");
 
 
 /*    num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &ii, flags);

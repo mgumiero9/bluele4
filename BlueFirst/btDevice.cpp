@@ -1,22 +1,93 @@
 #include "btDevice.h"
 #include <time.h>
+#include <errno.h>
+
 static volatile int signal_received = 0;
+
+LOCAL_DATA* btDevice::First = NULL;
+LOCAL_DATA* btDevice::Last = NULL;
+int btDevice::DevSock = NULL;
+bool btDevice::loop = true;
+
+BTSTATE btDevice::state = BTSTATE_CLOSED;
+
+void *btDevice::pMain(void *arg)
+{
+    int len, f_ok = 0;
+    time_t reg_time = time(NULL);
+    LOCAL_DATA *ptr;
+    uint8_t buf[256];
+
+    while(loop)
+    {
+        if (DevSock != NULL)
+        {
+            if ((len = read(DevSock, buf, sizeof(buf))) < 0) {
+                if((errno == EAGAIN) && loop)
+                {
+                    printf("Trying again (%d)\n", time(NULL));
+                    continue;
+
+                }
+                printf("Received Error (%d %d)\n", len, errno);
+                f_ok = 0;
+                continue;
+            }
+            if(len > 0)
+            {
+                printf("New Packet\n");
+                ptr = (LOCAL_DATA*) malloc(sizeof(LOCAL_DATA));
+                ptr->buf = (uint8_t*) malloc(len);
+                memcpy(ptr->buf, buf, len);
+                ptr->len = len;
+                ptr->next = NULL;
+                if(Last != NULL)
+                {
+                    Last->next = ptr;
+                }
+                else
+                {
+                    Last = ptr;
+                    First = ptr;
+                }
+            }
+        }
+    }
+    // Cleaning memory
+    printf("Freeing Memory\n");
+    ptr = First;
+    while (NULL != ptr)
+    {
+        free(ptr->buf);
+        First = (LOCAL_DATA *) ptr->next;
+        free(ptr);
+        ptr = First;
+    }
+}
 
 static void sigint_handler(int sig)
 {
 	signal_received = sig;
-}
 
+}
 
 btDevice::btDevice()
 {
+    InfoLen = 0;
     opened = false;
+    thMain = NULL;
 }
 
 btDevice::~btDevice()
 {
     if (opened) {
         hci_close_dev(DevSock);
+        opened = false;
+    }
+    loop = false;
+    if(thMain != NULL)
+    {
+        pthread_join(thMain, NULL);
     }
     //dtor
 }
@@ -43,6 +114,19 @@ void btDevice::init()
         perror("opening socket error");
         return;
     }
+    //DevFlags = fcntl(DevSock ,F_GETFL, 0);
+    //fcntl(DevSock, F_SETFL, DevFlags | O_NONBLOCK);
+
+    timeval timeout;
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+
+	if (setsockopt(DevSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+		printf("Could not set socket timeout\n");
+		return;
+	}
+
+    pthread_create(&thMain, NULL, &btDevice::pMain, NULL);
     opened = true;
 }
 
@@ -52,10 +136,9 @@ int btDevice::findDevices()
 
     int max_rsp, num_rsp;
     int len, flags;
-    char addr[19] = { 0 };
-    char name[248] = { 0 };
     uint16_t interval = htobs(0x0012);
     uint16_t window = htobs(0x0012);
+    LOCAL_DATA *ptr;
     /*
     printf("le_set_scan_parameters %d\n",
 	hci_le_set_scan_parameters(sock, 0x00, htobs(0x0010),
@@ -70,7 +153,7 @@ int btDevice::findDevices()
     if(err)
     {
         printf("le_set_scan_parameters %d\n", err);
-        //return 0;
+        return 0;
     }
 
     err = hci_le_set_scan_enable(DevSock, 0x01, 0x01, 1000);
@@ -83,7 +166,7 @@ int btDevice::findDevices()
     printf("\nLE SCAN\n");
 
 
-	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr;
+	unsigned char buf[HCI_MAX_EVENT_SIZE];
 	struct hci_filter nf, of;
 	struct sigaction sa;
 	socklen_t olen;
@@ -91,93 +174,68 @@ int btDevice::findDevices()
 
     olen = sizeof(of);
     if (getsockopt(DevSock, SOL_HCI, HCI_FILTER, &of, &olen) < 0) {
+    //if (getsockopt(DevSock, SOL_SOCKET, HCI_FILTER, &of, &olen) < 0) {
+
         printf("Could not get socket options\n");
         return -1;
     }
+    printf("OPT %08X %08X %08X %04X\n", of.type_mask, of.event_mask[0], of.event_mask[1], of.opcode);
+
+
 	hci_filter_clear(&nf);
-	hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
-	hci_filter_set_event(EVT_LE_META_EVENT, &nf);
+    hci_filter_all_ptypes(&nf);
+	hci_filter_all_events(&nf);
+
+//	hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
+//	hci_filter_set_event(EVT_LE_META_EVENT, &nf);
 
 	if (setsockopt(DevSock, SOL_HCI, HCI_FILTER, &nf, sizeof(nf)) < 0) {
 		printf("Could not set socket options\n");
 		return -1;
 	}
-
+/*
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_flags = SA_NOCLDSTOP;
 	sa.sa_handler = sigint_handler;
 	sigaction(SIGINT, &sa, NULL);
     le_advertising_info *info;
     le_advertising_info a;
-
+*/
     time_t end_time = time(NULL) + 30;
     InfoLen = 0;
 
-	while (end_time - time(NULL) > 0) {
+    printf("End Time %d\n", end_time);
 
-		evt_le_meta_event *meta;
-		char addr[18];
-		int j, f_ok = 1, found;
+    evt_le_meta_event *meta;
 
-		while (( end_time - time(NULL) > 0) && ((len = read(DevSock, buf, sizeof(buf))) < 0)) {
-			if (signal_received == SIGINT) {
-				len = 0;
-				f_ok = 0;
-				break;
-			}
-			f_ok = 0;
-			break;
-		}
+    int j, f_ok = 1, found;
 
-		ptr = buf + (1 + HCI_EVENT_HDR_SIZE);
-		// len -= (1 + HCI_EVENT_HDR_SIZE);
-        if(f_ok) {
-            printf("\n (%03d) (%d) <<<", len, end_time - time(NULL));
-            for(j=0; j<len; j++)
-            {
-                printf(" %02X", buf[j]);
-            }
-            printf("\n");
-
-            meta = (evt_le_meta_event*) ptr;
-
-            if (meta->subevent != 0x02)
-                break;
-
-            // Ignoring multiple reports
-            info = (le_advertising_info *) (meta->data + 1);
-            if (info->evt_type == 0) {
-                char name[30];
-
-                memset(name, 0, sizeof(name));
-                ba2str(&info->bdaddr, addr);
-                eir_parse_name(info->data, info->length, name, sizeof(name) - 1);
-                printf("EvtType %d \t %02X %02X\n", info->evt_type, info->data[0], info->data[1]);
-                printf("%s %s %d\n", addr, name, info->bdaddr_type);
-                found = 0;
-                for(int i=0; i<InfoLen; i++)
-                {
-                    printf("Resultado Comparação %d\n", bacmp(&InfoDevice[i], &info->bdaddr));
-                    if (bacmp(&InfoDevice[i], &info->bdaddr) == 0)
-                    {
-                        found = 1;
-                        break;
-                    }
-                }
-                if(!found)
-                {
-                    bacpy(&InfoDevice[InfoLen++], &info->bdaddr);
-                    printf("New Device %s (Index %d)\n", name, InfoLen);
-                }
-
-            }
-        }
-        else {
+	while ((end_time - time(NULL) > 0) ) {
+        if (signal_received == SIGINT) {
+            printf("Received SIGINT\n");
             break;
         }
+        if(NULL != First)
+        {
+            printf("Reading Packet (%d)\n", First->len);
+            for(int i=0; i<First->len; i++)
+                printf(" %02X", First->buf[i]);
+            printf("\n");
+            readPacket(First->buf, First->len);
+            ptr = First;
+            First = (LOCAL_DATA*)ptr->next;
+            ptr->next = NULL;
+            free(ptr->buf);
+            free(ptr);
+        }
+
+
+
+
+
 	}
     printf("Disable Le %d\n", hci_le_set_scan_enable(DevSock, 0x00, 0x00, 1000));
-	setsockopt(DevSock, SOL_HCI, HCI_FILTER, &of, sizeof(of));
+//	setsockopt(DevSock, SOL_HCI, HCI_FILTER, &of, sizeof(of));
 	return InfoLen;
 
 }
@@ -220,18 +278,38 @@ void btDevice::openDevice(int index)
     uint16_t handle = 0;
     int err;
 
-    //info->bdaddr.b[0] = 0x00;
-    //info->bdaddr.b[1] = 0x18;
-    //info->bdaddr.b[2] = 0x8C;
-    //info->bdaddr.b[3] = 0x32;
-    //info->bdaddr.b[4] = 0x34;
-    //info->bdaddr.b[5] = 0x20;
-    //info->bdaddr_type = 0;
-
     err = hci_le_create_conn(DevSock, interval, window, initiator_filter, own_bdaddr_type, InfoDevice[index], own_bdaddr_type, min_interval,
                                     max_interval, latency, supervision_timeout, min_ce_length, max_ce_length, &handle, 25000);
     printf("Conn %d\n", err);
+
     printf("Connection handle %d\n", handle);
+
+    time_t end_time = time(NULL) + 30;
+    InfoLen = 0;
+    ssize_t len = 0;
+
+    printf("Starting...\n");
+    char buf[255];
+    while(end_time > time(NULL))
+    {
+/*        len = recv(DevSock, buf, sizeof(buf), MSG_DONTWAIT);
+        if (len > 0)
+        {
+            printf("RECEIVED :");
+            for(int i=0; i<len; i++)
+                printf("%02X ", buf[i]);
+            printf("\n");
+        }
+        else
+            printf("Code %d\n",  len);
+            */
+
+
+    }
+
+
+
+    /*
     if(handle > 0)
     {
         struct hci_version ver;
@@ -261,7 +339,7 @@ void btDevice::openDevice(int index)
             printf("Ext Features Error\n");
 
     }
-
+    */
 }
 
 void btDevice::eir_parse_name(uint8_t *eir, size_t eir_len,
@@ -304,4 +382,348 @@ failed:
 int btDevice::getDevicesFound()
 {
     return InfoLen;
+}
+
+
+void btDevice::connectDevice(int index)
+{
+	bdaddr_t sba, dba;
+	uint8_t dest_type;
+//	GError *tmp_err = NULL;
+//	BtIOSecLevel sec;
+
+//	str2ba(dst, &dba);
+
+	/* Local adapter */
+    sba.b[5] = 0x00;
+    sba.b[4] = 0x15;
+    sba.b[3] = 0x83;
+    sba.b[2] = 0x6A;
+    sba.b[1] = 0x1E;
+    sba.b[0] = 0x8F;
+    // OR bacpy(&sba, BDADDR_ANY);
+
+	/* Not used for BR/EDR */
+	//if (strcmp(dst_type, "random") == 0)
+	//	dest_type = BDADDR_LE_RANDOM;
+	//else
+//		dest_type = BDADDR_LE_PUBLIC;
+
+	//if (strcmp(sec_level, "medium") == 0)
+	//	sec = BT_IO_SEC_MEDIUM;
+	//else if (strcmp(sec_level, "high") == 0)
+	//	sec = BT_IO_SEC_HIGH;
+	//else
+//		sec = BT_IO_SEC_LOW;
+/*
+	if (psm == 0)
+		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
+				BT_IO_OPT_SOURCE_BDADDR, &sba,
+				BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
+				BT_IO_OPT_DEST_BDADDR, &dba,
+				BT_IO_OPT_DEST_TYPE, dest_type,
+				BT_IO_OPT_CID, ATT_CID,
+				BT_IO_OPT_SEC_LEVEL, sec,
+				BT_IO_OPT_INVALID);
+	else
+		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
+				BT_IO_OPT_SOURCE_BDADDR, &sba,
+				BT_IO_OPT_DEST_BDADDR, &dba,
+				BT_IO_OPT_PSM, psm,
+				BT_IO_OPT_IMTU, mtu,
+				BT_IO_OPT_SEC_LEVEL, sec,
+				BT_IO_OPT_INVALID);
+
+	if (tmp_err) {
+		g_propagate_error(gerr, tmp_err);
+		return NULL;
+	}
+
+*/
+}
+
+
+void btDevice::readPacket(uint8_t *buf, uint16_t len)
+{
+    if(len > 0)
+    {
+        switch(buf[0])
+        {
+            case HCI_COMMAND_PKT:
+                printf("Received Command Packet\n");
+
+            break;
+            case HCI_ACLDATA_PKT:
+                printf("Received ACL Packet\n");
+            break;
+            case HCI_SCODATA_PKT:
+                printf("Received SCO Packet\n");
+            break;
+            case HCI_EVENT_PKT:
+                printf("Event Packet\n");
+                if ((len < 3) || ((len + HCI_EVENT_HDR_SIZE + 1) != buf[HCI_EVENT_HDR_SIZE]))
+                {
+                    printf("Packet Size Wrong\n");
+                }
+                readEventPacket(buf[1], &buf[3], len - HCI_EVENT_HDR_SIZE - 1);
+            break;
+            case HCI_VENDOR_PKT:
+                printf("Received Vendor Packet\n");
+            break;
+        }
+    }
+}
+
+int btDevice::readEventPacket(uint8_t event, uint8_t *buf, uint16_t len)
+{
+    int i, j;
+    if(len == 0)
+        return 0;
+    printf("\n (%03d) Event %02X <<<", len, event);
+
+    for(int j=0; j<len; j++)
+    {
+        printf(" %02X", buf[j]);
+    }
+    printf("\n");
+
+    switch(event)
+    {
+    case EVT_LE_META_EVENT:
+        printf("Meta Event\n");
+        i = 0;
+        while(i < len)
+        {
+            printf("Calling Event %02X\n", buf[i]);
+            i = i + readEventPacket(buf[i], &buf[i+1], len - i - 1) + 1;
+        }
+        return i;
+        break;
+    case EVT_LE_CONN_COMPLETE:
+        if(len >= LE_CREATE_CONN_CP_SIZE)
+        {
+            printf("Conn Complete Event\n");
+            readConnComplete((evt_le_connection_complete*) &buf[1]);
+            return LE_CREATE_CONN_CP_SIZE;
+        }
+        break;
+    case EVT_LE_ADVERTISING_REPORT:
+        if ((len > 0) && (len - 1 >= LE_ADVERTISING_INFO_SIZE * buf[0]))
+        {
+            printf("Report Qty %d\n", buf[0]);
+            printf("Advertizing\n");
+            i = 1;
+            for(j=0; j<buf[0] && i < len; j++)
+            {
+                i =i + readAdvertisingEvent((le_advertising_info*) &buf[i], len - i);
+            }
+            return i;
+        }
+        else {
+            printf("Invalid Advertizing Size\n");
+        }
+        break;
+    case EVT_LE_CONN_UPDATE_COMPLETE:
+        //evt_le_connection_update_complete *data = ;
+        break;
+        case EVT_LE_CONN_UPDATE_COMPLETE_SIZE:
+    case EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE:
+        //evt_le_read_remote_used_features_complete *data = ;
+        if (len >= EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE_SIZE)
+        {
+
+        }
+        printf("Read Remote Features\n");
+        return EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE_SIZE;
+        break;
+    case EVT_LE_LTK_REQUEST:
+        if(len >= EVT_LE_LTK_REQUEST_SIZE)
+        {
+            return EVT_LE_LTK_REQUEST_SIZE;
+        }
+
+        break;
+    case EVT_CMD_COMPLETE:
+        printf("Command Complete\n");
+        if(len >= EVT_CMD_COMPLETE_SIZE)
+        {
+            //evt_cmd_complete* ;
+            return EVT_CMD_COMPLETE_SIZE;
+        }
+    default:
+        printf("Unknown Event\n");
+        return len;
+        break;
+    }
+    printf("Size Erro\n");
+    return len;
+}
+
+void btDevice::readConnComplete(evt_le_connection_complete* data)
+{
+
+}
+
+
+int btDevice::readAdvertisingEvent(le_advertising_info *info, int len)
+{
+    char addr[19] = { 0 };
+    char name[248] = { 0 };
+    bool found = 0;
+    int i;
+
+//    if (info->evt_type == 0) {
+//        char name[30];
+
+        memset(name, 0, sizeof(name));
+        ba2str(&info->bdaddr, addr);
+        eir_parse_name(info->data, info->length, name, sizeof(name) - 1);
+        printf("EvtType %d \t %02X %02X\n", info->evt_type, info->data[0], info->data[1]);
+        printf("%s %s %d\n", addr, name, info->bdaddr_type);
+        found = 0;
+        for(int i=0; i<InfoLen; i++)
+        {
+            printf("Resultado Comparação %d\n", bacmp(&InfoDevice[i], &info->bdaddr));
+            if (bacmp(&InfoDevice[i], &info->bdaddr) == 0)
+            {
+                found = 1;
+                break;
+            }
+        }
+        if(!found)
+        {
+            bacpy(&InfoDevice[InfoLen++], &info->bdaddr);
+            printf("New Device %s (Index %d) %02X:%02X:%02X:%02X:%02X:%02X\n", name, InfoLen, info->bdaddr.b[0], info->bdaddr.b[1],
+                   info->bdaddr.b[2], info->bdaddr.b[3], info->bdaddr.b[4], info->bdaddr.b[5]);
+        }
+        if(info->length > len - sizeof(le_advertising_info) + 1)
+        {
+            printf("Len Size Error Types\n");
+            return len;
+        }
+
+        int size = 0;
+        i = 0;
+
+        while(i < info->length)
+        {
+            size = info->data[i++];
+            printf("Size %02X Item %02X: ", size, info->data[i]);
+            if (size + i > info->length)
+            {
+                printf("Size Error");
+                return len;
+            }
+            switch(info->data[i])
+            {
+            case 0x01:
+                printf("Flags");
+                break;
+            case 0x02:
+                printf("Incomplete List of 16-bit Service Class UUIDs");
+                break;
+            case 0x03:
+                printf("Complete List of 16-bit Service Class UUIDs");
+                break;
+            case 0x04:
+                printf("Incomplete List of 32-bit Service Class UUIDs");
+                break;
+            case 0x05:
+            	printf("Complete List of 32-bit Service Class UUIDs	Bluetooth Core Specification:");
+            	break;
+            case 0x06:
+            	printf("Incomplete List of 128-bit Service Class UUIDs	Bluetooth Core Specification:");
+                break;
+            case 0x07:
+                printf("Complete List of 128-bit Service Class UUIDs");
+                break;
+            case 0x08:
+                printf("Shortened Local Name  Bluetooth Core Specification:");
+                break;
+            case 0x09:
+                printf("Complete Local Name	Bluetooth Core Specification:");
+                break;
+            case 0x0A:
+                printf("Tx Power Level	Bluetooth Core Specification:");
+                break;
+            case 0x0D:
+                printf("Class of Device	Bluetooth Core Specification:");
+                break;
+            case 0x0E:
+                printf("Simple Pairing Hash C	Bluetooth Core Specification:");
+                break;
+            case 0x0F:
+                printf("Simple Pairing Randomizer R	Bluetooth Core Specification:");
+                break;
+            case 0x10:
+                printf("Device ID	Device ID Profile v1.3 or later");
+                break;
+            case 0x11:
+                printf("Security Manager Out of Band Flags");
+                break;
+            case 0x12:
+                printf("Slave Connection Interval Range	Bluetooth Core Specification:");
+                break;
+            case 0x14:
+                printf("List of 16-bit Service Solicitation UUIDs");
+                break;
+            case 0x15:
+                printf("List of 128-bit Service Solicitation UUIDs	Bluetooth Core Specification:");
+                break;
+            case 0x16:
+                printf("Service Data» 16-bit	Bluetooth Core Specification:");
+                break;
+            case 0x20:
+                printf("Service Data - 32-bit UUID	​Core Specification Supplement, Part A, section 1.11");
+                break;
+            case 0x21:
+                printf("Service Data - 128-bit UUID	​Core Specification Supplement, Part A, section 1.11");
+                break;
+            case 0x17:
+                printf("Public Target Address	Bluetooth Core Specification:");
+                break;
+            case 0x18:
+                printf("Random Target Address	Bluetooth Core Specification:");
+                break;
+            case 0x19:
+                printf("Appearance»	Bluetooth Core Specification:");
+                break;
+            case 0x1A:
+                printf("Advertising Interval	​Bluetooth Core Specification:");
+                break;
+            case 0x1B:
+                printf("​LE Bluetooth Device Address	​Core Specification Supplement, Part A, section 1.16");
+                break;
+            case 0x1C:
+                printf("​LE Role	​Core Specification Supplement, Part A, section 1.17");
+                break;
+            case 0x1D:
+            	printf("​Simple Pairing Hash C-256	​Core Specification Supplement, Part A, section 1.6");
+                break;
+            case 0x1E:
+                printf("​Simple Pairing Randomizer R-256	​Core Specification Supplement, Part A, section 1.6");
+                break;
+            case 0x3D:
+            	printf("3D Information Data	​3D Synchronization Profile, v1.0 or later");
+                break;
+            case 0xFF:
+                printf("Manufacturer Specific Data	Bluetooth Core Specification");
+                break;
+            default:
+                printf("Erro");
+                break;
+            }
+            for(int j=1; j < size; j++)
+                printf(" %02X %c ", info->data[i+j], info->data[i+j] );
+            for(int j=0; j < size - 1; j++)
+                printf(" %02X %c ", info->data[++i], info->data[i] );
+            i++;
+            printf("\n");
+
+        }
+        return (sizeof(le_advertising_info) - 1 + info->length);
+
+
+//    }
+
 }

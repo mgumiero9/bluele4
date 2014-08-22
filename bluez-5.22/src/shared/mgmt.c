@@ -464,8 +464,13 @@ struct mgmt *mgmt_new_default(void)
 
 	fd = socket(PF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK,
 								BTPROTO_HCI);
+
 	if (fd < 0)
-		return NULL;
+	{
+	    error("TESTE Socket\n");
+	    return NULL;
+	}
+
 
 	memset(&addr, 0, sizeof(addr));
 	addr.hci.hci_family = AF_BLUETOOTH;
@@ -473,12 +478,15 @@ struct mgmt *mgmt_new_default(void)
 	addr.hci.hci_channel = HCI_CHANNEL_CONTROL;
 
 	if (bind(fd, &addr.common, sizeof(addr.hci)) < 0) {
+	    error("TESTE Bind\n");
+	    error(strerror(errno));
 		close(fd);
 		return NULL;
 	}
 
 	mgmt = mgmt_new(fd);
 	if (!mgmt) {
+	    error("TESTE Mgmt\n");
 		close(fd);
 		return NULL;
 	}

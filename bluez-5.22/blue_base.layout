@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="src/adapter.c" open="1" top="1" tabpos="9">
+		<Cursor position="180944" topLine="7264" />
+	</File>
+	<File name="src/dbus-common.c" open="1" top="0" tabpos="12">
+		<Cursor position="5124" topLine="198" />
+	</File>
+	<File name="src/gatt-dbus.c" open="1" top="0" tabpos="13">
+		<Cursor position="0" topLine="174" />
+	</File>
+	<File name="src/main.c" open="1" top="0" tabpos="11">
+		<Cursor position="12042" topLine="538" />
+	</File>
+	<File name="src/plugin.c" open="1" top="0" tabpos="7">
+		<Cursor position="3378" topLine="128" />
+	</File>
+</CodeBlocks_layout_file>

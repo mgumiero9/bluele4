@@ -19,11 +19,11 @@
 	<bluetooth/hci_lib.h>
 	<signal.h>
 
-1408387212 source:/home/asantos/git/BlueLE/BlueFirst/blue.cpp
+1408740612 source:/home/asantos/git/BlueLE/BlueFirst/blue.cpp
 	"btDevice.h"
 	<stdio.h>
 
-1408387175 /home/asantos/git/BlueLE/BlueFirst/btDevice.h
+1408726115 /home/asantos/git/BlueLE/BlueFirst/btDevice.h
 	<stdio.h>
 	<stdlib.h>
 	<unistd.h>
@@ -32,8 +32,14 @@
 	<bluetooth/hci.h>
 	<bluetooth/hci_lib.h>
 	<signal.h>
+	<pthread.h>
+	<sys/ioctl.h>
+	<unistd.h>
+	<fcntl.h>
+	<bluetooth/l2cap.h>
 
-1408387175 source:/home/asantos/git/BlueLE/BlueFirst/btDevice.cpp
+1408740637 source:/home/asantos/git/BlueLE/BlueFirst/btDevice.cpp
 	"btDevice.h"
 	<time.h>
+	<errno.h>
 

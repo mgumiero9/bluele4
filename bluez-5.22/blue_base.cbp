@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="blue_base" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/blue_base" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/blue_base" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DHAVE_CONFIG_H" />
+			<Add directory="/home/asantos/git/BlueLE/bluez-5.22/" />
+			<Add directory="/usr/include/glib-2.0/" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include/" />
+			<Add directory="/usr/include/dbus-1.0/" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include/" />
+		</Compiler>
+		<Linker>
+			<Add library="/usr/lib/x86_64-linux-gnu/libglib-2.0.a" />
+			<Add library="pthread" />
+			<Add library="/usr/lib/x86_64-linux-gnu/libdbus-1.a" />
+		</Linker>
+		<Unit filename="lib/mgmt.h" />
+		<Unit filename="lib/rfcomm.h" />
+		<Unit filename="lib/sco.h" />
+		<Unit filename="lib/sdp.h" />
+		<Unit filename="lib/sdp_lib.h" />
+		<Unit filename="lib/uuid.h" />
+		<Unit filename="src/adapter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/adapter.h" />
+		<Unit filename="src/agent.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/agent.h" />
+		<Unit filename="src/attio.h" />
+		<Unit filename="src/attrib-server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/attrib-server.h" />
+		<Unit filename="src/builtin.h" />
+		<Unit filename="src/dbus-common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dbus-common.h" />
+		<Unit filename="src/device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/device.h" />
+		<Unit filename="src/eir.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/eir.h" />
+		<Unit filename="src/error.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/error.h" />
+		<Unit filename="src/gatt-dbus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gatt-dbus.h" />
+		<Unit filename="src/gatt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gatt.h" />
+		<Unit filename="src/hcid.h" />
+		<Unit filename="src/log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/log.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/oui.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/oui.h" />
+		<Unit filename="src/plugin.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="src/plugin.h" />
+		<Unit filename="src/profile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/profile.h" />
+		<Unit filename="src/rfkill.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-client.h" />
+		<Unit filename="src/sdp-xml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-xml.h" />
+		<Unit filename="src/sdpd-database.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-request.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd.h" />
+		<Unit filename="src/service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/service.h" />
+		<Unit filename="src/storage.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/storage.h" />
+		<Unit filename="src/systemd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/systemd.h" />
+		<Unit filename="src/textfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/textfile.h" />
+		<Unit filename="src/uinput.h" />
+		<Unit filename="src/uuid-helper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/uuid-helper.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,542 @@
+# depslib dependency file v1.0
+1404497620 source:/home/asantos/git/BlueLE/bluez-5.22/lib/bluetooth.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<ctype.h>
+	<stdarg.h>
+	<stdlib.h>
+	<string.h>
+	<sys/socket.h>
+	"bluetooth.h"
+	"hci.h"
+
+1386658746 /home/asantos/git/BlueLE/bluez-5.22/lib/bluetooth.h
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+	<endian.h>
+	<byteswap.h>
+	<netinet/in.h>
+
+1381844467 /home/asantos/git/BlueLE/bluez-5.22/lib/hci.h
+	<sys/socket.h>
+
+1386658746 source:/home/asantos/git/BlueLE/bluez-5.22/lib/hci.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<fcntl.h>
+	<unistd.h>
+	<stdlib.h>
+	<string.h>
+	<sys/param.h>
+	<sys/uio.h>
+	<sys/poll.h>
+	<sys/types.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	"bluetooth.h"
+	"hci.h"
+	"hci_lib.h"
+
+1381844467 /home/asantos/git/BlueLE/bluez-5.22/lib/hci_lib.h
+
+1393033338 source:/home/asantos/git/BlueLE/bluez-5.22/lib/sdp.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<fcntl.h>
+	<unistd.h>
+	<stdlib.h>
+	<limits.h>
+	<string.h>
+	<syslog.h>
+	<sys/time.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<sys/un.h>
+	<netinet/in.h>
+	"bluetooth.h"
+	"hci.h"
+	"hci_lib.h"
+	"l2cap.h"
+	"sdp.h"
+	"sdp_lib.h"
+
+1339599860 /home/asantos/git/BlueLE/bluez-5.22/lib/l2cap.h
+	<sys/socket.h>
+
+1403289193 /home/asantos/git/BlueLE/bluez-5.22/lib/sdp.h
+	<stdint.h>
+	<bluetooth/bluetooth.h>
+
+1390263178 /home/asantos/git/BlueLE/bluez-5.22/lib/sdp_lib.h
+	<sys/socket.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/hci.h>
+
+1395780821 source:/home/asantos/git/BlueLE/bluez-5.22/lib/uuid.c
+	<config.h>
+	<string.h>
+	<stdlib.h>
+	<errno.h>
+	"uuid.h"
+
+1404497620 /home/asantos/git/BlueLE/bluez-5.22/lib/uuid.h
+	<stdint.h>
+	<bluetooth/bluetooth.h>
+
+1408728672 source:/home/asantos/git/BlueLE/bluez-5.22/src/adapter.c
+	<config.h>
+	<stdio.h>
+	<inttypes.h>
+	<errno.h>
+	<unistd.h>
+	<stdlib.h>
+	<stdbool.h>
+	<sys/ioctl.h>
+	<sys/file.h>
+	<sys/stat.h>
+	<dirent.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/hci.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	"log.h"
+	"textfile.h"
+	"lib/uuid.h"
+	"lib/mgmt.h"
+	"src/shared/mgmt.h"
+	"src/shared/util.h"
+	"hcid.h"
+	"sdpd.h"
+	"adapter.h"
+	"device.h"
+	"profile.h"
+	"dbus-common.h"
+	"error.h"
+	"uuid-helper.h"
+	"agent.h"
+	"storage.h"
+	"attrib/gattrib.h"
+	"attrib/att.h"
+	"attrib/gatt.h"
+	"attrib-server.h"
+	"eir.h"
+
+1379320567 /home/asantos/git/BlueLE/bluez-5.22/src/log.h
+
+1393033338 /home/asantos/git/BlueLE/bluez-5.22/src/textfile.h
+
+1400489512 /home/asantos/git/BlueLE/bluez-5.22/src/hcid.h
+
+1381844467 /home/asantos/git/BlueLE/bluez-5.22/src/sdpd.h
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<syslog.h>
+
+1407345936 /home/asantos/git/BlueLE/bluez-5.22/src/adapter.h
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/hci.h>
+	<bluetooth/hci_lib.h>
+	<dbus/dbus.h>
+	<glib.h>
+	<stdbool.h>
+
+1404497620 /home/asantos/git/BlueLE/bluez-5.22/src/device.h
+
+1368493448 /home/asantos/git/BlueLE/bluez-5.22/src/profile.h
+
+1357927304 /home/asantos/git/BlueLE/bluez-5.22/src/dbus-common.h
+
+1306809532 /home/asantos/git/BlueLE/bluez-5.22/src/error.h
+	<dbus/dbus.h>
+
+1393033338 /home/asantos/git/BlueLE/bluez-5.22/src/uuid-helper.h
+
+1356371215 /home/asantos/git/BlueLE/bluez-5.22/src/agent.h
+
+1393033338 /home/asantos/git/BlueLE/bluez-5.22/src/storage.h
+
+1394536834 /home/asantos/git/BlueLE/bluez-5.22/src/attrib-server.h
+
+1395780822 /home/asantos/git/BlueLE/bluez-5.22/src/eir.h
+
+1407345936 source:/home/asantos/git/BlueLE/bluez-5.22/src/agent.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<stdlib.h>
+	<stdbool.h>
+	<sys/socket.h>
+	<sys/ioctl.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	"log.h"
+	"error.h"
+	"hcid.h"
+	"dbus-common.h"
+	"adapter.h"
+	"device.h"
+	"agent.h"
+	"shared/queue.h"
+
+1403289193 /home/asantos/git/BlueLE/bluez-5.22/src/shared/queue.h
+	<stdbool.h>
+
+1397297609 source:/home/asantos/git/BlueLE/bluez-5.22/src/attrib-server.c
+	<config.h>
+	<errno.h>
+	<stdint.h>
+	<stdbool.h>
+	<string.h>
+	<unistd.h>
+	<glib.h>
+	<sys/stat.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"lib/uuid.h"
+	"btio/btio.h"
+	"log.h"
+	"adapter.h"
+	"device.h"
+	"src/shared/util.h"
+	"attrib/gattrib.h"
+	"attrib/att.h"
+	"attrib/gatt.h"
+	"attrib/att-database.h"
+	"textfile.h"
+	"storage.h"
+	"attrib-server.h"
+
+1356371215 source:/home/asantos/git/BlueLE/bluez-5.22/src/dbus-common.c
+	<config.h>
+	<stdio.h>
+	<stdint.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	"log.h"
+	"dbus-common.h"
+
+1407345936 source:/home/asantos/git/BlueLE/bluez-5.22/src/device.c
+	<config.h>
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<fcntl.h>
+	<stdbool.h>
+	<errno.h>
+	<dirent.h>
+	<time.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	"log.h"
+	"src/shared/util.h"
+	"btio/btio.h"
+	"lib/uuid.h"
+	"lib/mgmt.h"
+	"attrib/att.h"
+	"hcid.h"
+	"adapter.h"
+	"attrib/gattrib.h"
+	"attio.h"
+	"device.h"
+	"profile.h"
+	"service.h"
+	"dbus-common.h"
+	"error.h"
+	"uuid-helper.h"
+	"sdp-client.h"
+	"attrib/gatt.h"
+	"agent.h"
+	"textfile.h"
+	"storage.h"
+	"attrib-server.h"
+
+1339599860 /home/asantos/git/BlueLE/bluez-5.22/src/attio.h
+
+1375926205 /home/asantos/git/BlueLE/bluez-5.22/src/service.h
+
+1390263178 /home/asantos/git/BlueLE/bluez-5.22/src/sdp-client.h
+
+1395780822 source:/home/asantos/git/BlueLE/bluez-5.22/src/eir.c
+	<config.h>
+	<errno.h>
+	<ctype.h>
+	<stdlib.h>
+	<stdint.h>
+	<stdbool.h>
+	<glib.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/hci.h>
+	<bluetooth/sdp.h>
+	"src/shared/util.h"
+	"uuid-helper.h"
+	"eir.h"
+
+1356371215 source:/home/asantos/git/BlueLE/bluez-5.22/src/error.c
+	<config.h>
+	<gdbus/gdbus.h>
+	"error.h"
+
+1400489512 source:/home/asantos/git/BlueLE/bluez-5.22/src/gatt-dbus.c
+	<config.h>
+	<stdint.h>
+	<errno.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	"adapter.h"
+	"device.h"
+	"lib/uuid.h"
+	"dbus-common.h"
+	"log.h"
+	"error.h"
+	"attrib/gattrib.h"
+	"attrib/att.h"
+	"attrib/gatt.h"
+	"gatt.h"
+	"gatt-dbus.h"
+
+1397297609 /home/asantos/git/BlueLE/bluez-5.22/src/gatt.h
+
+1394536834 /home/asantos/git/BlueLE/bluez-5.22/src/gatt-dbus.h
+
+1397297609 source:/home/asantos/git/BlueLE/bluez-5.22/src/gatt.c
+	<config.h>
+	<glib.h>
+	<stdbool.h>
+	"log.h"
+	"lib/uuid.h"
+	"attrib/att.h"
+	"src/shared/util.h"
+	"gatt-dbus.h"
+	"gatt.h"
+
+1368493448 source:/home/asantos/git/BlueLE/bluez-5.22/src/log.c
+	<config.h>
+	<stdio.h>
+	<stdarg.h>
+	<syslog.h>
+	<glib.h>
+	"log.h"
+
+1379320567 source:/home/asantos/git/BlueLE/bluez-5.22/src/oui.c
+	<config.h>
+	"oui.h"
+	<libudev.h>
+
+1356371215 /home/asantos/git/BlueLE/bluez-5.22/src/oui.h
+	<bluetooth/bluetooth.h>
+
+1407345936 source:/home/asantos/git/BlueLE/bluez-5.22/src/profile.c
+	<config.h>
+	<stdbool.h>
+	<stdint.h>
+	<stdlib.h>
+	<errno.h>
+	<glib.h>
+	<dbus/dbus.h>
+	<gdbus/gdbus.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"btio/btio.h"
+	"lib/uuid.h"
+	"sdpd.h"
+	"log.h"
+	"error.h"
+	"uuid-helper.h"
+	"dbus-common.h"
+	"sdp-client.h"
+	"sdp-xml.h"
+	"adapter.h"
+	"device.h"
+	"profile.h"
+	"service.h"
+
+1356371215 /home/asantos/git/BlueLE/bluez-5.22/src/sdp-xml.h
+	<bluetooth/sdp.h>
+
+1357927304 source:/home/asantos/git/BlueLE/bluez-5.22/src/rfkill.c
+	<config.h>
+	<errno.h>
+	<stdio.h>
+	<fcntl.h>
+	<unistd.h>
+	<stdint.h>
+	<stdlib.h>
+	<string.h>
+	<glib.h>
+	"log.h"
+	"adapter.h"
+	"hcid.h"
+
+1393033338 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdp-client.c
+	<config.h>
+	<errno.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	<glib.h>
+	"btio/btio.h"
+	"log.h"
+	"sdp-client.h"
+
+1403289193 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdp-xml.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<ctype.h>
+	<string.h>
+	<limits.h>
+	<stdlib.h>
+	<glib.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"sdp-xml.h"
+
+1403289193 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdpd-database.c
+	<config.h>
+	<stdlib.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"sdpd.h"
+	"log.h"
+
+1395780822 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdpd-request.c
+	<config.h>
+	<errno.h>
+	<stdlib.h>
+	<limits.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/l2cap.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"src/shared/util.h"
+	"sdpd.h"
+	"log.h"
+
+1404497620 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdpd-server.c
+	<config.h>
+	<errno.h>
+	<unistd.h>
+	<stdlib.h>
+	<sys/stat.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/l2cap.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	<sys/un.h>
+	<glib.h>
+	"log.h"
+	"sdpd.h"
+
+1395780822 source:/home/asantos/git/BlueLE/bluez-5.22/src/sdpd-service.c
+	<config.h>
+	<errno.h>
+	<stdlib.h>
+	<assert.h>
+	<sys/time.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	<glib.h>
+	"src/shared/util.h"
+	"sdpd.h"
+	"log.h"
+
+1384551450 source:/home/asantos/git/BlueLE/bluez-5.22/src/service.c
+	<config.h>
+	<stdio.h>
+	<stdlib.h>
+	<assert.h>
+	<unistd.h>
+	<fcntl.h>
+	<stdbool.h>
+	<sys/stat.h>
+	<sys/ioctl.h>
+	<errno.h>
+	<bluetooth/bluetooth.h>
+	<glib.h>
+	"log.h"
+	"adapter.h"
+	"device.h"
+	"profile.h"
+	"service.h"
+
+1407345936 source:/home/asantos/git/BlueLE/bluez-5.22/src/storage.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<ctype.h>
+	<fcntl.h>
+	<unistd.h>
+	<stdlib.h>
+	<time.h>
+	<sys/file.h>
+	<sys/stat.h>
+	<glib.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"lib/uuid.h"
+	"textfile.h"
+	"uuid-helper.h"
+	"storage.h"
+
+1356371215 source:/home/asantos/git/BlueLE/bluez-5.22/src/systemd.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<unistd.h>
+	<stdlib.h>
+	<stddef.h>
+	<sys/socket.h>
+	<sys/un.h>
+	"systemd.h"
+
+1356371215 /home/asantos/git/BlueLE/bluez-5.22/src/systemd.h
+
+1365646773 source:/home/asantos/git/BlueLE/bluez-5.22/src/textfile.c
+	<config.h>
+	<stdio.h>
+	<errno.h>
+	<ctype.h>
+	<fcntl.h>
+	<unistd.h>
+	<stdlib.h>
+	<string.h>
+	<sys/file.h>
+	<sys/stat.h>
+	<sys/mman.h>
+	<sys/param.h>
+	"textfile.h"
+
+1393033338 source:/home/asantos/git/BlueLE/bluez-5.22/src/uuid-helper.c
+	<config.h>
+	<stdlib.h>
+	<stdio.h>
+	<stdbool.h>
+	<errno.h>
+	<arpa/inet.h>
+	<bluetooth/bluetooth.h>
+	<bluetooth/sdp.h>
+	<bluetooth/sdp_lib.h>
+	"uuid-helper.h"
+
