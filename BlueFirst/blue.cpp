@@ -21,7 +21,14 @@ int main(int argc, char **argv)
     for(int i=0; i<bt.getDevicesFound(); i++)
     {
         bt.openDevice(i);
+        bt.readAvaiableData(i);
     }
+
+    // E agora???
+    // Ler características
+
+    //
+
     printf("Finishing\n");
 
 

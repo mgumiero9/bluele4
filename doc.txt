@@ -170,3 +170,7 @@ After saying all that, though... I think the way you're supposed to do everythin
 
 ***************************************
 **************************************
+
+
+Compile bluez in Debian/Ubuntu
+./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd

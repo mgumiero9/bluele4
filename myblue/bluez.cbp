@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="bluez" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/bluez" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/bluez" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Environment>
+				<Variable name="PLUGINDIR" value='&quot;/bluetooth/plugins&quot;' />
+			</Environment>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-DHAVE_CONFIG_H" />
+			<Add option="-DBLUETOOTH_PLUGIN_BUILTIN" />
+			<Add directory="/usr/include/glib-2.0" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/glib-2.0/include/" />
+			<Add directory="/usr/include/dbus-1.0/" />
+			<Add directory="/usr/lib/x86_64-linux-gnu/dbus-1.0/include/" />
+			<Add directory="gdbus" />
+			<Add directory="/home/asantos/git/BlueLE/myblue/" />
+			<Add directory="src" />
+			<Add directory="obexd/src" />
+		</Compiler>
+		<Linker>
+			<Add library="pthread" />
+			<Add library="nsl" />
+			<Add library="glib-2.0" />
+			<Add library="dbus-1" />
+			<Add library="dl" />
+			<Add library="udev" />
+		</Linker>
+		<Unit filename="attrib/att-database.h" />
+		<Unit filename="attrib/att.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="attrib/att.h" />
+		<Unit filename="attrib/gatt-service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="attrib/gatt-service.h" />
+		<Unit filename="attrib/gatt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="attrib/gatt.h" />
+		<Unit filename="attrib/gattrib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="attrib/gattrib.h" />
+		<Unit filename="attrib/gatttool.h" />
+		<Unit filename="btio/btio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="btio/btio.h" />
+		<Unit filename="client/agent.h" />
+		<Unit filename="client/display.h" />
+		<Unit filename="config.h" />
+		<Unit filename="emulator/amp.h" />
+		<Unit filename="emulator/btdev.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="emulator/btdev.h" />
+		<Unit filename="emulator/bthost.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="emulator/bthost.h" />
+		<Unit filename="emulator/le.h" />
+		<Unit filename="emulator/serial.h" />
+		<Unit filename="emulator/server.h" />
+		<Unit filename="emulator/smp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="emulator/vhci.h" />
+		<Unit filename="gdbus/client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gdbus/gdbus.h" />
+		<Unit filename="gdbus/mainloop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gdbus/object.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gdbus/polkit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gdbus/watch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex-apparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex-apparam.h" />
+		<Unit filename="gobex/gobex-debug.h" />
+		<Unit filename="gobex/gobex-defs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex-defs.h" />
+		<Unit filename="gobex/gobex-header.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex-header.h" />
+		<Unit filename="gobex/gobex-packet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex-packet.h" />
+		<Unit filename="gobex/gobex-transfer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gobex/gobex.h" />
+		<Unit filename="lib/bluetooth.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib/hci.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib/sdp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib/uuid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="monitor/analyze.h" />
+		<Unit filename="monitor/avctp.h" />
+		<Unit filename="monitor/bt.h" />
+		<Unit filename="monitor/control.h" />
+		<Unit filename="monitor/crc.h" />
+		<Unit filename="monitor/display.h" />
+		<Unit filename="monitor/ellisys.h" />
+		<Unit filename="monitor/hcidump.h" />
+		<Unit filename="monitor/hwdb.h" />
+		<Unit filename="monitor/keys.h" />
+		<Unit filename="monitor/l2cap.h" />
+		<Unit filename="monitor/ll.h" />
+		<Unit filename="monitor/lmp.h" />
+		<Unit filename="monitor/mainloop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="monitor/mainloop.h" />
+		<Unit filename="monitor/packet.h" />
+		<Unit filename="monitor/rfcomm.h" />
+		<Unit filename="monitor/sdp.h" />
+		<Unit filename="monitor/uuid.h" />
+		<Unit filename="monitor/vendor.h" />
+		<Unit filename="obexd/client/bluetooth.h" />
+		<Unit filename="obexd/client/dbus.h" />
+		<Unit filename="obexd/client/driver.h" />
+		<Unit filename="obexd/client/ftp.h" />
+		<Unit filename="obexd/client/manager.h" />
+		<Unit filename="obexd/client/map-event.h" />
+		<Unit filename="obexd/client/map.h" />
+		<Unit filename="obexd/client/opp.h" />
+		<Unit filename="obexd/client/pbap.h" />
+		<Unit filename="obexd/client/session.h" />
+		<Unit filename="obexd/client/sync.h" />
+		<Unit filename="obexd/client/transfer.h" />
+		<Unit filename="obexd/client/transport.h" />
+		<Unit filename="obexd/plugins/filesystem.h" />
+		<Unit filename="obexd/plugins/ftp.h" />
+		<Unit filename="obexd/plugins/messages.h" />
+		<Unit filename="obexd/plugins/phonebook.h" />
+		<Unit filename="obexd/plugins/vcard.h" />
+		<Unit filename="obexd/src/builtin.h" />
+		<Unit filename="obexd/src/log.h" />
+		<Unit filename="obexd/src/manager.h" />
+		<Unit filename="obexd/src/map_ap.h" />
+		<Unit filename="obexd/src/mimetype.h" />
+		<Unit filename="obexd/src/obex-priv.h" />
+		<Unit filename="obexd/src/obex.h" />
+		<Unit filename="obexd/src/obexd.h" />
+		<Unit filename="obexd/src/plugin.h" />
+		<Unit filename="obexd/src/server.h" />
+		<Unit filename="obexd/src/service.h" />
+		<Unit filename="obexd/src/transport.h" />
+		<Unit filename="plugins/autopair.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/external-dummy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/gatt-example.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/hostname.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/neard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/policy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/sixaxis.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="plugins/wiimote.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/audio/a2dp-codecs.h" />
+		<Unit filename="profiles/audio/a2dp.h" />
+		<Unit filename="profiles/audio/avctp.h" />
+		<Unit filename="profiles/audio/avdtp.h" />
+		<Unit filename="profiles/audio/avrcp.h" />
+		<Unit filename="profiles/audio/control.h" />
+		<Unit filename="profiles/audio/media.h" />
+		<Unit filename="profiles/audio/player.h" />
+		<Unit filename="profiles/audio/sink.h" />
+		<Unit filename="profiles/audio/source.h" />
+		<Unit filename="profiles/audio/transport.h" />
+		<Unit filename="profiles/cups/cups.h" />
+		<Unit filename="profiles/deviceinfo/deviceinfo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/gatt/gas.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/health/hdp.h" />
+		<Unit filename="profiles/health/hdp_manager.h" />
+		<Unit filename="profiles/health/hdp_types.h" />
+		<Unit filename="profiles/health/hdp_util.h" />
+		<Unit filename="profiles/health/mcap.h" />
+		<Unit filename="profiles/health/mcap_internal.h" />
+		<Unit filename="profiles/health/mcap_lib.h" />
+		<Unit filename="profiles/input/device.h" />
+		<Unit filename="profiles/input/hidp_defs.h" />
+		<Unit filename="profiles/input/server.h" />
+		<Unit filename="profiles/input/suspend.h" />
+		<Unit filename="profiles/input/uhid_copy.h" />
+		<Unit filename="profiles/network/bnep.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/network/bnep.h" />
+		<Unit filename="profiles/network/connection.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/network/connection.h" />
+		<Unit filename="profiles/network/manager.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/network/server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="profiles/network/server.h" />
+		<Unit filename="profiles/proximity/immalert.h" />
+		<Unit filename="profiles/proximity/linkloss.h" />
+		<Unit filename="profiles/proximity/manager.h" />
+		<Unit filename="profiles/proximity/monitor.h" />
+		<Unit filename="profiles/proximity/reporter.h" />
+		<Unit filename="profiles/sap/manager.h" />
+		<Unit filename="profiles/sap/sap.h" />
+		<Unit filename="profiles/sap/server.h" />
+		<Unit filename="profiles/scanparam/scan.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/adapter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/adapter.h" />
+		<Unit filename="src/agent.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/agent.h" />
+		<Unit filename="src/attio.h" />
+		<Unit filename="src/attrib-server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/attrib-server.h" />
+		<Unit filename="src/builtin.h" />
+		<Unit filename="src/dbus-common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/dbus-common.h" />
+		<Unit filename="src/device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/device.h" />
+		<Unit filename="src/eir.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/eir.h" />
+		<Unit filename="src/error.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/error.h" />
+		<Unit filename="src/gatt-dbus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gatt-dbus.h" />
+		<Unit filename="src/gatt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/gatt.h" />
+		<Unit filename="src/hcid.h" />
+		<Unit filename="src/log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/log.h" />
+		<Unit filename="src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main.h" />
+		<Unit filename="src/my_plugin.h" />
+		<Unit filename="src/oui.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/oui.h" />
+		<Unit filename="src/plugin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/plugin.h" />
+		<Unit filename="src/profile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/profile.h" />
+		<Unit filename="src/rfkill.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-client.h" />
+		<Unit filename="src/sdp-xml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdp-xml.h" />
+		<Unit filename="src/sdpd-database.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-request.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd-service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/sdpd.h" />
+		<Unit filename="src/service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/service.h" />
+		<Unit filename="src/shared/att-types.h" />
+		<Unit filename="src/shared/att.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/att.h" />
+		<Unit filename="src/shared/btsnoop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/btsnoop.h" />
+		<Unit filename="src/shared/crypto.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/crypto.h" />
+		<Unit filename="src/shared/gatt-db.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/gatt-db.h" />
+		<Unit filename="src/shared/gatt-helpers.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/gatt-helpers.h" />
+		<Unit filename="src/shared/hci.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/hci.h" />
+		<Unit filename="src/shared/hciemu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/hciemu.h" />
+		<Unit filename="src/shared/hfp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/hfp.h" />
+		<Unit filename="src/shared/io-glib.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="src/shared/io-mainloop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/io.h" />
+		<Unit filename="src/shared/mgmt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/mgmt.h" />
+		<Unit filename="src/shared/pcap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/pcap.h" />
+		<Unit filename="src/shared/queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/queue.h" />
+		<Unit filename="src/shared/ringbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/ringbuf.h" />
+		<Unit filename="src/shared/tester.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/tester.h" />
+		<Unit filename="src/shared/timeout-glib.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="src/shared/timeout-mainloop.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/timeout.h" />
+		<Unit filename="src/shared/uhid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/uhid.h" />
+		<Unit filename="src/shared/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/shared/util.h" />
+		<Unit filename="src/storage.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/storage.h" />
+		<Unit filename="src/systemd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/systemd.h" />
+		<Unit filename="src/textfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/textfile.h" />
+		<Unit filename="src/uinput.h" />
+		<Unit filename="src/uuid-helper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/uuid-helper.h" />
+		<Unit filename="unit/util.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

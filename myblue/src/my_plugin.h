@@ -1,0 +1,7 @@
+#ifndef MY_PLUGIN_H_INCLUDED
+#define MY_PLUGIN_H_INCLUDED
+
+
+
+
+#endif // MY_PLUGIN_H_INCLUDED

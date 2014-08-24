@@ -46,6 +46,7 @@ class btDevice
         int getDevicesFound();
         void openDevice(int index);
         void connectDevice(int index);
+        int readAvaiableData(int index);
 
     protected:
         bdaddr_t InfoDevice[255];
@@ -76,6 +77,8 @@ class btDevice
 
         void readConnComplete(evt_le_connection_complete* data);
         int readAdvertisingEvent(le_advertising_info *info, int len);
+        void processPacket();
+        int readCommandComplete(evt_cmd_complete* info, uint8_t result);
 
 };
 

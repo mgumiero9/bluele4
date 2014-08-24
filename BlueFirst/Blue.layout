@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="blue.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="147" topLine="4" />
+	<File name="blue.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="308" topLine="0" />
 	</File>
-	<File name="btDevice.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="24297" topLine="557" />
+	<File name="btDevice.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="12997" topLine="507" />
 	</File>
-	<File name="btDevice.h" open="1" top="1" tabpos="2">
-		<Cursor position="2270" topLine="44" />
+	<File name="btDevice.h" open="0" top="0" tabpos="2">
+		<Cursor position="2416" topLine="35" />
 	</File>
 </CodeBlocks_layout_file>
