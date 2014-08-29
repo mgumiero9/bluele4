@@ -1,0 +1,13 @@
+package org.freedesktop.dbus;
+
+import java.util.Map;
+
+import org.freedesktop.dbus.exceptions.DBusException;
+
+public interface R extends Map {
+
+	public DBusInterface obj = null;
+	
+	
+
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.DBusConnection"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
+<fullyQualifiedTypeName name="java.lang.reflect.Array"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.viewer.DBusEntry"/>
+<fullyQualifiedTypeName name="org.freedesktop.DBus.Introspectable"/>
+<fullyQualifiedTypeName name="org.freedesktop.DBus"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.DBusMemberName"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.ObjectManager"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.Path"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.DBusInterfaceName"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.DBusInterface"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.ObjectPath"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="org.freedesktop.dbus.DBusMap"/>
+</qualifiedTypeNameHistroy>

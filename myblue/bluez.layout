@@ -4,13 +4,13 @@
 	<File name="attrib/att.c" open="0" top="0" tabpos="0">
 		<Cursor position="1034" topLine="17" />
 	</File>
-	<File name="attrib/gatt-service.c" open="1" top="0" tabpos="7">
+	<File name="attrib/gatt-service.c" open="1" top="0" tabpos="6">
 		<Cursor position="1043" topLine="38" />
 	</File>
 	<File name="attrib/gatt-service.h" open="0" top="0" tabpos="0">
 		<Cursor position="2" topLine="0" />
 	</File>
-	<File name="attrib/gatt.c" open="1" top="0" tabpos="10">
+	<File name="attrib/gatt.c" open="1" top="0" tabpos="9">
 		<Cursor position="7021" topLine="339" />
 	</File>
 	<File name="attrib/gatt.h" open="0" top="0" tabpos="0">
@@ -49,16 +49,16 @@
 	<File name="lib/sdp.c" open="0" top="0" tabpos="0">
 		<Cursor position="108704" topLine="4583" />
 	</File>
-	<File name="lib/uuid.c" open="1" top="0" tabpos="21">
+	<File name="lib/uuid.c" open="1" top="0" tabpos="20">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="monitor/mainloop.c" open="1" top="0" tabpos="5">
+	<File name="monitor/mainloop.c" open="1" top="0" tabpos="4">
 		<Cursor position="2434" topLine="107" />
 	</File>
-	<File name="monitor/mainloop.h" open="1" top="0" tabpos="28">
+	<File name="monitor/mainloop.h" open="1" top="0" tabpos="27">
 		<Cursor position="1502" topLine="19" />
 	</File>
-	<File name="obexd/src/log.h" open="1" top="0" tabpos="8">
+	<File name="obexd/src/log.h" open="1" top="0" tabpos="7">
 		<Cursor position="996" topLine="26" />
 	</File>
 	<File name="obexd/src/plugin.h" open="0" top="0" tabpos="0">
@@ -67,61 +67,61 @@
 	<File name="obexd/src/service.h" open="0" top="0" tabpos="0">
 		<Cursor position="875" topLine="10" />
 	</File>
-	<File name="plugins/sixaxis.c" open="1" top="0" tabpos="31">
+	<File name="plugins/sixaxis.c" open="1" top="0" tabpos="30">
 		<Cursor position="6954" topLine="294" />
 	</File>
-	<File name="profiles/network/server.c" open="1" top="0" tabpos="33">
+	<File name="profiles/network/server.c" open="1" top="0" tabpos="32">
 		<Cursor position="16830" topLine="718" />
 	</File>
-	<File name="profiles/scanparam/scan.c" open="1" top="0" tabpos="32">
+	<File name="profiles/scanparam/scan.c" open="1" top="0" tabpos="31">
 		<Cursor position="6607" topLine="242" />
 	</File>
-	<File name="src/adapter.c" open="1" top="0" tabpos="3">
+	<File name="src/adapter.c" open="1" top="0" tabpos="2">
 		<Cursor position="181321" topLine="7282" />
 	</File>
 	<File name="src/adapter.h" open="0" top="0" tabpos="0">
 		<Cursor position="1002" topLine="9" />
 	</File>
-	<File name="src/agent.c" open="1" top="0" tabpos="14">
+	<File name="src/agent.c" open="1" top="0" tabpos="13">
 		<Cursor position="1132" topLine="203" />
 	</File>
-	<File name="src/attrib-server.c" open="1" top="0" tabpos="23">
+	<File name="src/attrib-server.c" open="1" top="0" tabpos="22">
 		<Cursor position="1161" topLine="21" />
 	</File>
-	<File name="src/builtin.h" open="1" top="0" tabpos="30">
+	<File name="src/builtin.h" open="1" top="0" tabpos="29">
 		<Cursor position="1095" topLine="0" />
 	</File>
-	<File name="src/dbus-common.c" open="1" top="0" tabpos="12">
+	<File name="src/dbus-common.c" open="1" top="0" tabpos="11">
 		<Cursor position="3315" topLine="120" />
 	</File>
 	<File name="src/dbus-common.h" open="0" top="0" tabpos="0">
 		<Cursor position="1150" topLine="4" />
 	</File>
-	<File name="src/device.c" open="1" top="0" tabpos="11">
+	<File name="src/device.c" open="1" top="0" tabpos="10">
 		<Cursor position="32545" topLine="1382" />
 	</File>
 	<File name="src/eir.c" open="0" top="0" tabpos="0">
 		<Cursor position="1134" topLine="20" />
 	</File>
-	<File name="src/error.c" open="1" top="0" tabpos="22">
+	<File name="src/error.c" open="1" top="0" tabpos="21">
 		<Cursor position="0" topLine="81" />
 	</File>
-	<File name="src/gatt.c" open="1" top="0" tabpos="13">
+	<File name="src/gatt.c" open="1" top="0" tabpos="12">
 		<Cursor position="2980" topLine="29" />
 	</File>
-	<File name="src/gatt.h" open="1" top="0" tabpos="6">
+	<File name="src/gatt.h" open="1" top="0" tabpos="5">
 		<Cursor position="879" topLine="10" />
 	</File>
-	<File name="src/log.c" open="1" top="0" tabpos="15">
+	<File name="src/log.c" open="1" top="0" tabpos="14">
 		<Cursor position="2366" topLine="114" />
 	</File>
-	<File name="src/main.c" open="1" top="0" tabpos="2">
+	<File name="src/main.c" open="1" top="0" tabpos="1">
 		<Cursor position="13797" topLine="247" />
 	</File>
 	<File name="src/oui.h" open="0" top="0" tabpos="0">
 		<Cursor position="888" topLine="0" />
 	</File>
-	<File name="src/plugin.c" open="1" top="0" tabpos="29">
+	<File name="src/plugin.c" open="1" top="0" tabpos="28">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="src/plugin.h" open="0" top="0" tabpos="0">
@@ -130,13 +130,13 @@
 	<File name="src/profile.c" open="0" top="0" tabpos="0">
 		<Cursor position="1128" topLine="21" />
 	</File>
-	<File name="src/rfkill.c" open="1" top="0" tabpos="26">
+	<File name="src/rfkill.c" open="1" top="0" tabpos="25">
 		<Cursor position="1330" topLine="38" />
 	</File>
-	<File name="src/sdp-client.c" open="1" top="0" tabpos="16">
+	<File name="src/sdp-client.c" open="1" top="0" tabpos="15">
 		<Cursor position="1003" topLine="38" />
 	</File>
-	<File name="src/sdp-xml.c" open="1" top="0" tabpos="9">
+	<File name="src/sdp-xml.c" open="1" top="0" tabpos="8">
 		<Cursor position="1117" topLine="89" />
 	</File>
 	<File name="src/sdp-xml.h" open="0" top="0" tabpos="0">
@@ -157,22 +157,22 @@
 	<File name="src/sdpd.h" open="0" top="0" tabpos="0">
 		<Cursor position="1095" topLine="11" />
 	</File>
-	<File name="src/service.c" open="1" top="0" tabpos="18">
+	<File name="src/service.c" open="1" top="0" tabpos="17">
 		<Cursor position="1121" topLine="109" />
 	</File>
-	<File name="src/shared/hci.c" open="1" top="0" tabpos="24">
+	<File name="src/shared/hci.c" open="1" top="0" tabpos="23">
 		<Cursor position="0" topLine="156" />
 	</File>
 	<File name="src/shared/hciemu.c" open="0" top="0" tabpos="0">
 		<Cursor position="3297" topLine="124" />
 	</File>
-	<File name="src/shared/io-mainloop.c" open="1" top="0" tabpos="27">
+	<File name="src/shared/io-mainloop.c" open="1" top="0" tabpos="26">
 		<Cursor position="5130" topLine="245" />
 	</File>
-	<File name="src/shared/mgmt.c" open="1" top="0" tabpos="4">
+	<File name="src/shared/mgmt.c" open="1" top="0" tabpos="3">
 		<Cursor position="4881" topLine="198" />
 	</File>
-	<File name="src/shared/pcap.c" open="1" top="0" tabpos="25">
+	<File name="src/shared/pcap.c" open="1" top="0" tabpos="24">
 		<Cursor position="0" topLine="72" />
 	</File>
 	<File name="src/shared/queue.c" open="0" top="0" tabpos="0">
@@ -181,13 +181,13 @@
 	<File name="src/shared/timeout-mainloop.c" open="0" top="0" tabpos="0">
 		<Cursor position="1398" topLine="42" />
 	</File>
-	<File name="src/storage.c" open="1" top="0" tabpos="19">
+	<File name="src/storage.c" open="1" top="0" tabpos="18">
 		<Cursor position="1228" topLine="100" />
 	</File>
-	<File name="src/systemd.c" open="1" top="0" tabpos="17">
+	<File name="src/systemd.c" open="1" top="0" tabpos="16">
 		<Cursor position="0" topLine="30" />
 	</File>
-	<File name="src/textfile.c" open="1" top="1" tabpos="20">
+	<File name="src/textfile.c" open="1" top="0" tabpos="19">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="src/uuid-helper.c" open="0" top="0" tabpos="0">

@@ -1,0 +1,7 @@
+package org.bluez.dbus;
+
+import DBusInterface;
+
+public class ObjectManager extends DBusInterface {
+
+}

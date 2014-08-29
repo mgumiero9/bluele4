@@ -1,0 +1,111 @@
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
+
+import org.bluez.Adapter1;
+import org.bluez.Device1;
+import org.bluez.HeartRateManager1;
+import org.freedesktop.DBus;
+import org.freedesktop.dbus.DBusConnection;
+import org.freedesktop.dbus.exceptions.DBusException;
+
+
+public class TesteDBUS {
+	
+	public static void main(String [] args)
+	{
+		DBusConnection conn;
+		try {
+			conn = DBusConnection.getConnection(DBusConnection.SYSTEM);
+			DBus dbus = conn.getRemoteObject("org.freedesktop.DBus", "/org/freedesktop/DBus", DBus.class);
+			String[] names = dbus.ListNames();
+			for (String s: names) {
+				System.out.print(s);
+				System.out.println();
+			}
+			Adapter1 adp = null;
+			try
+			{
+				adp = conn.getRemoteObject("org.bluez", "/org/bluez/hci1", Adapter1.class);
+				
+			} catch (Exception De) {  
+				System.out.println("Interface Error");
+				System.out.println(De);
+		         System.exit(1);  
+			}
+			
+			System.out.println("Get Adapter OK " + adp);
+			adp.StartDiscovery();
+			adp.StopDiscovery();
+			//device.Connect();
+			
+			HeartRateManager1 hrm = null;
+			//hrm.RegisterWatcher(d);
+			
+			//device.Connect();
+			
+			
+			
+			
+			
+			
+			//base.GetManagedObjects();
+			
+			/*
+			System.out.println("Stopping Discovery");
+			try
+			{
+				adp.StopDiscovery();
+			}catch (DBusExecutionException Dee) {
+				System.out.println("Execution Error");
+				System.out.println(Dee);
+			}catch (Exception De) {  
+				System.out.println("Error StartDiscovery");
+				System.out.println(De);
+				System.exit(1);  
+			}
+			*/
+			conn.disconnect();
+		} catch (DBusException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	
+/*		ObjectManager om = null;
+		try {
+			om = conn.getRemoteObject("org.bluez", "/", ObjectManager.class);
+		} catch (DBusException e3) {
+			// TODO Auto-generated catch block
+			System.out.print("ObjectManager");
+			e3.printStackTrace();
+		}
+		Map<Path,DBusInterface> l = om.GetManagedObjects();
+		
+		System.out.println("Remote Peer OK : " + om);
+	*/	
+		/*
+		Device1 device = null;
+		
+		try {
+			device = conn.getRemoteObject("org.bluez", "/org/bluez/hci1/dev_00_18_8C_30_E6_3C", Device1.class);
+		} catch (DBusException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		*/
+		//System.out.println("Device : "+ device.toString());		
+		
+		
+		
+	}
+	public static void test()
+	{
+		System.out.println("Chegou\n");
+	}
+}
+
+

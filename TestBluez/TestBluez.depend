@@ -1,6 +1,11 @@
 # depslib dependency file v1.0
-1408831450 source:/home/asantos/git/BlueLE/TestBluez/main.cpp
+1409174320 source:/home/asantos/git/BlueLE/TestBluez/main.cpp
 	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<sys/types.h>
+	<unistd.h>
+	<time.h>
 	<gio/gio.h>
 
 1357747355 /usr/include/glib-2.0/gio/gio.h

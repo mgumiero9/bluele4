@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,10 +16,11 @@ on_name_appeared (GDBusConnection *connection,
                   const gchar     *name_owner,
                   gpointer         user_data)
 {
-  gint fd;
-  GError *error;
+    gint fd;
+    GError *error;
+    printf("OK\n");
 
-  error = NULL;
+    error = NULL;
 }
 
 static void
@@ -40,7 +42,7 @@ main (int argc, char *argv[])
 
   g_type_init ();
 
-  watcher_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
+  watcher_id = g_bus_watch_name (G_BUS_TYPE_SYSTEM,
                                  "org.bluez",
                                  G_BUS_NAME_WATCHER_FLAGS_NONE,
                                  on_name_appeared,
