@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/home/asantos/dev/adt-bundle-linux-x86_64-20140702/workspace/.metadata/.plugins/org.eclipse.jdt.core
+854741574.index
+24278257.index
+27878470.index

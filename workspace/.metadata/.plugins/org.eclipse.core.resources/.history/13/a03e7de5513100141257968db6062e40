@@ -1,0 +1,8 @@
+package com.example.teste1;
+
+import android.bluetooth.BluetoothProfile;
+
+public class Bluetooth_CDCDevice implements BluetoothProfile {
+	
+	
+}
