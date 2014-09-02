@@ -9,3 +9,11 @@
 1409600334203	Rename field 'button1'
 1409600382690	Extracts string 'Disconnect' into R.string.disconnect
 1409617785765	Extracts string 'Notify' into R.string.notify
+1409621084152	Remove Container
+1409622717091	Change Widget Type
+1409622887190	Remove Container
+1409623699381	Extract local variable 'inflate'
+1409625207820	Delete element
+1409627113628	Extracts string 'null' into R.string.Discovery
+1409627142696	Extracts string 'null' into R.string.discovery_menu
+1409629331726	Extract local variable 'itemAtPosition'

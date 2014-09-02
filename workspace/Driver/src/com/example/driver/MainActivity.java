@@ -1,10 +1,11 @@
 package com.example.driver;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import android.app.Activity;
 import android.app.Fragment;
+import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
@@ -19,26 +20,50 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.app.Service;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
-public class MainActivity extends Activity{
+public class MainActivity extends ListActivity{
 
 	private static final int REQUEST_ENABLE_BT = 0;
 	private static MainDriver mainDriver = new MainDriver();
 	private static String address = null;
+	protected BluetoothAdapter mBluetoothAdapter;
 
+	ArrayList<Map<String, String>> list;
+	protected SimpleAdapter adapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
-		
+		 super.onCreate(savedInstanceState);
+		    list = buildData();
+		    String[] from = { "Address", "Name", "Value1", "Value2"};
+		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2};
+
+		    adapter = new SimpleAdapter(this, list, R.layout.row, from, to);
+		    setListAdapter(adapter);
+			final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+			mBluetoothAdapter = bluetoothManager.getAdapter();
+			mainDriver.init(mBluetoothAdapter, mainDriverHandler);
 	}
 
+	private ArrayList<Map<String, String>> buildData() {
+		ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		list.add(putData("Android", new String[] {"q","1","0"}));
+		list.add(putData("Windows7", new String[] {"q","1","0"}));
+		list.add(putData("iPhone", new String[] {"q","1","0"}));
+		return list;
+	}
+
+	private HashMap<String, String> putData(String address, String[] purpose) {
+		HashMap<String, String> item = new HashMap<String, String>();
+		item.put("Address", address);
+		item.put("Name", purpose[0]);
+		item.put("Value1", purpose[1]);
+		item.put("Value2", purpose[2]);
+		return item;
+	}
+		  
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -55,95 +80,94 @@ public class MainActivity extends Activity{
 		if (id == R.id.action_settings) {
 			return true;
 		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
-	}
-	
-	/* Start Discovery
-	 * Some conditions must be verified : Bluetooth enabled and OS Capability
-	 * 
-	 */
-	public void startDiscovery(View view) {
-		Button local = (Button)findViewById(R.id.btnStartDiscovery);
-		if (local.getText().equals("Start")) {
+		if (id == R.id.action_discovery) {
 			// Initializes Bluetooth adapter.
-			final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-			BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
 			if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
 			    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 			}
 			else {
 				Log.d("MAIN_THREAD", "BtAdapter Enabled");
-				mainDriver.init(mBluetoothAdapter, mainDriverHandler);
 				mainDriver.startDiscovery();
-				local.setText("Stop");
 			}
-		} else {
-			mainDriver.stopDiscovery();
-			local.setText("Start");
 		}
+		return super.onOptionsItemSelected(item);
 	}
 	
-	public void connectDevice(View view) {
-		Log.d("MAIN_THREAD", "Trying connect to " + address);
-		mainDriver.connect(address);
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		@SuppressWarnings("unchecked")
+		Map<String, String> itemAtPosition = (Map<String, String>) l.getItemAtPosition(position);
+		Log.d("MAIN_THREAD", "Trying connect to " + itemAtPosition.get("Address"));
+		mainDriver.connect(itemAtPosition.get("Address"));
 	}
-
+	
+	
 	public void disconnectDevice(View view) {
 		Log.d("MAIN_THREAD", "Trying disconnect to " + address);
 		mainDriver.disconnect(address);
 	}
 	
-	public void notify(View view) {
-		Log.d("MAIN_THREAD", "Trying set notification " + address);
-		mainDriver.setNotification(address);
-	}
-
-	
 	public Handler mainDriverHandler = new Handler(new Handler.Callback() {
 		public boolean handleMessage(Message msg) {
-			if (msg.what == 115) {
+			if (msg.what == mainDriver.WARNING_STOP_DISCOVERY) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Button local = (Button)findViewById(R.id.btnStartDiscovery);
-						local.setText("Start");
+						//Button local = (Button)findViewById(R.id.btnStartDiscovery);
+						//local.setText("Start");
 					}
 				});
 				return true;
 			}
-			if (msg.what == 1) {
+			if (msg.what == mainDriver.WARNING_FIND_DEVICE) {
 				final String localmsg = (String) msg.obj;
-				Log.d("HANDLER", "FOUND " + localmsg);
 				address = localmsg.substring(0, 17);
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						TextView local = (TextView)findViewById(R.id.lstInfo);
-						local.append(localmsg + "\n");
+						Map<String, String> newMap = new HashMap<String, String>();
+						newMap.put("Address", localmsg.substring(0,17));
+						newMap.put("Name", localmsg.substring(17));
+						newMap.put("Value1", "?");
+						newMap.put("Value2", "?");
+						list.add(newMap);
+						adapter.notifyDataSetChanged();
+						//ListView local = (ListView)findViewById(R.id.listView1);
+						//local.addView(newText);
+						
+					}
+				});
+				return true;
+			}
+			if (msg.what == mainDriver.WARNING_NEW_DATA) {
+				
+				final String address = (String) msg.obj;
+				Log.d("MAIN_THREAD", "Message arrived " + address);
+				final String value1 = String.valueOf(msg.arg1);
+				final String value2 = String.valueOf(msg.arg2);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						for (Map<String, String> element : list) {
+							if (element.get("Address").equals(address)) {
+								Log.d("MAIN_THREAD", "Item Found");				
+								element.put("Value1", value1);
+								element.put("Value2", value2);
+								adapter.notifyDataSetChanged();
+								return;
+							}
+						}
+						
+						//ListView local = (ListView)findViewById(R.id.listView1);
+						//local.addView(newText);
+						
 					}
 				});
 				return true;
 			}
 			
-			//Log.d("CallBack", msg.getData().toString());
 			return false;
 		}
 	});
