@@ -1,0 +1,7 @@
+package com.example.driver;
+
+import BluetoothProfile;
+
+public class BluetoothCDC extends BluetoothProfile {
+
+}

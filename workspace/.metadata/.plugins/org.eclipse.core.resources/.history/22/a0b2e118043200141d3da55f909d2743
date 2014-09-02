@@ -1,0 +1,9 @@
+package com.example.driver;
+
+import android.bluetooth.BluetoothGatt;
+
+public class BtDevice {
+	public BluetoothGatt bluetoothGatt;
+	public int state;
+
+}

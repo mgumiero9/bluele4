@@ -46,7 +46,8 @@ public class MainActivity extends Activity {
 		if(id == R.id.exit_settings) {
 			finish();
 		}
-			
+		
+		
 		return super.onOptionsItemSelected(item);
 	}
 }

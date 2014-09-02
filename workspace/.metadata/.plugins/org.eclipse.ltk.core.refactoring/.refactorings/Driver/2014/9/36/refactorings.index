@@ -1,0 +1,11 @@
+1409579608618	Extracts string 'Start Discovery' into R.string.start_discovery
+1409579624088	Rename field 'button1'
+1409580803495	Rename type 'mainDriver'
+1409580839130	Move compilation unit
+1409584161168	Rename field 'editText1'
+1409585595458	Remove Container
+1409585611860	Extracts string 'Connect' into R.string.connect
+1409585692454	Rename field 'button1'
+1409600334203	Rename field 'button1'
+1409600382690	Extracts string 'Disconnect' into R.string.disconnect
+1409617785765	Extracts string 'Notify' into R.string.notify

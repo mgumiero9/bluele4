@@ -176,7 +176,7 @@ Compile bluez in Debian/Ubuntu
 ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd
 
  
-modprobe vboxnetflt
-modprobe vboxnetadp
-modprobe vboxdrv
+modprobe vboxnetflt && modprobe vboxnetadp && modprobe vboxdrv
 Adicionar vbox0
+
+Douglas, Marcelo, 

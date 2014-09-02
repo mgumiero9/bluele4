@@ -1,0 +1,16 @@
+package com.example.driver;
+
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+
+public class BtDevice {
+	public BluetoothDevice device;
+	public BluetoothGatt gatt;
+	public int state;
+	public BtDevice(BluetoothGatt bluetoothGatt, int state) {
+		this.gatt = bluetoothGatt;
+		this.state = state;
+		// TODO Auto-generated constructor stub
+	}
+
+}
