@@ -1,0 +1,44 @@
+package com.example.driver;
+
+import java.util.LinkedList;
+
+import com.example.driver.MainDriver.OPERATION;
+import com.example.driver.MainDriver.ProcessIO;
+
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+
+public class BtDevice {
+	public BluetoothDevice device;
+	public BluetoothGatt gatt = null;
+	public int state = 0;
+	public int init_state = 0;
+
+	public enum OPERATION { READ, WRITE, SET_NOT};
+	class ProcessIO {
+		public ProcessIO(BluetoothGatt gatt,
+				BluetoothGattCharacteristic characteristic,
+				BluetoothGattDescriptor descriptor, OPERATION operation) {
+			this.gatt = gatt;
+			this.characteristic = characteristic;
+			this.descriptor = descriptor;
+			this.operation = operation;
+		}
+		public BluetoothGatt gatt;
+		public BluetoothGattCharacteristic characteristic;
+		public BluetoothGattDescriptor descriptor;
+		public OPERATION operation;
+	};
+	LinkedList<ProcessIO> operations = new LinkedList<MainDriver.ProcessIO>();
+	
+	public BtDevice(BluetoothDevice device, int state) {
+		this.device = device;
+		this.state = state;
+		// TODO Auto-generated constructor stub
+	}
+	
+}

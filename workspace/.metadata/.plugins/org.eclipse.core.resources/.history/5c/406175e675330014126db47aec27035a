@@ -1,0 +1,75 @@
+package com.example.driver;
+
+import java.util.LinkedList;
+import java.util.UUID;
+
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.util.Log;
+
+public class BtDevice {
+	public BluetoothDevice device;
+	public BluetoothGatt gatt = null;
+	public int state = 0;
+	public int init_state = 0;
+
+	public enum OPERATION { READ, WRITE, SET_NOT};
+	public class ProcessIO {
+		public ProcessIO( BluetoothGattCharacteristic characteristic,
+				BluetoothGattDescriptor descriptor, OPERATION operation) {
+			this.characteristic = characteristic;
+			this.descriptor = descriptor;
+			this.operation = operation;
+		}
+		public BluetoothGattCharacteristic characteristic;
+		public BluetoothGattDescriptor descriptor;
+		public OPERATION operation;
+	};
+	public void addOperation(BluetoothGattCharacteristic characteristic,
+				BluetoothGattDescriptor descriptor, OPERATION operation) {
+		operations.add(new ProcessIO(characteristic, descriptor, operation));
+	}
+	
+	final UUID UUID_CLIENT_CHARACTERISTICS = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");	// Descriptor
+	
+    public boolean setNotification(String address, BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+		Log.d("BT DEVICE", "Setting Notification");
+		gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
+		BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(UUID_CLIENT_CHARACTERISTICS);
+		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+		addOperation(bluetoothGattCharacteristic, descriptor, BtDevice.OPERATION.WRITE);
+    }
+	
+	
+	public void execNextOperation() {
+    	ProcessIO newProcess = operations.poll();
+    	if (newProcess.operation == OPERATION.READ) {
+    		if (newProcess.descriptor != null) {
+    			gatt.readDescriptor(newProcess.descriptor);
+    		} else {
+    			gatt.readCharacteristic(newProcess.characteristic);
+    		}
+    	} else if (newProcess.operation == OPERATION.WRITE){
+    		if (newProcess.descriptor != null) {
+    			gatt.writeDescriptor(newProcess.descriptor);
+    		} else {
+    			gatt.writeCharacteristic(newProcess.characteristic);
+    		}
+    	} else if (newProcess.operation == OPERATION.SET_NOT) {
+    		setNotification(gatt.getDevice().getAddress(), newProcess.characteristic);
+    	}
+
+	}
+	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
+	
+	public BtDevice(BluetoothDevice device, int state) {
+		this.device = device;
+		this.state = state;
+		// TODO Auto-generated constructor stub
+	}
+	
+}

@@ -1,4 +1,5 @@
 package com.example.driver;
+import java.nio.ByteOrder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -26,6 +27,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 
@@ -34,7 +37,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 	final int WARNING_STOP_DISCOVERY = 0x01;
 	final int WARNING_FIND_DEVICE = 0x02;
 	final int WARNING_NEW_DATA = 0x03;
-	
+	final int WARNING_CONNECTED = 0x04;
+	final int WARNING_DISCONNECTED = 0x04;	
 	
 	// Data for CDC Device
 	final UUID UUID_SERVICE_GENERIC_ACCESS = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
@@ -52,7 +56,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final UUID UUID_MANUFACTURER = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"); // utf8s
 		final UUID UUID_PNP_ID = UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb");		// uint8/16
 		
+	final UUID UUID_SERVICE_RUNNING_SPEED = UUID.fromString("00001814-0000-1000-8000-00805f9b34fb");
+		final UUID UUID_RUNNING_FEATURE = UUID.fromString("00002a54-0000-1000-8000-00805f9b34fb"); // 16bit bin
+		final UUID UUID_RUNNING_SPEED = UUID.fromString("00002a53-0000-1000-8000-00805f9b34fb"); // 16bit bin
 	
+		
 		
 		// final UUID UUID_MODEL = UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"); // utf8s
 	final UUID UUID_SERVICE_BATTERY = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
@@ -74,27 +82,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 	final UUID UUID_CERTIFICATION = UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb");
 	final UUID UUID_MODEL = UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb");
 		
-	public enum OPERATION { READ, WRITE, SET_NOT};
-	class ProcessIO {
-		public ProcessIO(BluetoothGatt gatt,
-				BluetoothGattCharacteristic characteristic,
-				BluetoothGattDescriptor descriptor, OPERATION operation) {
-			this.gatt = gatt;
-			this.characteristic = characteristic;
-			this.descriptor = descriptor;
-			this.operation = operation;
-		}
-		public BluetoothGatt gatt;
-		public BluetoothGattCharacteristic characteristic;
-		public BluetoothGattDescriptor descriptor;
-		public OPERATION operation;
-	};
-	LinkedList<ProcessIO> operations = new LinkedList<MainDriver.ProcessIO>();
-	 
 	private static final String MAIN_DRIVER = "MAIN DRIVER";
 	private static final long SCAN_PERIOD = 10000;
 	private BluetoothAdapter mBluetoothAdapter = null;
-	private Handler mHandler;
+	private Messenger mMsgHandler;
+	public Handler mHandler = new Handler();
 	private Handler mDiscoveryHandler = new Handler();
 	private List<BtDevice> lstDevices = new ArrayList<BtDevice>();
 	
@@ -108,21 +100,13 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 	};
 	
-	private Runnable ReadWriteTimeout = new Runnable() {
-		@Override
-		public void run() {
-			Log.d(MAIN_DRIVER, "Read/Write Operation Timeout");
-			NextOperation();
-		}
-	};
-	
 	/*
 	 * Register callback and interface (probably on)
 	 */
-	public boolean init(BluetoothAdapter adapter, Handler handler) {
+	public boolean init(BluetoothAdapter adapter, Messenger messenger) {
 		mBluetoothAdapter = adapter;
-		mHandler = handler;
-		return false;
+		mMsgHandler = messenger;
+		return true;
 	}
 	
 	/*
@@ -163,54 +147,44 @@ public class MainDriver extends Service implements BluetoothProfile {
 					Log.d(MAIN_DRIVER, "New Device Found");
 					lstDevices.add(new BtDevice(device, STATE_DISCONNECTED));
 					Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
-					mHandler.sendMessage(Message.obtain(mHandler, WARNING_FIND_DEVICE, 
-							device.getAddress() + " : " + device.getName() + "(" + device.getType() + ")"));
+
+					try {
+						mMsgHandler.send(Message.obtain(null, WARNING_FIND_DEVICE, 
+								device.getAddress() + " : " + device.getName() + "(" + device.getType() + ")"));
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
 			};
 			
 	public boolean disconnect(String address) {
-		for (BtDevice btDevice : lstDevices) {
-			if (btDevice.device.getAddress().equals(address)) {
-				btDevice.gatt.disconnect();
-				btDevice.state = STATE_DISCONNECTING;
-				Log.d(MAIN_DRIVER, "Disconnecting " + address);
-				return true;
-			}
+		BtDevice btDevice = findDevice(address);
+		if ((btDevice != null) && (btDevice.state != STATE_DISCONNECTED) && (btDevice.state != STATE_DISCONNECTING)) {
+			btDevice.gatt.disconnect();
+			btDevice.state = STATE_DISCONNECTING;
+			Log.d(MAIN_DRIVER, "Disconnecting " + address);
+			return true;
 		}
 		return false;
 	}
 
 	public boolean connect(String address) {
 		stopDiscovery();
-		for (BtDevice btDevice : lstDevices) {
-			if (btDevice.device.getAddress().equals(address)) {
-				if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
-					btDevice.gatt = btDevice.device.connectGatt(this, true, mGattCallback);
-					btDevice.state = STATE_CONNECTING;
-					Log.d(MAIN_DRIVER, "Connecting " + address);
-					return true;
-				}
+		Log.d(MAIN_DRIVER, "Verifying " + address);
+		BtDevice btDevice = findDevice(address);
+		if (btDevice != null) {
+			if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
+				btDevice.gatt = btDevice.device.connectGatt(this, true, mGattCallback);
+				btDevice.state = STATE_CONNECTING;
+				Log.d(MAIN_DRIVER, "Connecting " + address);
+				return true;
 			}
 		}
 		return false;
 	}
 
-    public boolean setNotification(String address, BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-		for (BtDevice btDevice : lstDevices) {
-			if (btDevice.device.getAddress().equals(address)) {
-				Log.d(MAIN_DRIVER, "Setting Notification");
-				btDevice.gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
-				BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(UUID_CLIENT_CHARACTERISTICS);
-				descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-				operations.add(new ProcessIO(btDevice.gatt, bluetoothGattCharacteristic, descriptor, OPERATION.WRITE));
-				return true;
-			}
-		}
-		return false;
-    }
-
-	
 	final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
     		
 		// When the device is connected for the first time, scan for services
@@ -219,36 +193,40 @@ public class MainDriver extends Service implements BluetoothProfile {
         public void onConnectionStateChange(BluetoothGatt gatt, int status,
                 int newState) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
-				for (BtDevice btDevice : lstDevices) {
-					if (btDevice.gatt.equals(gatt)) {
-						btDevice.state = newState;
-						// DEBUG
-						switch(newState) {
-						case STATE_CONNECTED:
-							Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTED");
-							break;
-						case STATE_DISCONNECTED:
-							Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTED");
-							break;
-						case STATE_DISCONNECTING:
-							Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTING");
-							break;
-						case STATE_CONNECTING:
-							Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTING");
-							break;
-						}
-						// DEBUG
-						if (newState == STATE_CONNECTED) {
-							//if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
-								Log.d(MAIN_DRIVER, "Getting Services");
-								btDevice.gatt.discoverServices();
-							//} else {
-							//	Log.d(MAIN_DRIVER, "Services Already Updated");
-							//	listServices(gatt, true);
-							//}
-						}
-						return;
+				BtDevice btDevice = findDevice(gatt.getDevice().getAddress());
+				if (btDevice != null) {
+					btDevice.state = newState;
+					// DEBUG
+					switch(newState) {
+					case STATE_CONNECTED:
+						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTED");
+						break;
+					case STATE_DISCONNECTED:
+						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTED");
+						break;
+					case STATE_DISCONNECTING:
+						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTING");
+						btDevice.operations.clear();
+						break;
+					case STATE_CONNECTING:
+						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTING");
+						btDevice.operations.clear();
+						break;
 					}
+					// DEBUG
+					if (newState == STATE_CONNECTED) {
+						//if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
+							Log.d(MAIN_DRIVER, "Getting Services");
+							btDevice.gatt.discoverServices();
+							mHandler.sendMessage(Message.obtain(null, WARNING_CONNECTED, gatt.getDevice().getAddress()));
+						//} else {
+						//	Log.d(MAIN_DRIVER, "Services Already Updated");
+						//	listServices(gatt, true);
+						//}
+					} else {
+						mHandler.sendMessage(Message.obtain(null, WARNING_DISCONNECTED, gatt.getDevice().getAddress()));
+					}
+					return;
 				}
 			}
 			else
@@ -261,13 +239,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 
         	if (status == BluetoothGatt.GATT_SUCCESS) {
     			Log.d(MAIN_DRIVER, "SERVICES DISCOVERED");
-    			listServices(gatt, true);
+				listServices(gatt, true);
             } else {
                 Log.w(MAIN_DRIVER, "onServicesDiscovered received: " + status);
             }
         }
-
-        
         
         public void onCharacteristicWrite(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic, int status) {
@@ -302,12 +278,12 @@ public class MainDriver extends Service implements BluetoothProfile {
             	characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0) + " " +
             	characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 0) + " (" + characteristic.getProperties() + ")";
             	}
-            	Log.d(MAIN_DRIVER, "Read " + msg);
+            	Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Read " + msg);
             } else {
-            	Log.d(MAIN_DRIVER, "Error on Read Characteristic " +  characteristic.getUuid().toString());
+            	Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Error Read Characteristic " +  characteristic.getUuid().toString());
             }
             
-            NextOperation();
+            NextOperation(findDevice(gatt.getDevice().getAddress()));
             /*
             if (index < lstCharacteristics.size()) {
 	            if (lstCharacteristics.size() > 1) {
@@ -337,9 +313,24 @@ public class MainDriver extends Service implements BluetoothProfile {
 					Log.d(MAIN_DRIVER, "Crank Val=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					pos = pos + 2;
 					Log.d(MAIN_DRIVER, "Crank TS=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
-					
 				}
-			
+			}
+			if (characteristic.getUuid().equals(UUID_RUNNING_SPEED)) {
+				Log.d(MAIN_DRIVER, "Read size=" + characteristic.getValue().length);
+				Log.d(MAIN_DRIVER, "Read flag=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0));
+				int pos = 1;
+				int instantaneousSpeed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos);
+				pos = pos + 2;
+				int instantaneousCadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, pos);
+				pos++;
+				mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, instantaneousSpeed, instantaneousCadence, gatt.getDevice().getAddress()));
+				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x01) == 0x01) {
+					Log.d(MAIN_DRIVER, "Read Avanço=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
+					pos = pos + 2;
+				}
+				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x02) == 0x02) {
+					Log.d(MAIN_DRIVER, "Read Total Distance=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, pos));
+				}
 			}
 		}
 		
@@ -347,9 +338,9 @@ public class MainDriver extends Service implements BluetoothProfile {
                 int status) {
 	    	int value = descriptor.getValue()[0] + descriptor.getValue()[1] * 256;
 	    	if(descriptor.getUuid().equals(UUID_CLIENT_CHARACTERISTICS)) {
-	    		Log.d(MAIN_DRIVER, "Read " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Descriptor=" + value + "; ");
+	    		Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Read " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Descriptor=" + value + "; ");
 	    	} else {
-	    		Log.d(MAIN_DRIVER, "Read " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Descriptor=" + descriptor.getUuid().toString() + "=" + value + "; ");
+	    		Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Read " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Descriptor=" + descriptor.getUuid().toString() + "=" + value + "; ");
 	    	}
 	    }
 	    
@@ -358,9 +349,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    	
 	    	if(descriptor.getUuid().equals(UUID_CLIENT_CHARACTERISTICS)) {
 	    		int value = descriptor.getValue()[0] + descriptor.getValue()[1] * 256;
-	    		Log.d(MAIN_DRIVER, "Cliente Characteristics from " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Read=" + value + " ("+ status + "); ");
+	    		Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Cliente Characteristics from " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Read=" + value + " ("+ status + "); ");
 	    	}
-	    	NextOperation();
+	    	NextOperation(findDevice(gatt.getDevice().getAddress()));
 	    }
 	    
 	    /**
@@ -380,24 +371,26 @@ public class MainDriver extends Service implements BluetoothProfile {
 	};
 	
     protected void listServices(BluetoothGatt gatt, boolean update) {
+    	BtDevice btDevice = findDevice(gatt.getDevice().getAddress());
+    	if (btDevice == null)
+    		return;
 		for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
 			Log.d(MAIN_DRIVER, "Found Service " + uuidToString(bluetoothGattService.getUuid()) + "(" + bluetoothGattService.getType() +")");
-    			
 			for(BluetoothGattCharacteristic bluetoothGattCharacteristic: bluetoothGattService.getCharacteristics()) {
 				if(bluetoothGattCharacteristic.getDescriptors().isEmpty()) {
 					Log.d(MAIN_DRIVER, "Characteristic:" + uuidToString(bluetoothGattCharacteristic.getUuid()) + "(" + bluetoothGattCharacteristic.getPermissions() + ")");
 					//if ((update) && ((bluetoothGattCharacteristic.getPermissions() & BluetoothGattCharacteristic.PERMISSION_READ) == BluetoothGattCharacteristic.PERMISSION_READ)) {
 					if (update) {
-						operations.add(new ProcessIO(gatt, bluetoothGattCharacteristic, null, OPERATION.READ));
+						btDevice.addOperation(bluetoothGattCharacteristic, null, BtDevice.OPERATION.READ);
 					}
 				} else {
 					// Dont work for CSC but test for scale
-					operations.add(new ProcessIO(gatt, bluetoothGattCharacteristic, null, OPERATION.READ));
+					btDevice.addOperation(bluetoothGattCharacteristic, null, BtDevice.OPERATION.READ);
     				for(BluetoothGattDescriptor bluetoothGattDescriptor: bluetoothGattCharacteristic.getDescriptors()) {
     					Log.d(MAIN_DRIVER, "Characteristic:" + uuidToString(bluetoothGattCharacteristic.getUuid()) + " Descriptor:" + uuidToString(bluetoothGattDescriptor.getUuid())  + "(" + bluetoothGattDescriptor.getPermissions() + ")");
     					//if ((update) && ((bluetoothGattDescriptor.getPermissions() & BluetoothGattDescriptor.PERMISSION_READ) == BluetoothGattDescriptor.PERMISSION_READ)) {
     					if (update) {
-    						operations.add(new ProcessIO(gatt, bluetoothGattCharacteristic, bluetoothGattDescriptor, OPERATION.READ));
+    						btDevice.addOperation(bluetoothGattCharacteristic, bluetoothGattDescriptor, BtDevice.OPERATION.READ);
     					}
     				}
 				}
@@ -411,37 +404,18 @@ public class MainDriver extends Service implements BluetoothProfile {
 /*				if ((bluetoothGattCharacteristic.getUuid().equals(UUID_CSC_MEASUREMENT)) ||
 						(bluetoothGattCharacteristic.getUuid().equals(UUID_CONTROL_POINT)) ||
 						(bluetoothGattCharacteristic.getUuid().equals(UUID_BATTERY_LEVEL))) { */
-					operations.add(new ProcessIO(gatt, bluetoothGattCharacteristic, null, OPERATION.SET_NOT));
+					btDevice.addOperation(bluetoothGattCharacteristic, null, BtDevice.OPERATION.SET_NOT);
 				}
 			}
 		}
-		NextOperation();
+		NextOperation(btDevice);
     }
 	
-
-	public void NextOperation() {
-		mHandler.removeCallbacks(ReadWriteTimeout);
+	public void NextOperation(BtDevice btDevice) {
+		if(btDevice == null)
+			return;
 		Log.d(MAIN_DRIVER, "Issuing next operation");
-        if (!operations.isEmpty())
-        {
-        	ProcessIO newProcess = operations.poll();
-        	if (newProcess.operation == OPERATION.READ) {
-        		if (newProcess.descriptor != null) {
-        			newProcess.gatt.readDescriptor(newProcess.descriptor);
-        		} else {
-        			newProcess.gatt.readCharacteristic(newProcess.characteristic);
-        		}
-        	} else if (newProcess.operation == OPERATION.WRITE){
-        		if (newProcess.descriptor != null) {
-        			newProcess.gatt.writeDescriptor(newProcess.descriptor);
-        		} else {
-        			newProcess.gatt.writeCharacteristic(newProcess.characteristic);
-        		}
-        	} else if (newProcess.operation == OPERATION.SET_NOT) {
-        		setNotification(newProcess.gatt.getDevice().getAddress(), newProcess.characteristic);
-        	}
-            mHandler.postDelayed(ReadWriteTimeout, 3000);
-        }   
+		btDevice.execNextOperation();
 	}
 	
 
@@ -468,6 +442,15 @@ public class MainDriver extends Service implements BluetoothProfile {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	BtDevice findDevice(String address) {
+		for (BtDevice btDevice : lstDevices)
+			if (btDevice.device.getAddress().equals(address))
+				return btDevice;
+		return null;
+		
+	}
+	
 	
 	String uuidToString(UUID uuid) {
     	if (uuid.equals(UUID_DEVICE_NAME)) {
@@ -516,11 +499,15 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return "System ID";
 		} else if(uuid.equals(UUID_CERTIFICATION)) {
 			return "Regulatory Certification";
+		} else if((uuid.equals(UUID_RUNNING_SPEED)) || (uuid.equals(UUID_SERVICE_RUNNING_SPEED))) {
+			return "Running Speed";
+		} else if(uuid.equals(UUID_RUNNING_FEATURE)) {
+			return "Running Speed Feature";
 		} else if(uuid.equals(UUID_MODEL)) {
 			return "Model Number";
 	   	} else {
 	   		return uuid.toString();
 	   	}
 	}
-	
 }
+
