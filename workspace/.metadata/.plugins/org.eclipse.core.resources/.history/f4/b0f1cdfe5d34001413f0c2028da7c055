@@ -42,7 +42,7 @@ public class BtDevice {
 	public Runnable ConnectingTime = new Runnable() {
 		@Override
 		public void run() {
-			Log.e("BT DEVICE", "Connecting Operation Timeout on address " + gatt.getDevice().getAddress());
+			Log.e("BT DEVICE", "Connecting Operation Timeouton address " + gatt.getDevice().getAddress());
 			if (state == MainDriver.STATE_CONNECTING) {
 				state = MainDriver.STATE_DISCONNECTED;
 				gatt.disconnect();
