@@ -268,6 +268,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 						btDevice.operations.clear();
 						break;
 					}
+					
+					if ((newState == STATE_CONNECTED) || (newState == STATE_DISCONNECTED)) {
+						mHandler.removeCallbacks(btDevice.ConnectingTime);
+					}
+					
 					// DEBUG
 					if (newState == STATE_CONNECTED) {
 						//if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
