@@ -3,26 +3,26 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="302" key="DIALOG_WIDTH"/>
 		<item value="176" key="DIALOG_Y_ORIGIN"/>
-		<item value="412" key="DIALOG_HEIGHT"/>
 		<item value="651" key="DIALOG_X_ORIGIN"/>
+		<item value="412" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="ENABLE_" key="selection"/>
+		<item value="STATE_CONNECTING" key="selection"/>
 		<list key="findhistory">
-			<item value="ENABLE_"/>
-			<item value="setN"/>
-			<item value="listS"/>
-			<item value="list"/>
-			<item value="List"/>
-			<item value="setNo"/>
-			<item value="SET_NOT"/>
-			<item value="hell"/>
+			<item value="STATE_CONNECTING"/>
+			<item value="new Bt"/>
+			<item value="start"/>
+			<item value="Start"/>
+			<item value="mBluetoothAdapter"/>
+			<item value="mBl"/>
+			<item value="stopDisc&apos;"/>
+			<item value="stopDisc"/>
 		</list>
 		<list key="replacehistory">
 		</list>

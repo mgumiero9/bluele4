@@ -8,9 +8,11 @@ import android.app.Fragment;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,19 +32,44 @@ import android.widget.SimpleAdapter;
 public class MainActivity extends ListActivity{
 
 	private static final int REQUEST_ENABLE_BT = 0;
-	private static MainDriver mainDriver = new MainDriver();
+	private static MainDriver mainDriver;
 	private static String address = null;
-	protected BluetoothAdapter mBluetoothAdapter;
 
 	ArrayList<Map<String, String>> list;
-	protected SimpleAdapter adapter;
+	SimpleAdapter adapter;
 	
-	
-	class InComingHandler extends Handler {
-		@Override
-		public void handleMessage(Message msg) {
-			final String mAddress;
-			if (msg.what == mainDriver.WARNING_STOP_DISCOVERY) {
+	 // Code to manage Service lifecycle.
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+ 
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            mainDriver = ((MainDriver.LocalBinder) service).getService();
+            if (!mainDriver.initialize()) {
+                Log.d("MAIN_THREAD", "Unable to initialize Bluetooth");
+                finish();
+            }
+        }
+ 
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        	Log.d("MAIN_THREAD", "Service Disconnected");
+            mainDriver = null;
+        }
+    };	
+    
+    // Handles various events fired by the Service.
+    // ACTION_GATT_CONNECTED: connected to a GATT server.
+    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
+    //                        or notification operations.
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            Log.d("MAIN_THREAD", "Received Action:" + action);
+			//final String mAddress = intent.;
+			if (action.equals(mainDriver.WARNING_STOP_DISCOVERY)) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -52,20 +79,22 @@ public class MainActivity extends ListActivity{
 				});
 				return;
 			}
-			if (msg.what == mainDriver.WARNING_FIND_DEVICE) {
-				final String localmsg = (String) msg.obj;
-				mAddress = localmsg.substring(0, 17);
-				Log.d("MAIN ACT", "Finding " + mAddress);
+			if (action.equals(mainDriver.WARNING_FIND_DEVICE)) {
+				Log.d("MAIN_THREAD", "Find Device");
+				Map<String, String> newMap = new HashMap<String, String>();
+				newMap.put("Address", intent.getStringExtra("address").substring(0,17));
+				newMap.put("Name", intent.getStringExtra("address").substring(17));
+				newMap.put("Value1", "?");
+				newMap.put("Value2", "?");
+				list.add(newMap);
+				adapter.notifyDataSetChanged();
+				
+				//final String localmsg = (String) msg.obj;
+				//mAddress = localmsg.substring(0, 17);
+				//Log.d("MAIN ACT", "Finding " + mAddress);
 /*				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Map<String, String> newMap = new HashMap<String, String>();
-						newMap.put("Address", localmsg.substring(0,17));
-						newMap.put("Name", localmsg.substring(17));
-						newMap.put("Value1", "?");
-						newMap.put("Value2", "?");
-						list.add(newMap);
-						adapter.notifyDataSetChanged();
 						//ListView local = (ListView)findViewById(R.id.listView1);
 						//local.addView(newText);
 						
@@ -73,9 +102,10 @@ public class MainActivity extends ListActivity{
 				});*/
 				return;
 			}
-			if (msg.what == mainDriver.WARNING_NEW_DATA) {
-				mAddress = (String) msg.obj;
-				Log.d("MAIN_THREAD", "Message arrived " + mAddress); /*
+			if (action.equals(mainDriver.WARNING_NEW_DATA)) {
+				//mAddress = (String) msg.obj;
+				//Log.d("MAIN_THREAD", "Message arrived " + mAddress);
+				/*
 				final String value1 = String.valueOf(msg.arg1);
 				final String value2 = String.valueOf(msg.arg2);
 				runOnUiThread(new Runnable() {
@@ -99,8 +129,8 @@ public class MainActivity extends ListActivity{
 				return;
 			}
 			
-			if (msg.what == mainDriver.WARNING_CONNECTED) {
-				mAddress = (String) msg.obj;
+			if (action.equals(mainDriver.WARNING_CONNECTED)) {
+				//mAddress = (String) msg.obj;
 				/*
 				runOnUiThread(new Runnable() {
 					@Override
@@ -123,8 +153,8 @@ public class MainActivity extends ListActivity{
 				return;
 			}
 
-			if (msg.what == mainDriver.WARNING_DISCONNECTED) {
-				mAddress = (String) msg.obj;
+			if (action.equals(mainDriver.WARNING_DISCONNECTED)) {
+				//mAddress = (String) msg.obj;
 				/*runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -141,52 +171,10 @@ public class MainActivity extends ListActivity{
 				});*/
 				return;
 			}
-		};
-	};
-	
-	final Messenger msgHandler = new Messenger(new InComingHandler());
-	
-	Messenger mService = null;
-	
-	/**
-	 * Class for interacting with the main interface of the service.
-	 */
-	private ServiceConnection mConnection = new ServiceConnection() {
-	    public void onServiceConnected(ComponentName className,
-	            IBinder service) {
-	        // This is called when the connection with the service has been
-	        // established, giving us the service object we can use to
-	        // interact with the service.  We are communicating with our
-	        // service through an IDL interface, so get a client-side
-	        // representation of that from the raw service object.
-	        mService = new Messenger(service);
-	        
-			for (Map<String, String> element : list) {
-				if (element.get("Address").equals("SERVICE")) {
-					Log.d("MAIN_THREAD", "Item Found");				
-					element.put("Value1", "RUNNING");
-					element.put("Value2", "RUNNING");
-					adapter.notifyDataSetChanged();
-					return;
-				}
-			}
-
-	    }
-
-	    public void onServiceDisconnected(ComponentName className) {
-	        // This is called when the connection with the service has been
-	        // unexpectedly disconnected -- that is, its process crashed.
-	        mService = null;
-	    }
-
-		void doBindService() {
-		
-		}
-		
-		void doUnbindService() {
-	    }
-	};
-	
+        }
+    };
+        
+        
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -195,11 +183,22 @@ public class MainActivity extends ListActivity{
 		    String[] from = { "Address", "Name", "Value1", "Value2"};
 		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2};
 
+	        final Intent intent = getIntent();
+		    
 		    adapter = new SimpleAdapter(this, list, R.layout.row, from, to);
 		    setListAdapter(adapter);
-			final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-			mBluetoothAdapter = bluetoothManager.getAdapter();
-			mainDriver.init(mBluetoothAdapter, msgHandler);
+			//final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+			
+		    Intent mainDriverIntent = new Intent(this, MainDriver.class);
+	        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
+			
+			//mBluetoothAdapter = bluetoothManager.getAdapter();
+			//final Handler mHandler = new Handler(new Handler.Callback() {
+
+			//});
+
+			//mHandler.sendEmptyMessage(-1);
+			//mainDriver.init(mBluetoothAdapter, mHandler);
 	}
 
 	private ArrayList<Map<String, String>> buildData() {
@@ -234,14 +233,16 @@ public class MainActivity extends ListActivity{
 		}
 		if (id == R.id.action_discovery) {
 			// Initializes Bluetooth adapter.
-			if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-			    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}
-			else {
-				Log.d("MAIN_THREAD", "BtAdapter Enabled");
-				mainDriver.startDiscovery();
-			}
+			//if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+			    //Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			    //startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			//}
+			//else {
+			//	Log.d("MAIN_THREAD", "BtAdapter Enabled");
+			Log.d("MAIN_THREAD","Starting Discovery");
+			mainDriver.startDiscovery();
+				
+			//}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -261,5 +262,39 @@ public class MainActivity extends ListActivity{
 		mainDriver.disconnect(address);
 	}
 	
-		
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+//      if (mainDriver != null) {
+//            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+//            Log.d(TAG, "Connect request result=" + result);
+ //     }
+    }	
+	
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MainDriver.WARNING_CONNECTED);
+        intentFilter.addAction(MainDriver.WARNING_DISCONNECTED);
+        intentFilter.addAction(MainDriver.WARNING_FIND_DEVICE);
+        intentFilter.addAction(MainDriver.WARNING_NEW_DATA);
+        intentFilter.addAction(MainDriver.WARNING_STOP_DISCOVERY);
+        return intentFilter;
+    }    
+    
+	@Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mGattUpdateReceiver);
+    }
+ 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnection);
+        mainDriver = null;
+    }
+
+    
+    
 }

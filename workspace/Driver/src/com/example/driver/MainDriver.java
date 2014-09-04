@@ -3,6 +3,7 @@ import java.nio.ByteOrder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -20,9 +21,11 @@ import android.bluetooth.BluetoothHealthAppConfiguration;
 import android.bluetooth.BluetoothHealthCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.BluetoothAdapter.LeScanCallback;
 import android.content.Context;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect.Descriptor;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,11 +37,11 @@ import android.util.Log;
 
 public class MainDriver extends Service implements BluetoothProfile {
 
-	final int WARNING_STOP_DISCOVERY = 0x01;
-	final int WARNING_FIND_DEVICE = 0x02;
-	final int WARNING_NEW_DATA = 0x03;
-	final int WARNING_CONNECTED = 0x04;
-	final int WARNING_DISCONNECTED = 0x04;	
+	final static String WARNING_STOP_DISCOVERY = "STOP_DISCOVERY";
+	final static String WARNING_FIND_DEVICE 	= "FIND_DEVICE";
+	final static String WARNING_NEW_DATA 		= "NEW_DATA";
+	final static String WARNING_CONNECTED 		= "CONNECTED";
+	final static String WARNING_DISCONNECTED   = "DISCONNECTED";	
 	
 	// Data for CDC Device
 	final UUID UUID_SERVICE_GENERIC_ACCESS = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
@@ -60,8 +63,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final UUID UUID_RUNNING_FEATURE = UUID.fromString("00002a54-0000-1000-8000-00805f9b34fb"); // 16bit bin
 		final UUID UUID_RUNNING_SPEED = UUID.fromString("00002a53-0000-1000-8000-00805f9b34fb"); // 16bit bin
 	
-		
-		
+	
 		// final UUID UUID_MODEL = UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"); // utf8s
 	final UUID UUID_SERVICE_BATTERY = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
 		final UUID UUID_BATTERY_LEVEL = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");	// uint8 0-100%
@@ -84,28 +86,46 @@ public class MainDriver extends Service implements BluetoothProfile {
 		
 	private static final String MAIN_DRIVER = "MAIN DRIVER";
 	private static final long SCAN_PERIOD = 10000;
+	
 	private BluetoothAdapter mBluetoothAdapter = null;
-	private Messenger mMsgHandler;
+	private BluetoothManager mBluetoothManager = null;
+	private boolean LeDiscovering = false;
+	
+	private Handler mTimeoutHandler = new Handler();
 	public Handler mHandler = new Handler();
 	private Handler mDiscoveryHandler = new Handler();
-	private List<BtDevice> lstDevices = new ArrayList<BtDevice>();
+	private HashMap<String,BtDevice> lstDevices = new HashMap<String, BtDevice>();
 	
+	/**
+	 * After SCAN_PERIOD, the discovering process is automatically stopped
+	 */
 	private Runnable DiscoveringTime = new Runnable() {
 		@Override
 		public void run() {
-			if (mBluetoothAdapter != null) {
-				mBluetoothAdapter.stopLeScan(mLeScanCallback);
-				mHandler.sendMessage(Message.obtain(mHandler, WARNING_STOP_DISCOVERY, ""));
-			}
+			stopDiscovery();
 		}
 	};
 	
 	/*
 	 * Register callback and interface (probably on)
 	 */
-	public boolean init(BluetoothAdapter adapter, Messenger messenger) {
-		mBluetoothAdapter = adapter;
-		mMsgHandler = messenger;
+	public boolean initialize() {
+        // For API level 18 and above, get a reference to BluetoothAdapter through
+        // BluetoothManager.
+        if (mBluetoothManager == null) {
+            mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+            if (mBluetoothManager == null) {
+                Log.d(MAIN_DRIVER, "Unable to initialize BluetoothManager.");
+                return false;
+            }
+        }
+ 
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        if (mBluetoothAdapter == null) {
+            Log.d(MAIN_DRIVER, "Unable to obtain a BluetoothAdapter.");
+            return false;
+        }
+ 
 		return true;
 	}
 	
@@ -120,47 +140,44 @@ public class MainDriver extends Service implements BluetoothProfile {
             // Stops scanning after a pre-defined scan period.
             mDiscoveryHandler.postDelayed(DiscoveringTime, SCAN_PERIOD);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
+            LeDiscovering = true;
             return true;
         }
 		return false;
 	}
 	
 	public void stopDiscovery() {
-		if ((mBluetoothAdapter != null) && (mBluetoothAdapter.isDiscovering()))
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
 		mDiscoveryHandler.removeCallbacks(DiscoveringTime);
+		if ((mBluetoothAdapter != null) && (LeDiscovering))
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+		LeDiscovering = false;
 	}
 	
 	/*
 	 * Each device is stored in a local (should be local?) list (should be hash?).
 	 */
-	private BluetoothAdapter.LeScanCallback mLeScanCallback = 
+	private final BluetoothAdapter.LeScanCallback mLeScanCallback = 
 			new BluetoothAdapter.LeScanCallback() {
 				@Override
 				public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 					Log.d(MAIN_DRIVER, "Found Device "+ device.getName() + "-" + device.getAddress() + "-" + device.getType());
-					if (!lstDevices.isEmpty())
-						for (BtDevice btDevice : lstDevices) {
-							if (btDevice.device.getAddress().equals(device.getAddress()))
-								return;
-						}
-					Log.d(MAIN_DRIVER, "New Device Found");
-					lstDevices.add(new BtDevice(device, STATE_DISCONNECTED));
-					Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
-
-					try {
-						mMsgHandler.send(Message.obtain(null, WARNING_FIND_DEVICE, 
-								device.getAddress() + " : " + device.getName() + "(" + device.getType() + ")"));
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (!lstDevices.isEmpty() && (lstDevices.containsKey(device.getAddress()))) {
+						return;
 					}
+					Log.d(MAIN_DRIVER, "New Device Found");
+					broadcastUpdate(WARNING_FIND_DEVICE, device.getAddress(), device.getName());
 				}
 				
 			};
 			
+		
+	/**
+	 * Why would be necessary disconnect ?
+	 * @param address
+	 * @return
+	 */
 	public boolean disconnect(String address) {
-		BtDevice btDevice = findDevice(address);
+		BtDevice btDevice = lstDevices.get(address);
 		if ((btDevice != null) && (btDevice.state != STATE_DISCONNECTED) && (btDevice.state != STATE_DISCONNECTING)) {
 			btDevice.gatt.disconnect();
 			btDevice.state = STATE_DISCONNECTING;
@@ -169,47 +186,64 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 		return false;
 	}
+	
+	/**
+	 * How will Activity get this address?
+	 * 
+	 */
 
 	public boolean connect(String address) {
 		stopDiscovery();
 		Log.d(MAIN_DRIVER, "Verifying " + address);
-		BtDevice btDevice = findDevice(address);
-		if (btDevice != null) {
+		if (lstDevices.containsKey(address)) {
+			BtDevice btDevice = lstDevices.get(address);
+			Log.d(MAIN_DRIVER, "Device " + address + " State = " + btDevice.state);
 			if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
-				btDevice.gatt = btDevice.device.connectGatt(this, true, mGattCallback);
+				if (mBluetoothAdapter.getRemoteDevice(address) == null)
+					Log.d(MAIN_DRIVER, "Adapter has no device");
+				btDevice.gatt = mBluetoothAdapter.getRemoteDevice(address).connectGatt(this, true, mGattCallback);
 				btDevice.state = STATE_CONNECTING;
 				Log.d(MAIN_DRIVER, "Connecting " + address);
 				return true;
 			}
+		} else {
+			Log.d(MAIN_DRIVER, "Device is not in the list");
 		}
+		
 		return false;
 	}
 
-	final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+	/**
+	 * All device callbacks are handle here
+	 */
+	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
     		
 		// When the device is connected for the first time, scan for services
 		// ???? How to known whether values are updated or its necessary readCharacteristics ????
 		@Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status,
                 int newState) {
+			Log.d(MAIN_DRIVER, "onConnectionStateChange");
 			if (status == BluetoothGatt.GATT_SUCCESS) {
-				BtDevice btDevice = findDevice(gatt.getDevice().getAddress());
+				Log.d(MAIN_DRIVER, "onConnectionStateChange SUCCESS");
+				BtDevice btDevice = lstDevices.get(gatt.getDevice().getAddress());
 				if (btDevice != null) {
+					Log.d(MAIN_DRIVER, "onConnectionStateChange SUCCESS Device OK");
 					btDevice.state = newState;
 					// DEBUG
 					switch(newState) {
 					case STATE_CONNECTED:
-						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTED");
+						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " CONNECTED");
 						break;
 					case STATE_DISCONNECTED:
-						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTED");
+						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " DISCONNECTED");
 						break;
 					case STATE_DISCONNECTING:
-						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " DISCONNECTING");
+						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " DISCONNECTING");
 						btDevice.operations.clear();
 						break;
 					case STATE_CONNECTING:
-						Log.d(MAIN_DRIVER, "Device " + btDevice.device.getAddress() + " CONNECTING");
+						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " CONNECTING");
 						btDevice.operations.clear();
 						break;
 					}
@@ -218,22 +252,27 @@ public class MainDriver extends Service implements BluetoothProfile {
 						//if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
 							Log.d(MAIN_DRIVER, "Getting Services");
 							btDevice.gatt.discoverServices();
-							mHandler.sendMessage(Message.obtain(null, WARNING_CONNECTED, gatt.getDevice().getAddress()));
+							//mHandler.sendMessage(Message.obtain(null, WARNING_CONNECTED, gatt.getDevice().getAddress()));
 						//} else {
 						//	Log.d(MAIN_DRIVER, "Services Already Updated");
 						//	listServices(gatt, true);
 						//}
 					} else {
-						mHandler.sendMessage(Message.obtain(null, WARNING_DISCONNECTED, gatt.getDevice().getAddress()));
+						//mHandler.sendMessage(Message.obtain(null, WARNING_DISCONNECTED, gatt.getDevice().getAddress()));
 					}
 					return;
+				} else {
+					Log.d(MAIN_DRIVER, "Device not found in callback");
 				}
+				
 			}
 			else
 				Log.d(MAIN_DRIVER, "Connection State Error (" + status + ")");
         }
 
-        // New services discovered
+        /**
+         * Happens after call .discoverServices()
+         */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
@@ -244,14 +283,21 @@ public class MainDriver extends Service implements BluetoothProfile {
                 Log.w(MAIN_DRIVER, "onServicesDiscovered received: " + status);
             }
         }
-        
+
+        /**
+         * Which writes are needed?
+         * (non-Javadoc)
+         * @see android.bluetooth.BluetoothGattCallback#onCharacteristicWrite(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)
+         */
         public void onCharacteristicWrite(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic, int status) {
         	Log.d(MAIN_DRIVER, "Characteristic Written (" + status + ")");
         	
         }
 
-        // Result of a characteristic read operation
+        /**
+         * Fired after .readCharacteristics
+         */
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic,
@@ -283,7 +329,7 @@ public class MainDriver extends Service implements BluetoothProfile {
             	Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Error Read Characteristic " +  characteristic.getUuid().toString());
             }
             
-            NextOperation(findDevice(gatt.getDevice().getAddress()));
+            NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
             /*
             if (index < lstCharacteristics.size()) {
 	            if (lstCharacteristics.size() > 1) {
@@ -307,7 +353,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 					int ts = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos);
 					Log.d(MAIN_DRIVER, "Read Value Rev=" + value);
 					Log.d(MAIN_DRIVER, "Read TS Rev=" + ts);
-					mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, value, ts, gatt.getDevice().getAddress()));
+					//mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, value, ts, gatt.getDevice().getAddress()));
 				}
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x02) == 0x02) {
 					Log.d(MAIN_DRIVER, "Crank Val=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
@@ -323,7 +369,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 				pos = pos + 2;
 				int instantaneousCadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, pos);
 				pos++;
-				mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, instantaneousSpeed, instantaneousCadence, gatt.getDevice().getAddress()));
+				//mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, instantaneousSpeed, instantaneousCadence, gatt.getDevice().getAddress()));
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x01) == 0x01) {
 					Log.d(MAIN_DRIVER, "Read Avanço=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					pos = pos + 2;
@@ -351,7 +397,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    		int value = descriptor.getValue()[0] + descriptor.getValue()[1] * 256;
 	    		Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Cliente Characteristics from " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Read=" + value + " ("+ status + "); ");
 	    	}
-	    	NextOperation(findDevice(gatt.getDevice().getAddress()));
+	    	NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    }
 	    
 	    /**
@@ -371,7 +417,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	};
 	
     protected void listServices(BluetoothGatt gatt, boolean update) {
-    	BtDevice btDevice = findDevice(gatt.getDevice().getAddress());
+    	BtDevice btDevice = lstDevices.get(gatt.getDevice().getAddress());
     	if (btDevice == null)
     		return;
 		for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
@@ -415,15 +461,50 @@ public class MainDriver extends Service implements BluetoothProfile {
 		if(btDevice == null)
 			return;
 		Log.d(MAIN_DRIVER, "Issuing next operation");
-		btDevice.execNextOperation();
+		mTimeoutHandler.removeCallbacks(btDevice.ReadWriteTimeout);
+		if (btDevice.execNextOperation())
+			mTimeoutHandler.postDelayed(btDevice.ReadWriteTimeout, 3000);
 	}
-	
 
+    public class LocalBinder extends Binder {
+        MainDriver getService() {
+            return MainDriver.this;
+        }
+    }
+    
+    /**
+     * After using a given BLE device, the app must call this method to ensure resources are
+     * released properly.
+     */
+    public void close() {
+
+    }    
+
+    
+    /**
+     * Android Services
+     * Service shoud not 
+     */
+    
+    
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
-		return null;
+		return mBinder;
 	}
+	
+    @Override
+    public boolean onUnbind(Intent intent) {
+        // After using a given device, you should make sure that BluetoothGatt.close() is called
+        // such that resources are cleaned up properly.  In this particular example, close() is
+        // invoked when the UI is disconnected from the Service.
+        close();
+        return super.onUnbind(intent);
+    }
+    
+    
+    private final IBinder mBinder = new LocalBinder();
+ 
 
 	@Override
 	public List<BluetoothDevice> getConnectedDevices() {
@@ -443,15 +524,18 @@ public class MainDriver extends Service implements BluetoothProfile {
 		return 0;
 	}
 
-	BtDevice findDevice(String address) {
-		for (BtDevice btDevice : lstDevices)
-			if (btDevice.device.getAddress().equals(address))
-				return btDevice;
-		return null;
-		
+	private void broadcastUpdate(final String action,
+		final String parameter, final String value) {
+		final Intent intent = new Intent(action);
+		if(action.equals(WARNING_FIND_DEVICE)) {
+			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED));
+			Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
+			intent.putExtra("address", parameter + value);
+			sendBroadcast(intent);
+		}
 	}
-	
-	
+	 
+	 
 	String uuidToString(UUID uuid) {
     	if (uuid.equals(UUID_DEVICE_NAME)) {
    		 	return "Device Name";

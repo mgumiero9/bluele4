@@ -13,11 +13,9 @@ import android.os.Handler;
 import android.util.Log;
 
 public class BtDevice {
-	public BluetoothDevice device;
 	public BluetoothGatt gatt = null;
 	public int state = 0;
 	public int init_state = 0;
-	private Handler mTimeoutHandler;
 	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
 
 
@@ -34,7 +32,7 @@ public class BtDevice {
 		public OPERATION operation;
 	};
 
-	private Runnable ReadWriteTimeout = new Runnable() {
+	public Runnable ReadWriteTimeout = new Runnable() {
 		@Override
 		public void run() {
 			Log.d("BT DEVICE", "Read/Write Operation Timeout");
@@ -59,8 +57,7 @@ public class BtDevice {
     }
 	
 	
-	public void execNextOperation() {
-		mTimeoutHandler.removeCallbacks(ReadWriteTimeout);
+	public boolean execNextOperation() {
 		Log.d("BT DEVICE", "Issuing next operation");
         if (!operations.isEmpty())
         {
@@ -80,16 +77,14 @@ public class BtDevice {
 	    	} else if (newProcess.operation == OPERATION.SET_NOT) {
 	    		setNotification(newProcess.characteristic);
 	    	}
-	    	mTimeoutHandler.postDelayed(ReadWriteTimeout, 3000);
+	    	return true;
         }
-
+        return false;
 	}
 	
-	public BtDevice(BluetoothDevice device, int state) {
-		this.device = device;
+	public BtDevice(int state) {
+		Log.d("BTDEV", "Tentando alocar device");
 		this.state = state;
-		mTimeoutHandler = new Handler();
-		// TODO Auto-generated constructor stub
 	}
 	
 }
