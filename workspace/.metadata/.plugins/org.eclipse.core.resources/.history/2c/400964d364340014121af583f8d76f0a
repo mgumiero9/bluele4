@@ -173,7 +173,14 @@ public class MainActivity extends ListActivity{
 			
 		    Intent mainDriverIntent = new Intent(this, MainDriver.class);
 	        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
+			
+			//mBluetoothAdapter = bluetoothManager.getAdapter();
+			//final Handler mHandler = new Handler(new Handler.Callback() {
 
+			//});
+
+			//mHandler.sendEmptyMessage(-1);
+			//mainDriver.init(mBluetoothAdapter, mHandler);
 	}
 
 	private ArrayList<Map<String, String>> buildData() {

@@ -69,7 +69,7 @@ public class MainActivity extends ListActivity{
             final String action = intent.getAction();
             Log.d("MAIN_THREAD", "Received Action:" + action);
 			//final String mAddress = intent.;
-			if (action.equals(mainDriver.ACTION_STOP_DISCOVERY)) {
+			if (action.equals(mainDriver.WARNING_STOP_DISCOVERY)) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -79,7 +79,7 @@ public class MainActivity extends ListActivity{
 				});
 				return;
 			}
-			if (action.equals(mainDriver.ACTION_FIND_DEVICE)) {
+			if (action.equals(mainDriver.WARNING_FIND_DEVICE)) {
 				Log.d("MAIN_THREAD", "Find Device");
 				Map<String, String> newMap = new HashMap<String, String>();
 				newMap.put("Address", intent.getStringExtra("address").substring(0,17));
@@ -92,7 +92,7 @@ public class MainActivity extends ListActivity{
 				adapter.notifyDataSetChanged();
 				return;
 			}
-			if (action.equals(mainDriver.ACTION_NEW_DATA)) {
+			if (action.equals(mainDriver.WARNING_NEW_DATA)) {
 				for (Map<String, String> element : list) {
 					if (element.get("Address").equals(intent.getStringExtra("address"))) {
 						Log.d("MAIN_THREAD", "Item Found");
@@ -111,7 +111,7 @@ public class MainActivity extends ListActivity{
 				return;
 			}
 			
-			if (action.equals(mainDriver.ACTION_CONNECTED)) {
+			if (action.equals(mainDriver.WARNING_CONNECTED)) {
 				//mAddress = (String) msg.obj;
 				/*
 				runOnUiThread(new Runnable() {
@@ -135,7 +135,7 @@ public class MainActivity extends ListActivity{
 				return;
 			}
 
-			if (action.equals(mainDriver.ACTION_DISCONNECTED)) {
+			if (action.equals(mainDriver.WARNING_DISCONNECTED)) {
 				//mAddress = (String) msg.obj;
 				/*runOnUiThread(new Runnable() {
 					@Override
@@ -173,7 +173,14 @@ public class MainActivity extends ListActivity{
 			
 		    Intent mainDriverIntent = new Intent(this, MainDriver.class);
 	        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
+			
+			//mBluetoothAdapter = bluetoothManager.getAdapter();
+			//final Handler mHandler = new Handler(new Handler.Callback() {
 
+			//});
+
+			//mHandler.sendEmptyMessage(-1);
+			//mainDriver.init(mBluetoothAdapter, mHandler);
 	}
 
 	private ArrayList<Map<String, String>> buildData() {
@@ -240,31 +247,32 @@ public class MainActivity extends ListActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("MAIN THREAD", "onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+//      if (mainDriver != null) {
+//            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
+//            Log.d(TAG, "Connect request result=" + result);
+ //     }
     }	
 	
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MainDriver.ACTION_CONNECTED);
-        intentFilter.addAction(MainDriver.ACTION_DISCONNECTED);
-        intentFilter.addAction(MainDriver.ACTION_FIND_DEVICE);
-        intentFilter.addAction(MainDriver.ACTION_NEW_DATA);
-        intentFilter.addAction(MainDriver.ACTION_STOP_DISCOVERY);
+        intentFilter.addAction(MainDriver.WARNING_CONNECTED);
+        intentFilter.addAction(MainDriver.WARNING_DISCONNECTED);
+        intentFilter.addAction(MainDriver.WARNING_FIND_DEVICE);
+        intentFilter.addAction(MainDriver.WARNING_NEW_DATA);
+        intentFilter.addAction(MainDriver.WARNING_STOP_DISCOVERY);
         return intentFilter;
     }    
     
 	@Override
     protected void onPause() {
         super.onPause();
-        Log.d("MAIN THREAD", "onPause");
         unregisterReceiver(mGattUpdateReceiver);
     }
  
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("MAIN THREAD", "onDestroy");
         unbindService(mServiceConnection);
         mainDriver = null;
     }
