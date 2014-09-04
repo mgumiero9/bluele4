@@ -63,21 +63,18 @@ public class BtDevice {
         {
 	    	ProcessIO newProcess = operations.poll();
 	    	if (newProcess.operation == OPERATION.READ) {
-	    		Log.d("BT DEVICE", "Issuing Read");
 	    		if (newProcess.descriptor != null) {
 	    			gatt.readDescriptor(newProcess.descriptor);
 	    		} else {
 	    			gatt.readCharacteristic(newProcess.characteristic);
 	    		}
 	    	} else if (newProcess.operation == OPERATION.WRITE){
-	    		Log.d("BT DEVICE", "Issuing Write");
 	    		if (newProcess.descriptor != null) {
 	    			gatt.writeDescriptor(newProcess.descriptor);
 	    		} else {
 	    			gatt.writeCharacteristic(newProcess.characteristic);
 	    		}
 	    	} else if (newProcess.operation == OPERATION.SET_NOT) {
-	    		Log.d("BT DEVICE", "Issuing Notification");
 	    		setNotification(newProcess.characteristic);
 	    	}
 	    	return true;

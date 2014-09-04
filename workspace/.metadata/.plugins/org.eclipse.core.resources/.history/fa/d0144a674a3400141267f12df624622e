@@ -86,28 +86,46 @@ public class MainActivity extends ListActivity{
 				newMap.put("Name", intent.getStringExtra("address").substring(17));
 				newMap.put("Value1", "?");
 				newMap.put("Value2", "?");
-				newMap.put("Value3", "?");
-				newMap.put("Value4", "?");
 				list.add(newMap);
 				adapter.notifyDataSetChanged();
+				
+				//final String localmsg = (String) msg.obj;
+				//mAddress = localmsg.substring(0, 17);
+				//Log.d("MAIN ACT", "Finding " + mAddress);
+/*				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						//ListView local = (ListView)findViewById(R.id.listView1);
+						//local.addView(newText);
+						
+					}
+				});*/
 				return;
 			}
 			if (action.equals(mainDriver.WARNING_NEW_DATA)) {
-				for (Map<String, String> element : list) {
-					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						Log.d("MAIN_THREAD", "Item Found");
-						if (intent.hasExtra("Value1"))
-							element.put("Value1", intent.getStringExtra("Value1"));
-						if (intent.hasExtra("Value2"))
-							element.put("Value2", intent.getStringExtra("Value2"));
-						if (intent.hasExtra("Value3"))
-							element.put("Value3", intent.getStringExtra("Value3"));
-						if (intent.hasExtra("Value4"))
-							element.put("Value4", intent.getStringExtra("Value4"));
-						adapter.notifyDataSetChanged();
-						return;
+				//mAddress = (String) msg.obj;
+				//Log.d("MAIN_THREAD", "Message arrived " + mAddress);
+				/*
+				final String value1 = String.valueOf(msg.arg1);
+				final String value2 = String.valueOf(msg.arg2);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						for (Map<String, String> element : list) {
+							if (element.get("Address").equals(mAddress)) {
+								Log.d("MAIN_THREAD", "Item Found");				
+								element.put("Value1", value1);
+								element.put("Value2", value2);
+								adapter.notifyDataSetChanged();
+								return;
+							}
+						}
+						
+						//ListView local = (ListView)findViewById(R.id.listView1);
+						//local.addView(newText);
+						
 					}
-				}
+				});*/
 				return;
 			}
 			
@@ -162,8 +180,8 @@ public class MainActivity extends ListActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 		    list = buildData();
-		    String[] from = { "Address", "Name", "Value1", "Value2", "Value3", "Value4"};
-		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
+		    String[] from = { "Address", "Name", "Value1", "Value2"};
+		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2};
 
 	        final Intent intent = getIntent();
 		    

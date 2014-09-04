@@ -22,6 +22,7 @@ import android.bluetooth.BluetoothHealthCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothAdapter.LeScanCallback;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect.Descriptor;
@@ -353,12 +354,15 @@ public class MainDriver extends Service implements BluetoothProfile {
 					int ts = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos);
 					Log.d(MAIN_DRIVER, "Read Value Rev=" + value);
 					Log.d(MAIN_DRIVER, "Read TS Rev=" + ts);
-					//mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, value, ts, gatt.getDevice().getAddress()));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value1", String.valueOf(value));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value2", String.valueOf(ts));
 				}
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x02) == 0x02) {
 					Log.d(MAIN_DRIVER, "Crank Val=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					pos = pos + 2;
 					Log.d(MAIN_DRIVER, "Crank TS=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value3", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value4", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
 				}
 			}
 			if (characteristic.getUuid().equals(UUID_RUNNING_SPEED)) {
@@ -367,15 +371,19 @@ public class MainDriver extends Service implements BluetoothProfile {
 				int pos = 1;
 				int instantaneousSpeed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos);
 				pos = pos + 2;
+				broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value1", String.valueOf(instantaneousSpeed));
 				int instantaneousCadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, pos);
 				pos++;
-				//mHandler.sendMessage(Message.obtain(mHandler, WARNING_NEW_DATA, instantaneousSpeed, instantaneousCadence, gatt.getDevice().getAddress()));
+				broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value2", String.valueOf(instantaneousCadence));
+
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x01) == 0x01) {
 					Log.d(MAIN_DRIVER, "Read Avanço=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value3", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
 					pos = pos + 2;
 				}
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x02) == 0x02) {
 					Log.d(MAIN_DRIVER, "Read Total Distance=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, pos));
+					broadcastUpdate(WARNING_NEW_DATA, gatt.getDevice().getAddress(), "Value4", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, pos)));
 				}
 			}
 		}
@@ -388,6 +396,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    	} else {
 	    		Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Read " + uuidToString(descriptor.getCharacteristic().getUuid()) + " Descriptor=" + descriptor.getUuid().toString() + "=" + value + "; ");
 	    	}
+	    	NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    }
 	    
 	    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
@@ -534,7 +543,16 @@ public class MainDriver extends Service implements BluetoothProfile {
 			sendBroadcast(intent);
 		}
 	}
-	 
+
+	private void broadcastUpdate(final String action, final String address,
+			final String parameter, final String value) {
+			final Intent intent = new Intent(action);
+			intent.putExtra("address", address);
+			intent.putExtra(parameter, value);
+			sendBroadcast(intent);
+		}
+	
+	
 	 
 	String uuidToString(UUID uuid) {
     	if (uuid.equals(UUID_DEVICE_NAME)) {

@@ -86,8 +86,6 @@ public class MainActivity extends ListActivity{
 				newMap.put("Name", intent.getStringExtra("address").substring(17));
 				newMap.put("Value1", "?");
 				newMap.put("Value2", "?");
-				newMap.put("Value3", "?");
-				newMap.put("Value4", "?");
 				list.add(newMap);
 				adapter.notifyDataSetChanged();
 				return;
@@ -95,15 +93,9 @@ public class MainActivity extends ListActivity{
 			if (action.equals(mainDriver.WARNING_NEW_DATA)) {
 				for (Map<String, String> element : list) {
 					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						Log.d("MAIN_THREAD", "Item Found");
-						if (intent.hasExtra("Value1"))
-							element.put("Value1", intent.getStringExtra("Value1"));
-						if (intent.hasExtra("Value2"))
-							element.put("Value2", intent.getStringExtra("Value2"));
-						if (intent.hasExtra("Value3"))
-							element.put("Value3", intent.getStringExtra("Value3"));
-						if (intent.hasExtra("Value4"))
-							element.put("Value4", intent.getStringExtra("Value4"));
+						Log.d("MAIN_THREAD", "Item Found");				
+						element.put("Value1", intent.getStringExtra("Value1"));
+						element.put("Value2", intent.getStringExtra("Value2"));
 						adapter.notifyDataSetChanged();
 						return;
 					}
@@ -162,8 +154,8 @@ public class MainActivity extends ListActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 		    list = buildData();
-		    String[] from = { "Address", "Name", "Value1", "Value2", "Value3", "Value4"};
-		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
+		    String[] from = { "Address", "Name", "Value1", "Value2"};
+		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtValue1, R.id.txtValue2};
 
 	        final Intent intent = getIntent();
 		    
