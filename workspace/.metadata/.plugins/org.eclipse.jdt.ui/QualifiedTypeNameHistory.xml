@@ -54,10 +54,10 @@
 <fullyQualifiedTypeName name="android.os.Binder"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
 <fullyQualifiedTypeName name="android.widget.SimpleAdapter"/>
-<fullyQualifiedTypeName name="com.example.driver.MainDriver"/>
 <fullyQualifiedTypeName name="android.content.IntentFilter"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter.LeScanCallback"/>
 <fullyQualifiedTypeName name="android.content.BroadcastReceiver"/>
+<fullyQualifiedTypeName name="com.example.driver.MainDriver"/>
 </qualifiedTypeNameHistroy>
