@@ -221,12 +221,14 @@ public class MainActivity extends ListActivity{
 	@Override
     protected void onPause() {
         super.onPause();
+        Log.d("MAIN THREAD", "onPause");
         unregisterReceiver(mGattUpdateReceiver);
     }
  
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("MAIN THREAD", "onDestroy");
         unbindService(mServiceConnection);
         mainDriver = null;
     }

@@ -26,17 +26,18 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
-        public static final int action_discovery=0x7f08000d;
-        public static final int action_settings=0x7f08000c;
+        public static final int action_discovery=0x7f08000e;
+        public static final int action_settings=0x7f08000d;
         public static final int deviceAddress=0x7f080003;
         public static final int deviceName=0x7f080002;
         public static final int listView=0x7f080001;
         public static final int txtAddress=0x7f080006;
+        public static final int txtCon=0x7f080008;
         public static final int txtName=0x7f080007;
-        public static final int txtValue1=0x7f080008;
-        public static final int txtValue2=0x7f080009;
-        public static final int txtValue3=0x7f08000a;
-        public static final int txtValue4=0x7f08000b;
+        public static final int txtValue1=0x7f080009;
+        public static final int txtValue2=0x7f08000a;
+        public static final int txtValue3=0x7f08000b;
+        public static final int txtValue4=0x7f08000c;
         public static final int value1=0x7f080004;
         public static final int value2=0x7f080005;
     }

@@ -214,7 +214,6 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 * How will Activity get this address?
 	 * 
 	 */
-
 	public boolean connect(String address) {
 		stopDiscovery();
 		Log.d(MAIN_DRIVER, "Verifying " + address);
@@ -308,7 +307,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 
         /**
          * Which writes are needed?
-         * (non-Javadoc)
+         * 
          * @see android.bluetooth.BluetoothGattCallback#onCharacteristicWrite(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)
          */
         public void onCharacteristicWrite(BluetoothGatt gatt,
@@ -361,8 +360,11 @@ public class MainDriver extends Service implements BluetoothProfile {
             }	
             index++;
             */            	
-            	
         }
+        
+        /**
+         * Notifications are treated here
+         */
 		public void onCharacteristicChanged(BluetoothGatt gatt,
 		        BluetoothGattCharacteristic characteristic) {
 			if (characteristic.getUuid().equals(UUID_CSC_MEASUREMENT)) {
@@ -438,6 +440,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 
 		}
 		
+		/**
+		 * Fired after .readDescriptor
+		 */
 	    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
                 int status) {
 	    	int value = descriptor.getValue()[0] + descriptor.getValue()[1] * 256;
@@ -449,6 +454,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    	NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    }
 	    
+	    /**
+	     * Firead after .writeDescriptor (needed for notification setup)
+	     */
 	    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
                 int status) {
 	    	
@@ -476,6 +484,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    
 	};
 	
+	/**
+	 * Queue read for each parameter and notification functions
+	 * @param gatt
+	 * @param update
+	 */
     protected void listServices(BluetoothGatt gatt, boolean update) {
     	BtDevice btDevice = lstDevices.get(gatt.getDevice().getAddress());
     	if (btDevice == null)
@@ -518,6 +531,10 @@ public class MainDriver extends Service implements BluetoothProfile {
 		NextOperation(btDevice);
     }
 	
+    /**
+     * 
+     * @param btDevice
+     */
 	public void NextOperation(BtDevice btDevice) {
 		if(btDevice == null)
 			return;
@@ -595,6 +612,10 @@ public class MainDriver extends Service implements BluetoothProfile {
 			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED));
 			Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
 			intent.putExtra("address", parameter + value);
+			sendBroadcast(intent);
+		}
+		if((action.equals(ACTION_DISCONNECTED) || action.equals(ACTION_CONNECTED))) {
+			intent.putExtra("address", parameter);
 			sendBroadcast(intent);
 		}
 	}

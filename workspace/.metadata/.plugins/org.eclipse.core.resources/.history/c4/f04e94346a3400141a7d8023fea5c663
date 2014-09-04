@@ -137,7 +137,7 @@ public class MainActivity extends ListActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 		    list = buildData();
-		    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
+	    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
 		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtCon , R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
 
 	        final Intent intent = getIntent();
@@ -182,8 +182,17 @@ public class MainActivity extends ListActivity{
 			return true;
 		}
 		if (id == R.id.action_discovery) {
+			// Initializes Bluetooth adapter.
+			//if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+			    //Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			    //startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			//}
+			//else {
+			//	Log.d("MAIN_THREAD", "BtAdapter Enabled");
 			Log.d("MAIN_THREAD","Starting Discovery");
 			mainDriver.startDiscovery();
+				
+			//}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -193,11 +202,13 @@ public class MainActivity extends ListActivity{
 		super.onListItemClick(l, v, position, id);
 		@SuppressWarnings("unchecked")
 		Map<String, String> itemAtPosition = (Map<String, String>) l.getItemAtPosition(position);
+		Log.d("MAIN_THREAD", "Trying connect to " + itemAtPosition.get("Address"));
 		mainDriver.connect(itemAtPosition.get("Address"));
 	}
 	
 	
 	public void disconnectDevice(View view) {
+		Log.d("MAIN_THREAD", "Trying disconnect to " + address);
 		mainDriver.disconnect(address);
 	}
 	
@@ -221,12 +232,14 @@ public class MainActivity extends ListActivity{
 	@Override
     protected void onPause() {
         super.onPause();
+        Log.d("MAIN THREAD", "onPause");
         unregisterReceiver(mGattUpdateReceiver);
     }
  
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("MAIN THREAD", "onDestroy");
         unbindService(mServiceConnection);
         mainDriver = null;
     }

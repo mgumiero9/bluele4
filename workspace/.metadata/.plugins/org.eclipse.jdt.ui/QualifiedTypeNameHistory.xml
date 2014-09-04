@@ -45,7 +45,6 @@
 <fullyQualifiedTypeName name="android.R"/>
 <fullyQualifiedTypeName name="android.R.id"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
-<fullyQualifiedTypeName name="com.example.driver.R.id"/>
 <fullyQualifiedTypeName name="com.example.driver.R.layout"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattDescriptor"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver.OPERATION"/>
@@ -60,4 +59,5 @@
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter.LeScanCallback"/>
 <fullyQualifiedTypeName name="android.content.BroadcastReceiver"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver"/>
+<fullyQualifiedTypeName name="com.example.driver.R.id"/>
 </qualifiedTypeNameHistroy>

@@ -193,11 +193,13 @@ public class MainActivity extends ListActivity{
 		super.onListItemClick(l, v, position, id);
 		@SuppressWarnings("unchecked")
 		Map<String, String> itemAtPosition = (Map<String, String>) l.getItemAtPosition(position);
+		Log.d("MAIN_THREAD", "Trying connect to " + itemAtPosition.get("Address"));
 		mainDriver.connect(itemAtPosition.get("Address"));
 	}
 	
 	
 	public void disconnectDevice(View view) {
+		Log.d("MAIN_THREAD", "Trying disconnect to " + address);
 		mainDriver.disconnect(address);
 	}
 	
@@ -221,12 +223,14 @@ public class MainActivity extends ListActivity{
 	@Override
     protected void onPause() {
         super.onPause();
+        Log.d("MAIN THREAD", "onPause");
         unregisterReceiver(mGattUpdateReceiver);
     }
  
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("MAIN THREAD", "onDestroy");
         unbindService(mServiceConnection);
         mainDriver = null;
     }
