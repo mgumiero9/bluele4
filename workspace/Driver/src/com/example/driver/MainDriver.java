@@ -44,15 +44,14 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 * ACTION_FIND_DEVICE - a new device was found in discovery process (address)
 	 * ACTION_NEW_DATA - new data was received from devices
 	 */
-	final static String ACTION_STOP_DISCOVERY = "STOP_DISCOVERY";
-	final static String ACTION_FIND_DEVICE 	= "FIND_DEVICE";
+	final static String ACTION_STOP_DISCOVERY 	= "STOP_DISCOVERY";
+	final static String ACTION_FIND_DEVICE 		= "FIND_DEVICE";
 	final static String ACTION_NEW_DATA 		= "NEW_DATA";
 	final static String ACTION_CONNECTED 		= "CONNECTED";
-	final static String ACTION_DISCONNECTED   = "DISCONNECTED";
+	final static String ACTION_DISCONNECTED  	= "DISCONNECTED";
 	
-
 	/**
-	 * 
+	 * Timeout for Read/Write Parameters and Connection. From command to callback.
 	 */
 	final static int TIMEOUT_CONNECTION   = 4000;
 	final static int TIMEOUT_READWRITE   = 1000;
@@ -142,7 +141,6 @@ public class MainDriver extends Service implements BluetoothProfile {
             Log.d(MAIN_DRIVER, "Unable to obtain a BluetoothAdapter.");
             return false;
         }
- 
 		return true;
 	}
 	
@@ -185,10 +183,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 					if (!lstDevices.isEmpty() && (lstDevices.containsKey(device.getAddress()))) {
 						return;
 					}
-					Log.d(MAIN_DRIVER, "New Device Found");
 					broadcastUpdate(ACTION_FIND_DEVICE, device.getAddress(), device.getName());
 				}
-				
 			};
 			
 		
@@ -204,7 +200,6 @@ public class MainDriver extends Service implements BluetoothProfile {
 			btDevice.state = STATE_DISCONNECTING;
 			mHandler.postDelayed(btDevice.ConnectingTime, TIMEOUT_CONNECTION);
 			Log.d(MAIN_DRIVER, "Disconnecting " + address);
-			
 			return true;
 		}
 		return false;
@@ -216,23 +211,19 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 */
 	public boolean connect(String address) {
 		stopDiscovery();
-		Log.d(MAIN_DRIVER, "Verifying " + address);
-		if (lstDevices.containsKey(address)) {
-			BtDevice btDevice = lstDevices.get(address);
-			Log.d(MAIN_DRIVER, "Device " + address + " State = " + btDevice.state);
-			if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
-				if (mBluetoothAdapter.getRemoteDevice(address) == null)
-					Log.d(MAIN_DRIVER, "Adapter has no device");
-				btDevice.gatt = mBluetoothAdapter.getRemoteDevice(address).connectGatt(this, true, mGattCallback);
-				btDevice.state = STATE_CONNECTING;
-				mHandler.postDelayed(btDevice.ConnectingTime, TIMEOUT_CONNECTION);
-				Log.d(MAIN_DRIVER, "Connecting " + address);
-				return true;
-			}
-		} else {
-			Log.d(MAIN_DRIVER, "Device is not in the list");
+		if (mBluetoothAdapter.getRemoteDevice(address) == null) {
+			Log.d(MAIN_DRIVER, "Adapter has no device");
+			return false;
 		}
-		
+		if (!lstDevices.containsKey(address))
+			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED));
+		BtDevice btDevice = lstDevices.get(address);
+		if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
+			btDevice.gatt = mBluetoothAdapter.getRemoteDevice(address).connectGatt(this, true, mGattCallback);
+			btDevice.state = STATE_CONNECTING;
+			mHandler.postDelayed(btDevice.ConnectingTime, TIMEOUT_CONNECTION);
+			return true;
+		}
 		return false;
 	}
 
@@ -318,7 +309,6 @@ public class MainDriver extends Service implements BluetoothProfile {
         public void onCharacteristicWrite(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic, int status) {
         	Log.d(MAIN_DRIVER, "Characteristic Written (" + status + ")");
-        	
         }
 
         /**
@@ -441,7 +431,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 				
 			}
 			else
-				Log.d(MAIN_DRIVER, "------------ Sth Changed in " + characteristic.getUuid().toString());
+				Log.d(MAIN_DRIVER, "------- Sth Changed in " + characteristic.getUuid().toString() + " ----");
 
 		}
 		
@@ -486,7 +476,6 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
 			Log.d(MAIN_DRIVER, "------------ Sth Changed RSSI " + rssi);
 	    }
-	    
 	};
 	
 	/**
@@ -626,12 +615,12 @@ public class MainDriver extends Service implements BluetoothProfile {
 	}
 
 	private void broadcastUpdate(final String action, final String address,
-			final String parameter, final String value) {
-			final Intent intent = new Intent(action);
-			intent.putExtra("address", address);
-			intent.putExtra(parameter, value);
-			sendBroadcast(intent);
-		}
+		final String parameter, final String value) {
+		final Intent intent = new Intent(action);
+		intent.putExtra("address", address);
+		intent.putExtra(parameter, value);
+		sendBroadcast(intent);
+	}
 	
 	
 	 

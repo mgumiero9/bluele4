@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="android.renderscript.Sampler"/>
 <fullyQualifiedTypeName name="java.security.spec.MGF1ParameterSpec"/>
 <fullyQualifiedTypeName name="com.example.teste1.R.id"/>
 <fullyQualifiedTypeName name="android.app.Fragment"/>
@@ -8,7 +7,6 @@
 <fullyQualifiedTypeName name="android.content.Intent"/>
 <fullyQualifiedTypeName name="com.example.driver.MainActivity"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter"/>
-<fullyQualifiedTypeName name="android.util.Log"/>
 <fullyQualifiedTypeName name="android.widget.Button"/>
 <fullyQualifiedTypeName name="java.text.MessageFormat"/>
 <fullyQualifiedTypeName name="android.os.Bundle"/>
@@ -20,7 +18,6 @@
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothProfile"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCallback"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattService"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
 <fullyQualifiedTypeName name="java.util.Deque"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothDevice"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
@@ -59,5 +56,8 @@
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter.LeScanCallback"/>
 <fullyQualifiedTypeName name="android.content.BroadcastReceiver"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
 <fullyQualifiedTypeName name="com.example.driver.R.id"/>
+<fullyQualifiedTypeName name="android.util.Log"/>
+<fullyQualifiedTypeName name="android.content.DialogInterface.OnClickListener"/>
 </qualifiedTypeNameHistroy>

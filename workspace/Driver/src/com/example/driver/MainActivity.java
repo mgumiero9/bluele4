@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -83,7 +84,8 @@ public class MainActivity extends ListActivity{
 				Log.d("MAIN_THREAD", "Find Device");
 				Map<String, String> newMap = new HashMap<String, String>();
 				newMap.put("Address", intent.getStringExtra("address").substring(0,17));
-				newMap.put("Name", intent.getStringExtra("address").substring(17));
+				newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
+				newMap.put("Connection", "OFF");
 				newMap.put("Value1", "?");
 				newMap.put("Value2", "?");
 				newMap.put("Value3", "?");
@@ -131,8 +133,6 @@ public class MainActivity extends ListActivity{
         }
     };
         
-        
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
@@ -195,6 +195,18 @@ public class MainActivity extends ListActivity{
 		Map<String, String> itemAtPosition = (Map<String, String>) l.getItemAtPosition(position);
 		mainDriver.connect(itemAtPosition.get("Address"));
 	}
+	class myLocaClick implements OnClickListener {
+        int rowid;
+        public myCustomClass(int rowid){
+            this.rowid=rowid;
+        }
+
+        @Override
+    	public void onCheck(View view) {
+    		Log.d("MAIN", view.toString() + rowid);		
+    	}
+
+    }
 	
 	
 	public void disconnectDevice(View view) {
