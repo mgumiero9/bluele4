@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.security.spec.MGF1ParameterSpec"/>
-<fullyQualifiedTypeName name="com.example.teste1.R.id"/>
-<fullyQualifiedTypeName name="android.app.Fragment"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothManager"/>
 <fullyQualifiedTypeName name="android.content.Intent"/>
 <fullyQualifiedTypeName name="com.example.driver.MainActivity"/>
@@ -32,7 +29,6 @@
 <fullyQualifiedTypeName name="android.widget.ArrayAdapter"/>
 <fullyQualifiedTypeName name="android.content.Context"/>
 <fullyQualifiedTypeName name="android.view.LayoutInflater"/>
-<fullyQualifiedTypeName name="android.widget.TextView"/>
 <fullyQualifiedTypeName name="android.view.View"/>
 <fullyQualifiedTypeName name="android.view.ViewGroup"/>
 <fullyQualifiedTypeName name="java.lang.Integer"/>
@@ -42,22 +38,26 @@
 <fullyQualifiedTypeName name="android.R"/>
 <fullyQualifiedTypeName name="android.R.id"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
-<fullyQualifiedTypeName name="com.example.driver.R.layout"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattDescriptor"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver.OPERATION"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="android.os.Handler.Callback"/>
 <fullyQualifiedTypeName name="android.os.Binder"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
-<fullyQualifiedTypeName name="android.widget.SimpleAdapter"/>
 <fullyQualifiedTypeName name="android.content.IntentFilter"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter.LeScanCallback"/>
 <fullyQualifiedTypeName name="android.content.BroadcastReceiver"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
-<fullyQualifiedTypeName name="com.example.driver.R.id"/>
 <fullyQualifiedTypeName name="android.util.Log"/>
 <fullyQualifiedTypeName name="android.content.DialogInterface.OnClickListener"/>
+<fullyQualifiedTypeName name="android.widget.SimpleAdapter"/>
+<fullyQualifiedTypeName name="com.example.driver.R.layout"/>
+<fullyQualifiedTypeName name="android.widget.CheckBox"/>
+<fullyQualifiedTypeName name="android.widget.TextView"/>
+<fullyQualifiedTypeName name="com.example.driver.R.id"/>
+<fullyQualifiedTypeName name="android.widget.CompoundButton.OnCheckedChangeListener"/>
+<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
 </qualifiedTypeNameHistroy>

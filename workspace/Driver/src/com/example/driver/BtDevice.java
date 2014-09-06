@@ -41,19 +41,20 @@ public class BtDevice {
 	public Runnable ConnectingTime = new Runnable() {
 		@Override
 		public void run() {
-			Log.e("BT DEVICE", "Connecting Operation Timeout on address " + gatt.getDevice().getAddress());
 			if (state == MainDriver.STATE_CONNECTING) {
-				state = MainDriver.STATE_DISCONNECTED;
-				gatt.disconnect();
+				Log.e("BT DEVICE", "Connecting timeout " + gatt.getDevice().getAddress() + ". Trying again...");
+				gatt.connect();
 			}
 			if (state == MainDriver.STATE_DISCONNECTING) {
-				state = MainDriver.STATE_CONNECTED;
-				
+				Log.e("BT DEVICE", "Disconnecting timeout " + gatt.getDevice().getAddress() + ". Trying again...");
+				gatt.disconnect();
 			}
 		}
 	};
 
-
+	public void clearOperation() {
+		operations.clear();
+	}
 	
 	public void addOperation(BluetoothGattCharacteristic characteristic,
 				BluetoothGattDescriptor descriptor, OPERATION operation) {

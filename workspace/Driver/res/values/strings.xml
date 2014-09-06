@@ -9,5 +9,6 @@
     <string name="notify">Notify</string>
     <string name="Discovery">action_menu</string>
     <string name="discovery_menu">Discovery</string>
+    <string name="clear_list">Clear List</string>
 
 </resources>

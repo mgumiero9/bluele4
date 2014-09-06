@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="314" key="DIALOG_WIDTH"/>
+		<item value="318" key="DIALOG_WIDTH"/>
 		<item value="176" key="DIALOG_Y_ORIGIN"/>
-		<item value="418" key="DIALOG_HEIGHT"/>
 		<item value="651" key="DIALOG_X_ORIGIN"/>
+		<item value="420" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="connect" key="selection"/>
+		<item value="onCheck" key="selection"/>
 		<list key="findhistory">
+			<item value="onCheck"/>
+			<item value="NEW"/>
 			<item value="connect"/>
 			<item value="Connect"/>
 			<item value="CONNECT"/>
 			<item value="connecyt"/>
 			<item value="Name"/>
 			<item value="?"/>
-			<item value="ACTION_CON"/>
-			<item value="UpdateB"/>
 		</list>
 		<list key="replacehistory">
 			<item value="ACTION_"/>

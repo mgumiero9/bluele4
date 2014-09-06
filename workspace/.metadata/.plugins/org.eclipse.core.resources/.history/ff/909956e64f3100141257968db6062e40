@@ -1,7 +1,0 @@
-package com.example.teste1;
-
-import BluetoothProfile;
-
-public class Bluetooth_CDCDevice extends BluetoothProfile {
-
-}

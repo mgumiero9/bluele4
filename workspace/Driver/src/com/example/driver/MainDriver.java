@@ -1,10 +1,6 @@
 package com.example.driver;
-import java.nio.ByteOrder;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Deque;
+
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,23 +12,13 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothHealth;
-import android.bluetooth.BluetoothHealthAppConfiguration;
-import android.bluetooth.BluetoothHealthCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothAdapter.LeScanCallback;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.audiofx.AudioEffect.Descriptor;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 
@@ -179,15 +165,14 @@ public class MainDriver extends Service implements BluetoothProfile {
 			new BluetoothAdapter.LeScanCallback() {
 				@Override
 				public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-					Log.d(MAIN_DRIVER, "Found Device "+ device.getName() + "-" + device.getAddress() + "-" + device.getType());
 					if (!lstDevices.isEmpty() && (lstDevices.containsKey(device.getAddress()))) {
 						return;
 					}
+					Log.d(MAIN_DRIVER, "Found Device "+ device.getName() + "-" + device.getAddress() + "-" + device.getBluetoothClass().toString());
 					broadcastUpdate(ACTION_FIND_DEVICE, device.getAddress(), device.getName());
 				}
 			};
 			
-		
 	/**
 	 * Why would be necessary disconnect ?
 	 * @param address
@@ -195,24 +180,29 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 */
 	public boolean disconnect(String address) {
 		BtDevice btDevice = lstDevices.get(address);
-		if ((btDevice != null) && (btDevice.state != STATE_DISCONNECTED) && (btDevice.state != STATE_DISCONNECTING)) {
-			btDevice.gatt.disconnect();
-			btDevice.state = STATE_DISCONNECTING;
-			mHandler.postDelayed(btDevice.ConnectingTime, TIMEOUT_CONNECTION);
-			Log.d(MAIN_DRIVER, "Disconnecting " + address);
-			return true;
+		if (btDevice != null) {
+			if ((btDevice.state != STATE_DISCONNECTED) && (btDevice.state != STATE_DISCONNECTING)) {
+				btDevice.clearOperation();
+				btDevice.gatt.disconnect();
+				btDevice.state = STATE_DISCONNECTING;
+				mHandler.postDelayed(btDevice.ConnectingTime, TIMEOUT_CONNECTION);
+				Log.d(MAIN_DRIVER, "Disconnecting " + address);
+				
+				return true;
+			}
 		}
 		return false;
 	}
 	
 	/**
-	 * How will Activity get this address?
+	 * Connect to device with address specified
+	 * The devices is get from Bluetooth adapter and insert in DeviceList when necessary
 	 * 
 	 */
 	public boolean connect(String address) {
 		stopDiscovery();
 		if (mBluetoothAdapter.getRemoteDevice(address) == null) {
-			Log.d(MAIN_DRIVER, "Adapter has no device");
+			Log.e(MAIN_DRIVER, "Adapter has no device with address " + address);
 			return false;
 		}
 		if (!lstDevices.containsKey(address))
@@ -239,70 +229,59 @@ public class MainDriver extends Service implements BluetoothProfile {
                 int newState) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				BtDevice btDevice = lstDevices.get(gatt.getDevice().getAddress());
-				if (btDevice != null) {
-					mHandler.removeCallbacks(btDevice.ConnectingTime);
-					btDevice.state = newState;
-					// DEBUG
-					switch(newState) {
-					case STATE_CONNECTED:
-						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " CONNECTED");
-						break;
-					case STATE_DISCONNECTED:
-						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " DISCONNECTED");
-						break;
-					case STATE_DISCONNECTING:
-						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " DISCONNECTING");
-						btDevice.operations.clear();
-						break;
-					case STATE_CONNECTING:
-						Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " CONNECTING");
-						btDevice.operations.clear();
-						break;
-					}
-					
-					if ((newState == STATE_CONNECTED) || (newState == STATE_DISCONNECTED)) {
-						mHandler.removeCallbacks(btDevice.ConnectingTime);
-					}
-					
-					// DEBUG
-					if (newState == STATE_CONNECTED) {
-						//if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
-							Log.d(MAIN_DRIVER, "Getting Services");
-							btDevice.gatt.discoverServices();
-							broadcastUpdate(ACTION_CONNECTED, gatt.getDevice().getAddress(), "");
-												//} else {
-						//	Log.d(MAIN_DRIVER, "Services Already Updated");
-						//	listServices(gatt, true);
-						//}
-					} else {
-						btDevice.operations.clear();
-						broadcastUpdate(ACTION_DISCONNECTED, gatt.getDevice().getAddress(), "");
-					}
-					return;
+				if (btDevice == null) {
+					lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState));
 				} else {
-					Log.d(MAIN_DRIVER, "Device not found in callback");
+					btDevice.state = newState;
 				}
-				
+				// On connection : list services
+				switch(newState) {
+				case STATE_CONNECTED:
+					mHandler.removeCallbacks(btDevice.ConnectingTime);
+					broadcastUpdate(ACTION_CONNECTED, gatt.getDevice().getAddress(), "");
+					if ((btDevice.gatt.getServices() == null) || (btDevice.gatt.getServices().isEmpty())){
+						Log.d(MAIN_DRIVER, gatt.getDevice().getAddress() + ": Discovering services");
+						btDevice.gatt.discoverServices();
+					} else {
+						listServices(gatt, false);
+					}
+					break;
+				case STATE_DISCONNECTED:
+					mHandler.removeCallbacks(btDevice.ConnectingTime);
+					btDevice.operations.clear();
+					broadcastUpdate(ACTION_DISCONNECTED, gatt.getDevice().getAddress(), "");
+					break;
+				case STATE_DISCONNECTING:
+					Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " DISCONNECTING");
+					btDevice.clearOperation();
+					break;
+				case STATE_CONNECTING:
+					Log.d(MAIN_DRIVER, "Device " + gatt.getDevice().getAddress() + " CONNECTING");
+					btDevice.operations.clear();
+					break;
+				}
 			}
 			else
+				// The error 257 should be treated. Some tests stops because this error code
 				Log.d(MAIN_DRIVER, "Connection State Error (" + status + ")");
         }
 
         /**
-         * Happens after call .discoverServices()
+         * Happens after call .discoverServices(). And if not????? timeout? Not happen until now...
          */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
 
         	if (status == BluetoothGatt.GATT_SUCCESS) {
-				listServices(gatt, true);
+				listServices(gatt, false);
             } else {
+            	// Never found any error
                 Log.w(MAIN_DRIVER, "onServicesDiscovered received: " + status);
             }
         }
 
         /**
-         * Which writes are needed?
+         * How manipulate configuration???
          * 
          * @see android.bluetooth.BluetoothGattCallback#onCharacteristicWrite(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)
          */
@@ -347,18 +326,10 @@ public class MainDriver extends Service implements BluetoothProfile {
             }
             
             NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
-            /*
-            if (index < lstCharacteristics.size()) {
-	            if (lstCharacteristics.size() > 1) {
-	            	mBluetoothGatt.readCharacteristic(lstCharacteristics.get(index));
-	            }
-            }	
-            index++;
-            */            	
         }
         
         /**
-         * Notifications are treated here
+         * Notifications are treated here. And if notifications stops without any feedback?
          */
 		public void onCharacteristicChanged(BluetoothGatt gatt,
 		        BluetoothGattCharacteristic characteristic) {
@@ -464,7 +435,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    }
 	    
 	    /**
-	     * Callback invoked when a reliable write transaction has been completed.
+	     * Callback invoked when a reliable write transaction has been completed. None until now.
 	     *
 	     * @param gatt GATT client invoked {@link BluetoothGatt#executeReliableWrite}
 	     * @param status {@link BluetoothGatt#GATT_SUCCESS} if the reliable write
@@ -473,6 +444,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
 	    }
 
+	    /**
+	     * For?
+	     */
 	    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
 			Log.d(MAIN_DRIVER, "------------ Sth Changed RSSI " + rssi);
 	    }
@@ -488,7 +462,7 @@ public class MainDriver extends Service implements BluetoothProfile {
     	if (btDevice == null)
     		return;
 		for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
-			Log.d(MAIN_DRIVER, "Found Service " + uuidToString(bluetoothGattService.getUuid()) + "(" + bluetoothGattService.getType() +")");
+			Log.d(MAIN_DRIVER, "Found Service " + uuidToString(bluetoothGattService.getUuid()));
 			for(BluetoothGattCharacteristic bluetoothGattCharacteristic: bluetoothGattService.getCharacteristics()) {
 				if(bluetoothGattCharacteristic.getDescriptors().isEmpty()) {
 					Log.d(MAIN_DRIVER, "Characteristic:" + uuidToString(bluetoothGattCharacteristic.getUuid()) + "(" + bluetoothGattCharacteristic.getPermissions() + ")");
@@ -526,60 +500,21 @@ public class MainDriver extends Service implements BluetoothProfile {
     }
 	
     /**
+     * Call BtDevice for the next operation.
+     * THINK MORE
+     * Its possible notification stops without any feedback about connection?
      * 
      * @param btDevice
      */
 	public void NextOperation(BtDevice btDevice) {
 		if(btDevice == null)
 			return;
-		Log.d(MAIN_DRIVER, "Issuing next operation");
 		mTimeoutHandler.removeCallbacks(btDevice.ReadWriteTimeout);
 		if (btDevice.execNextOperation())
 			mTimeoutHandler.postDelayed(btDevice.ReadWriteTimeout, TIMEOUT_READWRITE);
 	}
 
-    public class LocalBinder extends Binder {
-        MainDriver getService() {
-            return MainDriver.this;
-        }
-    }
-    
-    /**
-     * After using a given BLE device, the app must call this method to ensure resources are
-     * released properly.
-     */
-    public void close() {
-    	if (!lstDevices.isEmpty()) {
-	    	for (BtDevice btDevice : lstDevices.values()) {
-	    		if(btDevice.gatt != null)
-	    			btDevice.gatt.close();
-	    		btDevice.gatt = null;
-	    		btDevice = null;
-			}
-    	}
-    }    
-
-    
-    /**
-     * Android Services
-     * Service shoud not 
-     */
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mBinder;
-	}
 	
-    @Override
-    public boolean onUnbind(Intent intent) {
-        // After using a given device, you should make sure that BluetoothGatt.close() is called
-        // such that resources are cleaned up properly.  In this particular example, close() is
-        // invoked when the UI is disconnected from the Service.
-        close();
-        return super.onUnbind(intent);
-    }
-    
-    private final IBinder mBinder = new LocalBinder();
- 
 
 	@Override
 	public List<BluetoothDevice> getConnectedDevices() {
@@ -685,5 +620,49 @@ public class MainDriver extends Service implements BluetoothProfile {
 	   		return uuid.toString();
 	   	}
 	}
+
+    public class LocalBinder extends Binder {
+        MainDriver getService() {
+            return MainDriver.this;
+        }
+    }
+    
+    /**
+     * After using a given BLE device, the app must call this method to ensure resources are
+     * released properly.
+     */
+    public void close() {
+    	if (!lstDevices.isEmpty()) {
+	    	for (BtDevice btDevice : lstDevices.values()) {
+	    		if(btDevice.gatt != null)
+	    			btDevice.gatt.close();
+	    		btDevice.gatt = null;
+	    		btDevice = null;
+			}
+    	}
+    }    
+
+    /**
+     * Android Services
+     * Service shoud not 
+     */
+	@Override
+	public IBinder onBind(Intent intent) {
+		return mBinder;
+	}
+	
+    @Override
+    public boolean onUnbind(Intent intent) {
+        // After using a given device, you should make sure that BluetoothGatt.close() is called
+        // such that resources are cleaned up properly.  In this particular example, close() is
+        // invoked when the UI is disconnected from the Service.
+        close();
+        return super.onUnbind(intent);
+    }
+    
+    private final IBinder mBinder = new LocalBinder();
+ 
+	
+	
 }
 

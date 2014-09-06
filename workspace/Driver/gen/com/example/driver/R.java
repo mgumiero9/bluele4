@@ -26,6 +26,7 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
+        public static final int action_clear=0x7f080013;
         public static final int action_discovery=0x7f080012;
         public static final int action_settings=0x7f080011;
         public static final int btnConfig=0x7f08000b;
@@ -58,6 +59,7 @@ public final class R {
         public static final int Discovery=0x7f050006;
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
+        public static final int clear_list=0x7f050008;
         public static final int connect=0x7f050003;
         public static final int disconnect=0x7f050004;
         public static final int discovery_menu=0x7f050007;
