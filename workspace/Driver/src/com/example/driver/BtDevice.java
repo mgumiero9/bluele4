@@ -14,7 +14,7 @@ public class BtDevice {
 	public int init_state = 0;
 	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
 
-	public enum OPERATION { READ, WRITE, SET_NOT};
+	public enum OPERATION { READ, READ_FINISH, WRITE, SET_NOT};
 	public class ProcessIO {
 		public ProcessIO( BluetoothGattCharacteristic characteristic,
 				BluetoothGattDescriptor descriptor, OPERATION operation) {
@@ -87,6 +87,8 @@ public class BtDevice {
 	    		}
 	    	} else if (newProcess.operation == OPERATION.SET_NOT) {
 	    		setNotification(newProcess.characteristic);
+	    	} else if (newProcess.operation == OPERATION.READ_FINISH) {
+	    		// Do Nothing
 	    	}
 	    	return newProcess;
         }

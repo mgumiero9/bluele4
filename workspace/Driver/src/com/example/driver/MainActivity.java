@@ -2,8 +2,12 @@ package com.example.driver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,7 +15,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.DropBoxManager.Entry;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +29,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.GridLayout;
+import android.widget.GridLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -124,66 +132,87 @@ public class MainActivity extends ListActivity{
 					}
 				}
 			}
+			else if (action.equals(MainDriver.ACTION_UPDATED)) {
+				// Call Dialog
+				showDialogInfo(intent.getExtras());
+			}
         }
     };
         
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		 super.onCreate(savedInstanceState);
-		    list = buildData();
-		    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
-		    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtCon , R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
+		super.onCreate(savedInstanceState);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    list = buildData();
+	    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
+	    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtCon , R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
 
-	        final Intent intent = getIntent();
-		    
-		    adapter = new SimpleAdapter(this, list, R.layout.row, from, to)
-		    {
-		    	@Override
-		    	public void notifyDataSetChanged() {
-		    		super.notifyDataSetChanged();
-		    	}
-		    	
-	            @Override
-	            public View getView (int position, View convertView, ViewGroup parent)
-	            {
-	                View v = super.getView(position, convertView, parent);
+	    adapter = new SimpleAdapter(this, list, R.layout.row, from, to)
+	    {
+	    	@Override
+	    	public void notifyDataSetChanged() {
+	    		super.notifyDataSetChanged();
+	    	}
+	    	
+            @Override
+            public View getView (int position, View convertView, ViewGroup parent)
+            {
+                View v = super.getView(position, convertView, parent);
 
-	                TextView txtView = (TextView) v.findViewById(R.id.txtAddress);
-	                if (txtView != null) {
-	                	final String address = txtView.getText().toString();
-		                Button btnConfig = (Button) v.findViewById(R.id.btnConfig);
-		                CheckBox chkDev = (CheckBox) v.findViewById(R.id.chkDev);
-		                
-		                chkDev.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-							
-							@Override
-							public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-								if (isChecked) {
-									mainDriver.connect(address);
-								} else {
-									mainDriver.disconnect(address);
-								}
-								
-							}
-						});
-		                
-		                
-	                	btnConfig.setOnClickListener(new OnClickListener() {
+                TextView txtView = (TextView) v.findViewById(R.id.txtAddress);
+                if (txtView != null) {
+                	final String address = txtView.getText().toString();
+	                Button btnConfig = (Button) v.findViewById(R.id.btnConfig);
+	                Button btnInfo = (Button) v.findViewById(R.id.btnInfo);
+	                CheckBox chkDev = (CheckBox) v.findViewById(R.id.chkDev);
+	                
+	                chkDev.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						
-							@Override
-							public void onClick(View v) {
-								Log.d("MAIN ACT", "Botao Config Clicked");
-								
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+							if (isChecked) {
+								mainDriver.connect(address);
+							} else {
+								mainDriver.disconnect(address);
 							}
-						});
-	                }
-	                return v;
-		        };
-		    };
-		    setListAdapter(adapter);
-			
-		    Intent mainDriverIntent = new Intent(this, MainDriver.class);
-	        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
+							
+						}
+					});
+	                
+	                
+                	btnConfig.setOnClickListener(new OnClickListener() {
+					
+						@Override
+						public void onClick(View v) {
+							Log.d("MAIN ACT", "Botao Config Clicked");
+							
+						}
+					});
+                	
+                	btnInfo.setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							// Call dialog for details
+							mainDriver.readAll(address);
+							
+						}
+					});
+                }
+        	    setListAdapter(adapter);
+
+        	    // Trying divide uniformly
+        		//GridLayout.LayoutParams params = (LayoutParams) v.getLayoutParams();
+        		//params.width = (parent.getWidth()/parent.getColumnCount()) -params.rightMargin - params.leftMargin;
+        		//child.setLayoutParams(params);
+
+        	    return v;
+	        };
+	    };
+
+
+	    Intent mainDriverIntent = new Intent(this, MainDriver.class);
+        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
 
 	}
 
@@ -248,7 +277,107 @@ public class MainActivity extends ListActivity{
         Log.d("MAIN THREAD", "onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }	
-	
+
+    
+    private class DeviceDetails extends DialogFragment {
+    	HashMap<String, String> list;
+    	
+    	public DeviceDetails (HashMap<String, String> list) {
+    		this.list = list;  
+    	}
+    	
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+		    		    
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			ArrayList<Map<String, String>> listView = new ArrayList<Map<String, String>>();
+			for (String key : list.keySet()) {
+				listView.put("Parameter", key);
+				listView.put("Value", list.get(key));
+			}
+			
+		    String[] from = { "Parameter", "Value"};
+		    int[] to = { R.id.deviceParameter, R.id.deviceValue};
+
+		    SimpleAdapter listAdapter = new SimpleAdapter(null, listView, R.layout.list_line, from, to);
+			
+			
+		    // Get the layout inflater
+		    LayoutInflater inflater = getActivity().getLayoutInflater();
+
+		    // Inflate and set the layout for the dialog
+		    // Pass null as the parent view because its going in the dialog layout
+		    builder.setView(inflater.inflate(R.layout.dialog_signin, null))
+		    // Add action buttons
+		           .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int id) {
+		                   // sign in the user ...
+		               }
+		           })
+		           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+		               public void onClick(DialogInterface dialog, int id) {
+		                   LoginDialogFragment.this.getDialog().cancel();
+		               }
+		           });      
+		    return builder.create();
+
+		    
+		    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		    // Set the dialog title
+		    builder.setTitle("Dispositivo " + list.get("address"));
+		    // Specify the list array, the items to be selected by default (null for none),
+		    // and the listener through which to receive callbacks when items are selected
+		    builder.setItems(list., listener)
+		    .setMultiChoiceItems(R.array.toppings, null,
+		                      new DialogInterface.OnMultiChoiceClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int which,
+		                       boolean isChecked) {
+		                   if (isChecked) {
+		                       // If the user checked the item, add it to the selected items
+		                       mSelectedItems.add(which);
+		                   } else if (mSelectedItems.contains(which)) {
+		                       // Else, if the item is already in the array, remove it 
+		                       mSelectedItems.remove(Integer.valueOf(which));
+		                   }
+		               }
+		           })
+		    // Set the action buttons
+		           .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int id) {
+		                   // User clicked OK, so save the mSelectedItems results somewhere
+		                   // or return them to the component that opened the dialog
+		                   
+		               }
+		           })
+		           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+		               @Override
+		               public void onClick(DialogInterface dialog, int id) {
+		                   
+		               }
+		           });
+
+		    return builder.create();
+		}					
+	};
+    	
+    }
+    
+    private void showDialogInfo(HashMap<String, String> list) {
+		
+    	AlertDialog builder = new AlertDialog.Builder(this);
+    	
+    	builder.set
+		
+		AlertDialog.Builder builder = new AlertDialog(this) {
+		
+		// 3. Get the AlertDialog from create()
+		AlertDialog dialog = builder.create();
+
+    }
+    
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MainDriver.ACTION_CONNECTED);
@@ -256,6 +385,7 @@ public class MainActivity extends ListActivity{
         intentFilter.addAction(MainDriver.ACTION_FIND_DEVICE);
         intentFilter.addAction(MainDriver.ACTION_NEW_DATA);
         intentFilter.addAction(MainDriver.ACTION_STOP_DISCOVERY);
+        intentFilter.addAction(MainDriver.ACTION_UPDATED);
         return intentFilter;
     }    
     

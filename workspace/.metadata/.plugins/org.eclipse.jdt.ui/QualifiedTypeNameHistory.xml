@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.text.MessageFormat"/>
-<fullyQualifiedTypeName name="android.os.Bundle"/>
-<fullyQualifiedTypeName name="android.os.Message"/>
-<fullyQualifiedTypeName name="android.app.Service"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothHealthCallback"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothHealthAppConfiguration"/>
-<fullyQualifiedTypeName name="java.util.UUID"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothProfile"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCallback"/>
-<fullyQualifiedTypeName name="java.util.Deque"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothDevice"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
 <fullyQualifiedTypeName name="java.lang.Process"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver.Operation"/>
@@ -36,7 +25,6 @@
 <fullyQualifiedTypeName name="android.os.Handler.Callback"/>
 <fullyQualifiedTypeName name="android.os.Binder"/>
 <fullyQualifiedTypeName name="android.content.IntentFilter"/>
-<fullyQualifiedTypeName name="java.util.HashMap"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothAdapter.LeScanCallback"/>
 <fullyQualifiedTypeName name="android.content.BroadcastReceiver"/>
@@ -44,20 +32,32 @@
 <fullyQualifiedTypeName name="android.util.Log"/>
 <fullyQualifiedTypeName name="android.content.DialogInterface.OnClickListener"/>
 <fullyQualifiedTypeName name="android.widget.SimpleAdapter"/>
-<fullyQualifiedTypeName name="com.example.driver.R.layout"/>
 <fullyQualifiedTypeName name="android.widget.CheckBox"/>
 <fullyQualifiedTypeName name="android.widget.TextView"/>
-<fullyQualifiedTypeName name="com.example.driver.R.id"/>
 <fullyQualifiedTypeName name="android.widget.CompoundButton.OnCheckedChangeListener"/>
-<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattService"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver.ConnectingTimeout"/>
 <fullyQualifiedTypeName name="java.lang.Runnable"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
 <fullyQualifiedTypeName name="android.bluetooth.BluetoothGattDescriptor"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice.OPERATION"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
 <fullyQualifiedTypeName name="com.example.driver.BtDevice.ProcessIO"/>
 <fullyQualifiedTypeName name="android.text.format.Time"/>
 <fullyQualifiedTypeName name="com.example.driver.MainDriver.OperationTimeout"/>
+<fullyQualifiedTypeName name="android.content.pm.ActivityInfo"/>
+<fullyQualifiedTypeName name="android.widget.GridLayout"/>
+<fullyQualifiedTypeName name="com.example.driver.R"/>
+<fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
+<fullyQualifiedTypeName name="java.lang.reflect.ParameterizedType"/>
+<fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice.OPERATION"/>
+<fullyQualifiedTypeName name="android.content.Intent"/>
+<fullyQualifiedTypeName name="java.text.BreakIterator"/>
+<fullyQualifiedTypeName name="android.app.Dialog"/>
+<fullyQualifiedTypeName name="android.app.AlertDialog"/>
+<fullyQualifiedTypeName name="android.app.AlertDialog.Builder"/>
+<fullyQualifiedTypeName name="android.app.DialogFragment"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="android.os.DropBoxManager.Entry"/>
+<fullyQualifiedTypeName name="com.example.driver.R.id"/>
+<fullyQualifiedTypeName name="com.example.driver.R.layout"/>
 </qualifiedTypeNameHistroy>

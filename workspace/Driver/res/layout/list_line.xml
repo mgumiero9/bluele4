@@ -1,30 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnCount="3" >
 
     <TextView
-        android:id="@+id/deviceName"
-        android:layout_column="0"
-        android:layout_gravity="right|top"
-        android:layout_row="0" />
-
-    <TextView
-        android:id="@+id/deviceAddress"
-        android:layout_column="1"
+        android:id="@+id/deviceParameter"
         android:layout_gravity="right|top" />
 
     <TextView
-        android:id="@+id/value1"
-        android:layout_column="0"
-        android:layout_gravity="right|top"
-        android:layout_row="1" />
+        android:id="@+id/deviceValue"
+        android:layout_column="1" />
 
-    <TextView
-        android:id="@+id/value2"
-        android:layout_column="1"
-        android:layout_gravity="right|top"
-        android:layout_row="1" />
-
-</GridLayout>
+</LinearLayout>

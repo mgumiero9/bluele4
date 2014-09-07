@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.format.Time;
 import android.util.Log;
 
 
@@ -38,6 +37,13 @@ public class MainDriver extends Service implements BluetoothProfile {
 	final static String ACTION_NEW_DATA 		= "NEW_DATA";
 	final static String ACTION_CONNECTED 		= "CONNECTED";
 	final static String ACTION_DISCONNECTED  	= "DISCONNECTED";
+	final static String ACTION_UPDATED		  	= "UPDATED";
+	
+	final static int SET_ACCUMULATIVE_VALUE = 0;
+	final static int SET_SENSOR_CALIBRATION = 1;
+	final static int SET_SENSOR_POSITION = 2;
+	final static int SET_REQUEST_SUPPORTED_POSITION = 3;
+		
 	
 	/**
 	 * Timeout for Read/Write Parameters and Connection. From command to callback.
@@ -96,7 +102,6 @@ public class MainDriver extends Service implements BluetoothProfile {
 	private BluetoothManager mBluetoothManager = null;
 	private boolean LeDiscovering = false;
 	
-	private Handler mTimeoutHandler = new Handler();
 	private Handler mHandler = new Handler();
 	private Handler mDiscoveryHandler = new Handler();
 	private HashMap<String,BtDevice> lstDevices = new HashMap<String, BtDevice>();
@@ -157,14 +162,17 @@ public class MainDriver extends Service implements BluetoothProfile {
 				mHandler.removeCallbacks(this);
 				return;
 			}
-			device = btDevice;
-			process = device.execNextOperation();
+			process = btDevice.execNextOperation();
+			
+			if (process.operation == BtDevice.OPERATION.READ_FINISH) {
+				mHandler.removeCallbacks(this);
+				broadcastRead(btDevice);
+			}
 		}
 		
 		@Override
 		public void run() {
 			if (process != null) {
-				Log.d()
 				device.addOperation(process);
 				mHandler.postDelayed(new OperationTimeout(device), TIMEOUT_READWRITE);
 			}
@@ -274,7 +282,6 @@ public class MainDriver extends Service implements BluetoothProfile {
 		BtDevice btDevice = lstDevices.get(address);
 		if ((btDevice.state != STATE_CONNECTED) && (btDevice.state != STATE_CONNECTING)) {
 			btDevice.gatt = mBluetoothAdapter.getRemoteDevice(address).connectGatt(null, true, mGattCallback);
-			//btDevice.gatt.connect();
 			btDevice.state = STATE_CONNECTING;
 			mHandler.postDelayed(new ConnectingTimeout(btDevice), TIMEOUT_CONNECTION);
 			return true;
@@ -369,30 +376,7 @@ public class MainDriver extends Service implements BluetoothProfile {
                 BluetoothGattCharacteristic characteristic,
                 int status) {
         	
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-            	final String msg;
-            	
-            	if ((characteristic.getUuid().equals(UUID_DEVICE_NAME)) || (characteristic.getUuid().equals(UUID_CSC_MEASUREMENT)) ||
-            		(characteristic.getUuid().equals(UUID_FIRMWARE_REV)) || (characteristic.getUuid().equals(UUID_HARDWARE_REV)) ||
-            		(characteristic.getUuid().equals(UUID_MANUFACTURER)) || (characteristic.getUuid().equals(UUID_SERIAL_NUMBER)) ||
-            		(characteristic.getUuid().equals(UUID_SOFTWARE_REV)) || (characteristic.getUuid().equals(UUID_PREFERRED_PARAMETERS))) {
-            		msg = uuidToString(characteristic.getUuid()) +"="+ characteristic.getStringValue(0) + "; ";
-            	} else if((characteristic.getUuid().equals(UUID_PNP_ID)) ||
-            	(characteristic.getUuid().equals(UUID_APPEARENCE)) || (characteristic.getUuid().equals(UUID_CSC_FEATURE)) ||
-            	(characteristic.getUuid().equals(UUID_CLIENT_CHARACTERISTICS))) {
-            		msg = uuidToString(characteristic.getUuid()) + "="+ String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)) + "; ";
-            	} else if ((characteristic.getUuid().equals(UUID_PREFERRED_PARAMETERS)) || (characteristic.getUuid().equals(UUID_BATTERY_LEVEL)) ||
-            			(characteristic.getUuid().equals(UUID_SENSOR_LOCATION)) || (characteristic.getUuid().equals(UUID_HEART_CP)) || 
-            			(characteristic.getUuid().equals(UUID_BODY_LOCATION))) {
-            		msg = uuidToString(characteristic.getUuid()) + "=" + String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)) + "; ";
-            	} else {
-            		msg = uuidToString(characteristic.getUuid()) +"="+ characteristic.getStringValue(0) + " " + 
-            	characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 0) + " " +
-            	characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0) + " " +
-            	characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 0) + " (" + characteristic.getProperties() + ")";
-            	}
-            	Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Read " + msg);
-            } else {
+            if (status != BluetoothGatt.GATT_SUCCESS) {
             	Log.d(MAIN_DRIVER, "Dev" + gatt.getDevice().getAddress() + "Error Read Characteristic " +  characteristic.getUuid().toString());
             }
             
@@ -591,10 +575,26 @@ public class MainDriver extends Service implements BluetoothProfile {
 				}
 			}
 		}
+		btDevice.addOperation(null, null, BtDevice.OPERATION.READ_FINISH);
 		
         mHandler.postDelayed(new OperationTimeout(lstDevices.get(gatt.getDevice().getAddress())), TIMEOUT_READWRITE);
     }
 	
+    public boolean readAll(final String address) {
+    	
+    	BtDevice device = lstDevices.get(address);
+    	if (device == null) {
+    		return false;
+    	}
+    	    	
+    	listServices(device.gatt, true);
+    	
+    	// Wait for finish
+    	
+    	return true;
+    }
+    
+    
 	@Override
 	public List<BluetoothDevice> getConnectedDevices() {
 		// TODO Auto-generated method stub
@@ -636,7 +636,52 @@ public class MainDriver extends Service implements BluetoothProfile {
 		sendBroadcast(intent);
 	}
 	
+	private void broadcastRead(BtDevice device) {
+    	
+		final Intent intent = new Intent(ACTION_UPDATED);
+		intent.putExtra("address", device.gatt.getDevice().getAddress());
+
+		for (BluetoothGattService service : device.gatt.getServices()) {
+			for(BluetoothGattCharacteristic characteristic: service.getCharacteristics()) {
+		    	if ((characteristic.getUuid().equals(UUID_DEVICE_NAME)) || (characteristic.getUuid().equals(UUID_CSC_MEASUREMENT)) ||
+		    		(characteristic.getUuid().equals(UUID_FIRMWARE_REV)) || (characteristic.getUuid().equals(UUID_HARDWARE_REV)) ||
+		    		(characteristic.getUuid().equals(UUID_MANUFACTURER)) || (characteristic.getUuid().equals(UUID_SERIAL_NUMBER)) ||
+		    		(characteristic.getUuid().equals(UUID_SOFTWARE_REV)) || (characteristic.getUuid().equals(UUID_PREFERRED_PARAMETERS))) {
+		    		intent.putExtra(uuidToString(characteristic.getUuid()), characteristic.getStringValue(0));
+		    	} else if((characteristic.getUuid().equals(UUID_PNP_ID)) ||
+		    	(characteristic.getUuid().equals(UUID_APPEARENCE)) || (characteristic.getUuid().equals(UUID_CSC_FEATURE)) ||
+		    	(characteristic.getUuid().equals(UUID_CLIENT_CHARACTERISTICS))) {
+		    		intent.putExtra(uuidToString(characteristic.getUuid()), String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)));
+		    	} else if ((characteristic.getUuid().equals(UUID_PREFERRED_PARAMETERS)) || (characteristic.getUuid().equals(UUID_BATTERY_LEVEL)) ||
+    			(characteristic.getUuid().equals(UUID_SENSOR_LOCATION)) || (characteristic.getUuid().equals(UUID_HEART_CP)) || 
+    			(characteristic.getUuid().equals(UUID_BODY_LOCATION))) {
+		    		intent.putExtra(uuidToString(characteristic.getUuid()), String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)));
+		    	} else {
+		    		intent.putExtra(uuidToString(characteristic.getUuid()), String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)));
+		    	}
+			}
+    	}
+		sendBroadcast(intent);
+	}
 	
+	
+	public boolean applyCommand(final String address, final int command, final String parameter) {
+		BtDevice device = lstDevices.get(address);
+		if (device == null)
+			return false;
+
+		switch(command) {
+		case SET_ACCUMULATIVE_VALUE :
+			break;
+		case SET_REQUEST_SUPPORTED_POSITION :
+			break;
+		case SET_SENSOR_CALIBRATION :
+			break;
+		case SET_SENSOR_POSITION :
+			break;
+		}
+		return false;
+	}
 	 
 	private String uuidToString(UUID uuid) {
     	if (uuid.equals(UUID_DEVICE_NAME)) {
