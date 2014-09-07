@@ -77,7 +77,6 @@ public class MainActivity extends ListActivity{
 				return;
 			}
 			else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
-				Log.d("MAIN_THREAD", "Find Device");
 				Map<String, String> newMap = new HashMap<String, String>();
 				newMap.put("Address", intent.getStringExtra("address").substring(0,17));
 				newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
@@ -93,7 +92,6 @@ public class MainActivity extends ListActivity{
 			else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
 				for (Map<String, String> element : list) {
 					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						Log.d("MAIN_THREAD", "Item Found");
 						if (intent.hasExtra("Value1"))
 							element.put("Value1", intent.getStringExtra("Value1"));
 						if (intent.hasExtra("Value2"))

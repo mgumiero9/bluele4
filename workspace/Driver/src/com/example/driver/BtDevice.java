@@ -41,14 +41,6 @@ public class BtDevice {
 	public Runnable ConnectingTime = new Runnable() {
 		@Override
 		public void run() {
-			if (state == MainDriver.STATE_CONNECTING) {
-				Log.e("BT DEVICE", "Connecting timeout " + gatt.getDevice().getAddress() + ". Trying again...");
-				gatt.connect();
-			}
-			if (state == MainDriver.STATE_DISCONNECTING) {
-				Log.e("BT DEVICE", "Disconnecting timeout " + gatt.getDevice().getAddress() + ". Trying again...");
-				gatt.disconnect();
-			}
 		}
 	};
 
@@ -60,11 +52,16 @@ public class BtDevice {
 				BluetoothGattDescriptor descriptor, OPERATION operation) {
 		operations.add(new ProcessIO(characteristic, descriptor, operation));
 	}
+
+	public void addOperation(ProcessIO process) {
+		if (process != null)
+			operations.add(process);
+	}
+
 	
 	final UUID UUID_CLIENT_CHARACTERISTICS = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");	// Descriptor
 	
     public void setNotification(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-		Log.d("BT DEVICE", "Setting Notification");
 		gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
 		BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(UUID_CLIENT_CHARACTERISTICS);
 		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
@@ -72,7 +69,7 @@ public class BtDevice {
     }
 	
 	
-	public boolean execNextOperation() {
+	public ProcessIO execNextOperation() {
         if (!operations.isEmpty())
         {
 	    	ProcessIO newProcess = operations.poll();
@@ -91,9 +88,9 @@ public class BtDevice {
 	    	} else if (newProcess.operation == OPERATION.SET_NOT) {
 	    		setNotification(newProcess.characteristic);
 	    	}
-	    	return true;
+	    	return newProcess;
         }
-        return false;
+        return null;
 	}
 	
 	public BtDevice(int state) {
