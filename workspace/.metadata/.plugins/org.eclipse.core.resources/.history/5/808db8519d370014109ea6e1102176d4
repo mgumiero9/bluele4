@@ -531,24 +531,6 @@ public class MainDriver extends Service implements BluetoothProfile {
     			Log.d(MAIN_DRIVER, "Set Notification for Cycling Device on " + gatt.getDevice().getAddress());
     		}
     	}
-
-    	// Testing Scale
-    	if (gatt.getService(UUID_SERVICE_SCALE_1) != null) {
-    		if (gatt.getService(UUID_SERVICE_SCALE_1).getCharacteristic(UUID_SCALE_2) != null) {
-    			btDevice.addOperation(gatt.getService(UUID_SERVICE_SCALE_1).getCharacteristic(UUID_SCALE_2), null, OPERATION.SET_NOT);
-    			Log.d(MAIN_DRIVER, "Set Notification for Cycling Device on " + gatt.getDevice().getAddress());
-    		}
-    	}
-    	if (gatt.getService(UUID_SERVICE_SCALE_2) != null) {
-    		if (gatt.getService(UUID_SERVICE_SCALE_2).getCharacteristic(UUID_SCALE_5) != null) {
-    			btDevice.addOperation(gatt.getService(UUID_SERVICE_SCALE_2).getCharacteristic(UUID_SCALE_5), null, OPERATION.SET_NOT);
-    			Log.d(MAIN_DRIVER, "Set Notification for Cycling Device on " + gatt.getDevice().getAddress());
-    		}
-    	}
-
-	
-	
-	
 	}
 		
 	/**
@@ -882,6 +864,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return "Scale 2";
 		} else if(uuid.equals(UUID_SCALE_3)) {
 			return "Scale 3";
+		} else if(uuid.equals(UUID_SCALE_4)) {
+			return "Scale 4";
 		} else if(uuid.equals(UUID_SCALE_5)) {
 			return "Scale 5";
 		} else if(uuid.equals(UUID_SCALE_6)) {

@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="326" key="DIALOG_WIDTH"/>
-		<item value="356" key="DIALOG_Y_ORIGIN"/>
-		<item value="424" key="DIALOG_HEIGHT"/>
-		<item value="325" key="DIALOG_X_ORIGIN"/>
+		<item value="330" key="DIALOG_WIDTH"/>
+		<item value="65" key="DIALOG_Y_ORIGIN"/>
+		<item value="1150" key="DIALOG_X_ORIGIN"/>
+		<item value="426" key="DIALOG_HEIGHT"/>
 		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="isRegEx"/>
 		<item value="false" key="casesensitive"/>
+		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="startDisco" key="selection"/>
+		<item value="enableN" key="selection"/>
 		<list key="findhistory">
-			<item value="startDisco"/>
-			<item value="Log."/>
-			<item value="Log.d(MAIN_DRIVER, &quot;Unable to initialize BluetoothManager.&quot;);"/>
-			<item value="stopDiscovery"/>
-			<item value="Connect"/>
-			<item value="connect"/>
-			<item value="CONNECT"/>
-			<item value="Log"/>
+			<item value="enableN"/>
+			<item value="setNotif"/>
+			<item value="getDevices"/>
+			<item value="onChara"/>
+			<item value="enableNoti"/>
+			<item value="UUID_HEART_MEASUREMENT"/>
+			<item value="180d"/>
+			<item value="Services"/>
 		</list>
 		<list key="replacehistory">
 			<item value="ACTION_"/>

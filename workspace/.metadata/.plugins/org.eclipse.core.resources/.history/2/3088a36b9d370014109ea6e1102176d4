@@ -882,6 +882,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return "Scale 2";
 		} else if(uuid.equals(UUID_SCALE_3)) {
 			return "Scale 3";
+		} else if(uuid.equals(UUID_SCALE_4)) {
+			return "Scale 4";
 		} else if(uuid.equals(UUID_SCALE_5)) {
 			return "Scale 5";
 		} else if(uuid.equals(UUID_SCALE_6)) {
