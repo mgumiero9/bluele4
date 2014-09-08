@@ -247,7 +247,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return false;
 		}
 		if (!lstDevices.containsKey(address))
-			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED, address));
+			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED));
 		BtDevice device = lstDevices.get(address);
 		
 		stopDiscovery(); // Its necessary stopDiscovery before any connection

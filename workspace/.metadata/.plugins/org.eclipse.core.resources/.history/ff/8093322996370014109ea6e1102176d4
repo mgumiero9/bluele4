@@ -138,8 +138,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 		@Override
 		public void run() {
 			if ((device.state != STATE_CONNECTED) && (device.enable)) {
-				Log.d(MAIN_DRIVER, "Connecting timeout " + device.address + ". Trying again...");
-				connect(device.address);
+				Log.d(MAIN_DRIVER, "Connecting timeout " + device.gatt.getDevice().getAddress() + ". Trying again...");
+				connect(device.gatt.getDevice().getAddress());
 				mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
 			}
 		}
@@ -247,7 +247,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return false;
 		}
 		if (!lstDevices.containsKey(address))
-			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED, address));
+			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED));
 		BtDevice device = lstDevices.get(address);
 		
 		stopDiscovery(); // Its necessary stopDiscovery before any connection
@@ -279,16 +279,16 @@ public class MainDriver extends Service implements BluetoothProfile {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
 				if (device == null) {
-					lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState, gatt.getDevice().getAddress()));
+					lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState));
 				} else {
 				}
 				// On connection : list services
 				switch(newState) {
 				case STATE_CONNECTED:
 					mHandler.removeCallbacks(device.ConnectingTime);
-					broadcastUpdate(ACTION_CONNECTED, device.address, "");
+					broadcastUpdate(ACTION_CONNECTED, gatt.getDevice().getAddress(), "");
 					if ((device.gatt.getServices() == null) || (device.gatt.getServices().isEmpty())){
-						Log.d(MAIN_DRIVER, device.address + ": Discovering services");
+						Log.d(MAIN_DRIVER, gatt.getDevice().getAddress() + ": Discovering services");
 						device.gatt.discoverServices();
 					} else {
 						listServices(gatt, device.updating);
@@ -301,7 +301,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 					device.operations.clear();
 					if (device.enable) {
 						device.state = STATE_CONNECTING;
-						device.gatt = mBluetoothAdapter.getRemoteDevice(device.address).connectGatt(null, true, this);
+						device.gatt = mBluetoothAdapter.getRemoteDevice(gatt.getDevice().getAddress()).connectGatt(null, true, this);
 						mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
 					}
 					else
@@ -628,7 +628,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final String parameter, final String value) {
 		final Intent intent = new Intent(action);
 		if(action.equals(ACTION_FIND_DEVICE)) {
-			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED, parameter));
+			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED));
 			Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
 			intent.putExtra("address", parameter + value);
 			sendBroadcast(intent);

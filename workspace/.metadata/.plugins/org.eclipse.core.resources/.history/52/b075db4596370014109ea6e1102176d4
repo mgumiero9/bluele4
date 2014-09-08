@@ -247,7 +247,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return false;
 		}
 		if (!lstDevices.containsKey(address))
-			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED, address));
+			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED));
 		BtDevice device = lstDevices.get(address);
 		
 		stopDiscovery(); // Its necessary stopDiscovery before any connection
@@ -628,7 +628,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final String parameter, final String value) {
 		final Intent intent = new Intent(action);
 		if(action.equals(ACTION_FIND_DEVICE)) {
-			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED, parameter));
+			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED));
 			Log.d(MAIN_DRIVER, "Sending Message: New Device Found");
 			intent.putExtra("address", parameter + value);
 			sendBroadcast(intent);

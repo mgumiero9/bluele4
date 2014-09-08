@@ -11,7 +11,6 @@ import android.util.Log;
 
 public class BtDevice {
 	public BluetoothGatt gatt = null;
-	public String address = null;
 	public int state = 0;
 	public boolean enable = false;
 	private int retries = 0;
@@ -155,9 +154,8 @@ public class BtDevice {
 	 * 
 	 * @param state
 	 */
-	public BtDevice(int state, String address) {
+	public BtDevice(int state) {
 		this.state = state;
-		this.address = address;
 	}
 	
 }
