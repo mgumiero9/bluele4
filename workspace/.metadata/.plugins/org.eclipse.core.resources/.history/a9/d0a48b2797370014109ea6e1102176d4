@@ -90,10 +90,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final UUID UUID_CONTROL_POINT = UUID.fromString("00002a55-0000-1000-8000-00805f9b34fb");	// used for calibration
 	
 
-	final UUID UUID_SERVICE_HEART_MEASUREMENT = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb");
-		final UUID UUID_BODY_LOCATION = UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb");	// uint8
-		final UUID UUID_HEART_CP = UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb");	// uint8
-		final UUID UUID_HEART_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");	// uint8	
+	final UUID UUID_BODY_LOCATION = UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb");	// uint8
+	final UUID UUID_HEART_CP = UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb");	// uint8
+	final UUID UUID_HEART_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");	// uint8	
 		
 	final UUID UUID_SYSTEM_ID = UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb");
 	final UUID UUID_CERTIFICATION = UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb");
@@ -415,22 +414,27 @@ public class MainDriver extends Service implements BluetoothProfile {
 				Log.d(MAIN_DRIVER, "HEART size=" + characteristic.getValue().length + " flag=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0));
 				int pos = 1;
 				int contact = (characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) / 2) & 0x3;
+				Log.d(MAIN_DRIVER, "Contato Status=" + contact);
 				broadcastUpdate(ACTION_NEW_DATA, gatt.getDevice().getAddress(), "Value1", String.valueOf(contact));
 
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x01) == 0x01) {
+					Log.d(MAIN_DRIVER, "Batimentos=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					broadcastUpdate(ACTION_NEW_DATA, gatt.getDevice().getAddress(), "Value2", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
 					pos++;
 					pos++;
 				} else {
+					Log.d(MAIN_DRIVER, "Batimentos=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, pos));
 					broadcastUpdate(ACTION_NEW_DATA, gatt.getDevice().getAddress(), "Value2", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, pos)));
 					pos++;
 				}
 				
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x08) == 0x08) {
+					Log.d(MAIN_DRIVER, "Energia=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					broadcastUpdate(ACTION_NEW_DATA, gatt.getDevice().getAddress(), "Value3", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
 					pos = pos + 2;
 				}
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x10) == 0x10) {
+					Log.d(MAIN_DRIVER, "RR Interval=" + characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos));
 					broadcastUpdate(ACTION_NEW_DATA, gatt.getDevice().getAddress(), "Value4", String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, pos)));
 					pos = pos + 2;
 				}
@@ -512,9 +516,9 @@ public class MainDriver extends Service implements BluetoothProfile {
     		}
     	}
     	// Heart Monitor Device
-    	if (gatt.getService(UUID_SERVICE_HEART_MEASUREMENT) != null) {
-    		if (gatt.getService(UUID_SERVICE_HEART_MEASUREMENT).getCharacteristic(UUID_HEART_MEASUREMENT) != null) {
-    			btDevice.addOperation(gatt.getService(UUID_SERVICE_HEART_MEASUREMENT).getCharacteristic(UUID_HEART_MEASUREMENT), null, OPERATION.SET_NOT);
+    	if (gatt.getService(UUID_HEART_MEASUREMENT) != null) {
+    		if (gatt.getService(UUID_HEART_MEASUREMENT).getCharacteristic(UUID_HEART_MEASUREMENT) != null) {
+    			btDevice.addOperation(gatt.getService(UUID_HEART_MEASUREMENT).getCharacteristic(UUID_HEART_MEASUREMENT), null, OPERATION.SET_NOT);
     			Log.d(MAIN_DRIVER, "Set Notification for Heart Monitor on " + gatt.getDevice().getAddress());
     		}
     	}
