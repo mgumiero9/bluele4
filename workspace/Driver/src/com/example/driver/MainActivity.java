@@ -75,25 +75,22 @@ public class MainActivity extends ListActivity{
     		final String action = intent.getAction();
     		//final String mAddress = intent.;
     		if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
-    			runOnUiThread(new Runnable() {
-    				@Override
-    				public void run() {
-    					//Button local = (Button)findViewById(R.id.btnStartDiscovery);
-    					//local.setText("Start");
-    				}
-    			});
     			return;
     		}
     		else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
     			Map<String, String> newMap = new HashMap<String, String>();
     			newMap.put("Address", intent.getStringExtra("address").substring(0,17));
-    			newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
+    			if (intent.getStringExtra("address").length() >=21)
+    				newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
+    			else 
+    				newMap.put("Name", intent.getStringExtra("address").substring(17));
     			newMap.put("Connection", "OFF");
     			newMap.put("Value1", "?");
     			newMap.put("Value2", "?");
     			newMap.put("Value3", "?");
     			newMap.put("Value4", "?");
     			list.add(newMap);
+    			Log.d("LIST", "List Size " + list.size() );
     			adapter.notifyDataSetChanged();
     			return;
     		}
@@ -202,7 +199,7 @@ public class MainActivity extends ListActivity{
 						}
 					});
                 }
-        	    setListAdapter(adapter);
+        	    
 
         	    // Trying divide uniformly
         		//GridLayout.LayoutParams params = (LayoutParams) v.getLayoutParams();
@@ -214,7 +211,6 @@ public class MainActivity extends ListActivity{
 	    };
 	    
 	    setListAdapter(adapter);
-
 
 	    Intent mainDriverIntent = new Intent(this, MainDriver.class);
         bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -237,6 +233,9 @@ public class MainActivity extends ListActivity{
 		 
 	private void showDialogInfo(Bundle list) {
 		
+		for (String key : list.keySet()) {
+			Log.d("DETALHES", "Info: " + key + " = " + list.getString(key));	
+		}
 	}
 	
 	@Override

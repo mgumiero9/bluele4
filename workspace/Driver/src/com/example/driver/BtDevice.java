@@ -6,18 +6,19 @@ import java.util.UUID;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.os.Handler;
+import android.content.Intent;
 import android.util.Log;
 
 public class BtDevice {
 	public BluetoothGatt gatt = null;
 	public int state = 0;
-	public int init_state = 0;
+	public boolean enable = false;
 	private int retries = 0;
 	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
 	private ProcessIO lastOperation;
 	public boolean updating = false;
 	public ReadWriteTimeoutCallback reply;
+	public Intent intentRead = new Intent(MainDriver.ACTION_UPDATED);
 	
 
 	public enum OPERATION { READ, READ_FINISH, WRITE, SET_NOT};
@@ -36,11 +37,18 @@ public class BtDevice {
 	public Runnable ReadWriteTimeout = new Runnable() {
 		@Override
 		public void run() {
-			Log.d("BT DEVICE", "Read/Write Operation Timeout on address " + gatt.getDevice().getAddress());
+			Log.d("BT DEVICE", "Read/Write Operation Timeout on address " + gatt.getDevice().getAddress() + ". Trying " + retries);
+			retries++;
 			// Reinsert the operation
-			reply.callbackTimeout();
-			execLastOperation();
 			
+			if (retries < 9) {
+				if (execLastOperation())
+					reply.callbackTimeout();
+				else
+					reply.callbackFinish();
+			} else
+				reply.callbackNextOper();
+				
 		}
 	};
 	
@@ -84,21 +92,18 @@ public class BtDevice {
      */
     private boolean execOperation (ProcessIO process) {
     	if (process.operation == OPERATION.READ) {
-    		Log.d("OPER", "Reading data");
     		if (process.descriptor != null) {
     			gatt.readDescriptor(process.descriptor);
     		} else {
     			gatt.readCharacteristic(process.characteristic);
     		}
     	} else if (process.operation == OPERATION.WRITE){
-    		Log.d("OPER", "Writing data");
     		if (process.descriptor != null) {
     			gatt.writeDescriptor(process.descriptor);
     		} else {
     			gatt.writeCharacteristic(process.characteristic);
     		}
     	} else if (process.operation == OPERATION.SET_NOT) {
-    		Log.d("OPER", "Notification data");
     		setNotification(process.characteristic);
     		return false;
     	}
@@ -110,9 +115,12 @@ public class BtDevice {
      * @return
      */
     public boolean execLastOperation() {
-    	Log.d("OPER", "Last Operation");
     	if (lastOperation == null)
     		return false;
+    	if (lastOperation.characteristic == null)
+    		Log.d("OPER", "Retrying " + lastOperation.toString() + " " + lastOperation.descriptor.getUuid().toString());
+    	else
+    		Log.d("OPER", "Retrying " + lastOperation.toString() + " " + lastOperation.characteristic.getUuid().toString());
     	execOperation(lastOperation);
     	//mHandler.postDelayed(ReadWriteTimeout, TIMEOUT_READWRITE);
 		return true; 
@@ -123,6 +131,7 @@ public class BtDevice {
      * @return
      */
 	public boolean execNextOperation(ReadWriteTimeoutCallback callback) {
+		retries = 0;
 		reply = callback;
 		Log.d("OPER", "Next Operation");
 		//mHandler.removeCallbacks(ReadWriteTimeout);
@@ -131,7 +140,7 @@ public class BtDevice {
 	    	ProcessIO newProcess = operations.poll();
 			if (!execOperation(newProcess))
 			{
-				execNextOperation();
+				execNextOperation(callback);
 			}
 	    	lastOperation = newProcess;
 	    	//mHandler.postDelayed(ReadWriteTimeout, TIMEOUT_READWRITE);
