@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.DropBoxManager.Entry;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -69,80 +70,83 @@ public class MainActivity extends ListActivity{
     // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
     //                        or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            Log.d("MAIN_THREAD", "Received Action:" + action);
-			//final String mAddress = intent.;
-			if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						//Button local = (Button)findViewById(R.id.btnStartDiscovery);
-						//local.setText("Start");
-					}
-				});
-				return;
-			}
-			else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
-				Map<String, String> newMap = new HashMap<String, String>();
-				newMap.put("Address", intent.getStringExtra("address").substring(0,17));
-				newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
-				newMap.put("Connection", "OFF");
-				newMap.put("Value1", "?");
-				newMap.put("Value2", "?");
-				newMap.put("Value3", "?");
-				newMap.put("Value4", "?");
-				list.add(newMap);
-				adapter.notifyDataSetChanged();
-				return;
-			}
-			else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
-				for (Map<String, String> element : list) {
-					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						if (intent.hasExtra("Value1"))
-							element.put("Value1", intent.getStringExtra("Value1"));
-						if (intent.hasExtra("Value2"))
-							element.put("Value2", intent.getStringExtra("Value2"));
-						if (intent.hasExtra("Value3"))
-							element.put("Value3", intent.getStringExtra("Value3"));
-						if (intent.hasExtra("Value4"))
-							element.put("Value4", intent.getStringExtra("Value4"));
-						adapter.notifyDataSetChanged();
-						return;
-					}
-				}
-				return;
-			} 
-			else if (action.equals(MainDriver.ACTION_CONNECTED)) {
-				for (Map<String, String> element : list) {
-					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						element.put("Connection", "ON");
-						adapter.notifyDataSetChanged();
-						return;
-					}
-				}
-			}
-			else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
-				for (Map<String, String> element : list) {
-					if (element.get("Address").equals(intent.getStringExtra("address"))) {
-						element.put("Connection", "OFF");
-						adapter.notifyDataSetChanged();
-						return;
-					}
-				}
-			}
-			else if (action.equals(MainDriver.ACTION_UPDATED)) {
-				// Call Dialog
-				showDialogInfo(intent.getExtras());
-			}
-        }
+    	@Override
+    	public void onReceive(Context context, Intent intent) {
+    		final String action = intent.getAction();
+    		//final String mAddress = intent.;
+    		if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
+    			runOnUiThread(new Runnable() {
+    				@Override
+    				public void run() {
+    					//Button local = (Button)findViewById(R.id.btnStartDiscovery);
+    					//local.setText("Start");
+    				}
+    			});
+    			return;
+    		}
+    		else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
+    			Map<String, String> newMap = new HashMap<String, String>();
+    			newMap.put("Address", intent.getStringExtra("address").substring(0,17));
+    			newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
+    			newMap.put("Connection", "OFF");
+    			newMap.put("Value1", "?");
+    			newMap.put("Value2", "?");
+    			newMap.put("Value3", "?");
+    			newMap.put("Value4", "?");
+    			list.add(newMap);
+    			adapter.notifyDataSetChanged();
+    			return;
+    		}
+    		else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
+    			for (Map<String, String> element : list) {
+    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    					if (intent.hasExtra("Value1"))
+    						element.put("Value1", intent.getStringExtra("Value1"));
+    					if (intent.hasExtra("Value2"))
+    						element.put("Value2", intent.getStringExtra("Value2"));
+    					if (intent.hasExtra("Value3"))
+    						element.put("Value3", intent.getStringExtra("Value3"));
+    					if (intent.hasExtra("Value4"))
+    						element.put("Value4", intent.getStringExtra("Value4"));
+    					adapter.notifyDataSetChanged();
+    					return;
+    				}
+    			}
+    			return;
+    		} 
+    		else if (action.equals(MainDriver.ACTION_CONNECTED)) {
+    			for (Map<String, String> element : list) {
+    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    					element.put("Connection", "ON");
+    					adapter.notifyDataSetChanged();
+    					return;
+    				}
+    			}
+    		}
+    		else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
+    			for (Map<String, String> element : list) {
+    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    					element.put("Connection", "OFF");
+    					adapter.notifyDataSetChanged();
+    					return;
+    				}
+    			}
+    		}
+    		else if (action.equals(MainDriver.ACTION_UPDATED)) {
+    			// Call Dialog
+    			showDialogInfo(intent.getExtras());
+    		}
+    	}
     };
-        
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+
+    @Override
+
+    /**
+     * 
+     */
+    protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 	    list = buildData();
 	    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
 	    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtCon , R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
@@ -179,7 +183,6 @@ public class MainActivity extends ListActivity{
 						}
 					});
 	                
-	                
                 	btnConfig.setOnClickListener(new OnClickListener() {
 					
 						@Override
@@ -209,6 +212,8 @@ public class MainActivity extends ListActivity{
         	    return v;
 	        };
 	    };
+	    
+	    setListAdapter(adapter);
 
 
 	    Intent mainDriverIntent = new Intent(this, MainDriver.class);
@@ -229,7 +234,11 @@ public class MainActivity extends ListActivity{
 		item.put("Value2", purpose[2]);
 		return item;
 	}*/
-		  
+		 
+	private void showDialogInfo(Bundle list) {
+		
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -259,124 +268,12 @@ public class MainActivity extends ListActivity{
 		return super.onOptionsItemSelected(item);
 	}
 	
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		@SuppressWarnings("unchecked")
-		Map<String, String> itemAtPosition = (Map<String, String>) l.getItemAtPosition(position);
-		mainDriver.connect(itemAtPosition.get("Address"));
-	}
-	
-	public void disconnectDevice(View view) {
-		mainDriver.disconnect(address);
-	}
-	
     @Override
     protected void onResume() {
         super.onResume();
         Log.d("MAIN THREAD", "onResume");
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }	
-
-    
-    private class DeviceDetails extends DialogFragment {
-    	HashMap<String, String> list;
-    	
-    	public DeviceDetails (HashMap<String, String> list) {
-    		this.list = list;  
-    	}
-    	
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-		    		    
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			ArrayList<Map<String, String>> listView = new ArrayList<Map<String, String>>();
-			for (String key : list.keySet()) {
-				listView.put("Parameter", key);
-				listView.put("Value", list.get(key));
-			}
-			
-		    String[] from = { "Parameter", "Value"};
-		    int[] to = { R.id.deviceParameter, R.id.deviceValue};
-
-		    SimpleAdapter listAdapter = new SimpleAdapter(null, listView, R.layout.list_line, from, to);
-			
-			
-		    // Get the layout inflater
-		    LayoutInflater inflater = getActivity().getLayoutInflater();
-
-		    // Inflate and set the layout for the dialog
-		    // Pass null as the parent view because its going in the dialog layout
-		    builder.setView(inflater.inflate(R.layout.dialog_signin, null))
-		    // Add action buttons
-		           .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
-		               @Override
-		               public void onClick(DialogInterface dialog, int id) {
-		                   // sign in the user ...
-		               }
-		           })
-		           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-		               public void onClick(DialogInterface dialog, int id) {
-		                   LoginDialogFragment.this.getDialog().cancel();
-		               }
-		           });      
-		    return builder.create();
-
-		    
-		    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		    // Set the dialog title
-		    builder.setTitle("Dispositivo " + list.get("address"));
-		    // Specify the list array, the items to be selected by default (null for none),
-		    // and the listener through which to receive callbacks when items are selected
-		    builder.setItems(list., listener)
-		    .setMultiChoiceItems(R.array.toppings, null,
-		                      new DialogInterface.OnMultiChoiceClickListener() {
-		               @Override
-		               public void onClick(DialogInterface dialog, int which,
-		                       boolean isChecked) {
-		                   if (isChecked) {
-		                       // If the user checked the item, add it to the selected items
-		                       mSelectedItems.add(which);
-		                   } else if (mSelectedItems.contains(which)) {
-		                       // Else, if the item is already in the array, remove it 
-		                       mSelectedItems.remove(Integer.valueOf(which));
-		                   }
-		               }
-		           })
-		    // Set the action buttons
-		           .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-		               @Override
-		               public void onClick(DialogInterface dialog, int id) {
-		                   // User clicked OK, so save the mSelectedItems results somewhere
-		                   // or return them to the component that opened the dialog
-		                   
-		               }
-		           })
-		           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-		               @Override
-		               public void onClick(DialogInterface dialog, int id) {
-		                   
-		               }
-		           });
-
-		    return builder.create();
-		}					
-	};
-    	
-    }
-    
-    private void showDialogInfo(HashMap<String, String> list) {
-		
-    	AlertDialog builder = new AlertDialog.Builder(this);
-    	
-    	builder.set
-		
-		AlertDialog.Builder builder = new AlertDialog(this) {
-		
-		// 3. Get the AlertDialog from create()
-		AlertDialog dialog = builder.create();
-
-    }
     
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();

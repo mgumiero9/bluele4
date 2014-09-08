@@ -6,13 +6,19 @@ import java.util.UUID;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.os.Handler;
 import android.util.Log;
 
 public class BtDevice {
 	public BluetoothGatt gatt = null;
 	public int state = 0;
 	public int init_state = 0;
+	private int retries = 0;
 	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
+	private ProcessIO lastOperation;
+	public boolean updating = false;
+	public ReadWriteTimeoutCallback reply;
+	
 
 	public enum OPERATION { READ, READ_FINISH, WRITE, SET_NOT};
 	public class ProcessIO {
@@ -30,8 +36,11 @@ public class BtDevice {
 	public Runnable ReadWriteTimeout = new Runnable() {
 		@Override
 		public void run() {
-			Log.e("BT DEVICE", "Read/Write Operation Timeout on address " + gatt.getDevice().getAddress());
-			execNextOperation();
+			Log.d("BT DEVICE", "Read/Write Operation Timeout on address " + gatt.getDevice().getAddress());
+			// Reinsert the operation
+			reply.callbackTimeout();
+			execLastOperation();
+			
 		}
 	};
 	
@@ -68,33 +77,74 @@ public class BtDevice {
 		addOperation(bluetoothGattCharacteristic, descriptor, BtDevice.OPERATION.WRITE);
     }
 	
+    /**
+     * 
+     * @param process
+     * @return
+     */
+    private boolean execOperation (ProcessIO process) {
+    	if (process.operation == OPERATION.READ) {
+    		Log.d("OPER", "Reading data");
+    		if (process.descriptor != null) {
+    			gatt.readDescriptor(process.descriptor);
+    		} else {
+    			gatt.readCharacteristic(process.characteristic);
+    		}
+    	} else if (process.operation == OPERATION.WRITE){
+    		Log.d("OPER", "Writing data");
+    		if (process.descriptor != null) {
+    			gatt.writeDescriptor(process.descriptor);
+    		} else {
+    			gatt.writeCharacteristic(process.characteristic);
+    		}
+    	} else if (process.operation == OPERATION.SET_NOT) {
+    		Log.d("OPER", "Notification data");
+    		setNotification(process.characteristic);
+    		return false;
+    	}
+    	return true;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean execLastOperation() {
+    	Log.d("OPER", "Last Operation");
+    	if (lastOperation == null)
+    		return false;
+    	execOperation(lastOperation);
+    	//mHandler.postDelayed(ReadWriteTimeout, TIMEOUT_READWRITE);
+		return true; 
+    }
 	
-	public ProcessIO execNextOperation() {
+    /**
+     * 
+     * @return
+     */
+	public boolean execNextOperation(ReadWriteTimeoutCallback callback) {
+		reply = callback;
+		Log.d("OPER", "Next Operation");
+		//mHandler.removeCallbacks(ReadWriteTimeout);
         if (!operations.isEmpty())
         {
 	    	ProcessIO newProcess = operations.poll();
-	    	if (newProcess.operation == OPERATION.READ) {
-	    		if (newProcess.descriptor != null) {
-	    			gatt.readDescriptor(newProcess.descriptor);
-	    		} else {
-	    			gatt.readCharacteristic(newProcess.characteristic);
-	    		}
-	    	} else if (newProcess.operation == OPERATION.WRITE){
-	    		if (newProcess.descriptor != null) {
-	    			gatt.writeDescriptor(newProcess.descriptor);
-	    		} else {
-	    			gatt.writeCharacteristic(newProcess.characteristic);
-	    		}
-	    	} else if (newProcess.operation == OPERATION.SET_NOT) {
-	    		setNotification(newProcess.characteristic);
-	    	} else if (newProcess.operation == OPERATION.READ_FINISH) {
-	    		// Do Nothing
-	    	}
-	    	return newProcess;
+			if (!execOperation(newProcess))
+			{
+				execNextOperation();
+			}
+	    	lastOperation = newProcess;
+	    	//mHandler.postDelayed(ReadWriteTimeout, TIMEOUT_READWRITE);
+	    	return true;
         }
-        return null;
+        lastOperation = null;
+        return false;
 	}
 	
+	/**
+	 * 
+	 * @param state
+	 */
 	public BtDevice(int state) {
 		this.state = state;
 	}
