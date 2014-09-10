@@ -1,0 +1,196 @@
+package com.example.driver;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class DriverUUID {
+	
+	public static enum FORMAT {UTF8S, UINT8, UINT16 };
+
+	// Data for CDC Device
+	// Services
+	public static final UUID UUID_SERVICE_GENERIC_ACCESS = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_GENERIC_ATTRIBUTE = UUID.fromString("00001801-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_DEVICE_INFORMATION = UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_RUNNING_SPEED = UUID.fromString("00001814-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_BATTERY = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_ALERT = UUID.fromString("00001802-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_HEART_MEASUREMENT = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SERVICE_HEALTH = UUID.fromString("00001809-0000-1000-8000-00805f9b34fb");
+	
+
+	// Characteristics - Read
+	public static final UUID UUID_DEVICE_NAME = UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb");
+	public static final FORMAT UUID_DEVICE_NAME_FORMAT = FORMAT.UTF8S;
+	
+	public static final UUID UUID_APPEARENCE = UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb");
+	public static final FORMAT UUID_APPEARENCE_FORMAT = FORMAT.UTF8S;
+	
+	public static final UUID UUID_PREFERRED_PARAMETERS = UUID.fromString("00002a04-0000-1000-8000-00805f9b34fb");	// 
+	public static final UUID UUID_SERIAL_NUMBER = UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"); 			// UTF8s
+	public static final UUID UUID_HARDWARE_REV = UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb");			// UTF8s
+	public static final UUID UUID_FIRMWARE_REV = UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"); 			// UTF8s
+	public static final UUID UUID_SOFTWARE_REV = UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb");			// UTF8s
+	public static final UUID UUID_MANUFACTURER = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"); 			// UTF8s
+	public static final UUID UUID_PNP_ID = UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb");					// UINT8/16
+	
+	public static final UUID UUID_RUNNING_FEATURE = UUID.fromString("00002a54-0000-1000-8000-00805f9b34fb"); 		// 16bit bin
+	public static final UUID UUID_RUNNING_SPEED = UUID.fromString("00002a53-0000-1000-8000-00805f9b34fb"); 			// 16bit bin
+	
+	public static final UUID UUID_BATTERY_LEVEL = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");			// uint8 0-100%
+	
+	public static final UUID UUID_SERVICE_CYCLING_SPEED = UUID.fromString("00001816-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_CSC_MEASUREMENT = UUID.fromString("00002a5b-0000-1000-8000-00805f9b34fb");		// Characteristic
+			
+	public static final UUID UUID_CSC_FEATURE = UUID.fromString("00002a5c-0000-1000-8000-00805f9b34fb");			// uint16
+	// CSC_FEATURE: Bit 0 - Wheel Revolution Data Supported
+	// CSC_FEATURE: Bit 1 - Crank Revolution Data Supported 	
+	// CSC_FEATURE: Bit 2 - Multiple Sensor Locations Supported
+	public static final UUID UUID_SENSOR_LOCATION = UUID.fromString("00002a5d-0000-1000-8000-00805f9b34fb");		// uint8
+	public static final UUID UUID_CONTROL_POINT = UUID.fromString("00002a55-0000-1000-8000-00805f9b34fb");			// used for calibration
+
+
+	public static final UUID UUID_BODY_LOCATION = UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb");			// uint8
+	public static final UUID UUID_HEART_CP = UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb");				// uint8
+	public static final UUID UUID_HEART_MEASUREMENT = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");		// uint8	
+		
+	public static final UUID UUID_SYSTEM_ID = UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_CERTIFICATION = UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_MODEL = UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb");
+	
+	
+	public static final UUID UUID_SERVICE_CHANGED = UUID.fromString("00002a05-0000-1000-8000-00805f9b34fb");
+	
+	public static final UUID UUID_PRIVACY_FLAG = UUID.fromString("00002a02-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_RECONNECTION_ADDRESS = UUID.fromString("00002a03-0000-1000-8000-00805f9b34fb");
+
+	public static final UUID UUID_ALERT_LEVEL = UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb");				// UINT8
+	
+	// Descriptors
+	public static final UUID UUID_USER_DESCRIPTION = UUID.fromString("00002901-0000-1000-8000-00805f9b34fb");			// UTF8S
+	public static final UUID UUID_CLIENT_CHARACTERISTICS = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");	// UINT8
+	
+	public static final UUID UUID_TEMPERATURE_MEASUREMENT = UUID.fromString("00002a1c-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_TEMPERATURE_INTERMEDIARE = UUID.fromString("00002a1e-0000-1000-8000-00805f9b34fb");
+
+	
+	public static final UUID UUID_SERVICE_SCALE_1 = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455");
+	public static final UUID UUID_SCALE_1 = UUID.fromString("49535343-6daa-4d02-abf6-19569aca69fe");
+	public static final UUID UUID_SCALE_2 = UUID.fromString("49535343-aca3-481c-91ce-d85e28a60318");
+	public static final UUID UUID_SCALE_3 = UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb");
+
+	public static final UUID UUID_SERVICE_SCALE_2 = UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SCALE_5 = UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb");
+	public static final UUID UUID_SCALE_6 = UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb");
+
+	
+	public static final Map<UUID, FORMAT> UUID_LIST = ImmutableMap.of(UUID_DEVICE_NAME, FORMAT.UTF8S);
+
+	
+	
+	/**
+	 * TODO: Change texts for resources strings
+	 * @param uuid
+	 * @return
+	 */
+	public static String uuidToString(UUID uuid) {
+    	if (uuid.equals(UUID_DEVICE_NAME)) {
+   		 	return "Nome";
+	   	} else if (uuid.equals(UUID_BATTERY_LEVEL) || uuid.equals(UUID_SERVICE_BATTERY)) {
+	   		return "Bateria";
+	   	} else if (uuid.equals(UUID_CSC_MEASUREMENT)) {
+	   		return "Revolucoes";
+	   	} else if(uuid.equals(UUID_PREFERRED_PARAMETERS)) {
+	   		return "Preferências";
+	   	} else if(uuid.equals(UUID_PNP_ID)) {
+	   		return "Plug'n Play ID";
+	   	} else if(uuid.equals(UUID_FIRMWARE_REV)) {
+	   		return "Firmware";
+	   	} else if(uuid.equals(UUID_HARDWARE_REV)) {
+	   		return "Hardware";
+	   	} else if(uuid.equals(UUID_MANUFACTURER)) {
+	   		return "Fabricante";
+	   	} else if(uuid.equals(UUID_SERIAL_NUMBER)) {
+	   		return "Serial Number";
+	   	} else if(uuid.equals(UUID_SOFTWARE_REV)) {
+	   		return "Software Ver";
+	   	} else if (uuid.equals(UUID_CSC_FEATURE)) {
+	   		return "Features";
+	   	} else if (uuid.equals(UUID_SENSOR_LOCATION)) {
+	   		return "Localização Sensor";
+	   	} else if(uuid.equals(UUID_PREFERRED_PARAMETERS)) {
+	   		return "Preferred Params";
+	   	} else if(uuid.equals(UUID_APPEARENCE)) {
+	   		return "Aparência";
+	   	} else if(uuid.equals(UUID_CLIENT_CHARACTERISTICS)) {
+	   		return "Client Characteristics";
+	   	} else if(uuid.equals(UUID_CONTROL_POINT)) {
+	   		return "Control Point";
+	   	} else if(uuid.equals(UUID_SERVICE_CYCLING_SPEED)) {
+			return "Cycling Speed and Cadence";
+		} else if(uuid.equals(UUID_SERVICE_GENERIC_ACCESS)) {
+			return "Generic Access";
+		} else if(uuid.equals(UUID_SERVICE_GENERIC_ATTRIBUTE)) {
+			return "Generic Attribute";
+		} else if(uuid.equals(UUID_SERVICE_DEVICE_INFORMATION)) {
+			return "Informações";
+		} else if(uuid.equals(UUID_SYSTEM_ID)) {
+			return "System ID";
+		} else if(uuid.equals(UUID_CERTIFICATION)) {
+			return "Regulatory Certification";
+		} else if((uuid.equals(UUID_RUNNING_SPEED)) || (uuid.equals(UUID_SERVICE_RUNNING_SPEED))) {
+			return "Running Speed";
+		} else if(uuid.equals(UUID_RUNNING_FEATURE)) {
+			return "Funcionalidades";
+		} else if(uuid.equals(UUID_MODEL)) {
+			return "Model Number";
+		} else if(uuid.equals(UUID_BODY_LOCATION)) {
+			return "Posição Corpo";
+		} else if(uuid.equals(UUID_HEART_CP)) {
+			return "Heart Control Point";
+		} else if(uuid.equals(UUID_SCALE_1)) {
+			return "Scale 1";
+		} else if(uuid.equals(UUID_SCALE_2)) {
+			return "Scale 2";
+		} else if(uuid.equals(UUID_SCALE_3)) {
+			return "Scale 3";
+		} else if(uuid.equals(UUID_SCALE_5)) {
+			return "Scale 5";
+		} else if(uuid.equals(UUID_SCALE_6)) {
+			return "Scale 6";
+		} else if(uuid.equals(UUID_SERVICE_SCALE_1)) {
+			return "Scale Service 1";
+		} else if(uuid.equals(UUID_SERVICE_SCALE_1)) {
+			return "Scale Service 2";
+		} else if(uuid.equals(UUID_SERVICE_CHANGED)) {
+			return "Serviço Trocado";
+		} else if(uuid.equals(UUID_PRIVACY_FLAG)) {
+			return "Privacidade";
+		} else if(uuid.equals(UUID_RECONNECTION_ADDRESS)) {
+			return "Endereço Reconexão";
+		} else if(uuid.equals(UUID_USER_DESCRIPTION)) {
+			return "Descrição";
+		} else if(uuid.equals(UUID_SERVICE_ALERT)) {
+			return "Alerta";
+		} else if(uuid.equals(UUID_ALERT_LEVEL)) {
+			return "Nível de Alerta";
+		} else if(uuid.equals(UUID_SERVICE_HEALTH)) {
+			return "Termomêtro de Saúde";
+		} else if(uuid.equals(UUID_TEMPERATURE_MEASUREMENT)) {
+			return "Temperatura";
+		} else if(uuid.equals(UUID_TEMPERATURE_INTERMEDIARE)) {
+			return "Temperatura Intermediária";
+		} else if (uuid.equals(UUID_SERVICE_HEART_MEASUREMENT)) {
+			return "Batimento Cardíaco";
+		} else if (uuid.equals(UUID_SERVICE_HEART_MEASUREMENT)) {
+			return "Batimento Cardíaco";
+		} else if (uuid.equals(UUID_HEART_MEASUREMENT)) {
+			return "Batimento Cardíaco";
+	   	} else {
+	   		return uuid.toString();
+	   	}
+	}
+	
+	
+}

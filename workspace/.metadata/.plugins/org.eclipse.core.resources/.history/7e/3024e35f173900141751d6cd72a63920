@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="SERVICE_GENERIC_ACCESS">Acesso Genérico</string>
+	<string name="SERVICE_GENERIC_ATTRIBUTE">Atributos Genéricos</string>
+	<string name="SERVICE_ALERT">Alertas</string>
+			 
+		put(UUID.fromString("00001802-0000-1000-8000-00805f9b34fb"), new Details("Alertas", FORMAT.UTF8S));					// 
+		put(UUID.fromString("00001809-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UTF8S));						// SERVICE_HEALTH
+		put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), new Details("Informações", FORMAT.UTF8S));				// SERVICE_DEVICE_INFORMATION
+		put(UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb"), new Details("Cardíaco", FORMAT.UTF8S));				// SERVICE_HEART_MEASUREMENT
+		put(UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb"), new Details("Bateria", FORMAT.UTF8S));					// SERVICE_BATTERY
+		put(UUID.fromString("00001814-0000-1000-8000-00805f9b34fb"), new Details("Velocidade de Corrida", FORMAT.UTF8S));	// SERVICE_RUNNING_SPEED
+		put(UUID.fromString("00001816-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT16));						// SERVICE_CYCLING_SPEED
+	}};
+		
+	/**
+	 * Map of each characteristic
+	 */
+	public static final Map<UUID, Details> UUID_CHARACTERISTICS = new HashMap<UUID, Details>() {{
+		// Characteristics - Read
+		put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"), new Details("Nome do Dispositivo", FORMAT.UTF8S));			// DEVICE_NAME
+		put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"), new Details("Aparência", FORMAT.UTF8S));					// APPEARENCE
+		put(UUID.fromString("00002a04-0000-1000-8000-00805f9b34fb"), new Details("Parâmetros Preferenciais", FORMAT.UTF8S));	// PREFERRED_PARAMETERS 
+		put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), new Details("Serial Numbear", FORMAT.UTF8S));				// SERIAL_NUMBER
+		put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), new Details("Hardware Rev.", FORMAT.UTF8S));				// HARDWARE_REV
+		put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), new Details("Firmware Rev.", FORMAT.UTF8S));				// FIRMWARE_REV
+		put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), new Details("Software Rev.", FORMAT.UTF8S));				// SOFTWARE_REV
+		put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), new Details("Fabricante", FORMAT.UTF8S));					// MANUFACTURER
+		put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"), new Details("Plug'n Play ID", FORMAT.UINT8_16));			// PNP_ID
+		
+		put(UUID.fromString("00002a54-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT16)); 							// RUNNING_FEATURE
+		put(UUID.fromString("00002a53-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT16));							// RUNNING_SPEED
+		// SERVICE BATTERY
+		put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"), new Details("Bateria", FORMAT.UINT8));						// BATTERY_LEVEL
+		
+		
+		put(UUID.fromString("00002a5b-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT16));							// CSC_MEASUREMENT
+				
+		put(UUID.fromString("00002a5c-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT16));							// CSC_FEATURE
+		// CSC_FEATURE: Bit 0 - Wheel Revolution Data Supported
+		// CSC_FEATURE: Bit 1 - Crank Revolution Data Supported 	
+		// CSC_FEATURE: Bit 2 - Multiple Sensor Locations Supported
+		put(UUID.fromString("00002a5d-0000-1000-8000-00805f9b34fb"), new Details("Localização do Sensor", FORMAT.UINT8));		// SENSOR_LOCATION
+		put(UUID.fromString("00002a55-0000-1000-8000-00805f9b34fb"), new Details("Ponto de Controle", FORMAT.UINT16));			// CONTROL_POINT
+
+		put(UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb"), new Details("Localização no Corpo", FORMAT.UINT8));		// BODY_LOCATION
+		put(UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// HEART_CP
+		put(UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// HEART_MEASUREMENT	
+			
+		put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"), new Details("System ID", FORMAT.UINT8));					// SYSTEM_ID
+		put(UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb"), new Details("Certificação", FORMAT.UINT8));				// CERTIFICATION
+		put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), new Details("Modelo", FORMAT.UINT8));						// UUID_MODEL
+		
+		put(UUID.fromString("00002a05-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_SERVICE_CHANGED
+		
+		put(UUID.fromString("00002a02-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_PRIVACY_FLAG
+		put(UUID.fromString("00002a03-0000-1000-8000-00805f9b34fb"), new Details("Endereço de Reconexão", FORMAT.UINT8));		// UUID_RECONNECTION_ADDRESS
+
+		put(UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_ALERT_LEVEL
+		
+		
+		put(UUID.fromString("00002a1c-0000-1000-8000-00805f9b34fb"), new Details("Temperatura", FORMAT.UINT8));					// UUID_TEMPERATURE_MEASUREMENT
+		put(UUID.fromString("00002a1e-0000-1000-8000-00805f9b34fb"), new Details("Temperatura Intermediária", FORMAT.UINT8));	// UUID_TEMPERATURE_INTERMEDIARE
+
+		
+		put(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"), new Details("", FORMAT.UINT8));							// UUID_SERVICE_SCALE_1
+		put(UUID.fromString("49535343-6daa-4d02-abf6-19569aca69fe"), new Details("", FORMAT.UINT8));							// UUID_SCALE_1
+		put(UUID.fromString("49535343-aca3-481c-91ce-d85e28a60318"), new Details("", FORMAT.UINT8));							// UUID_SCALE_2
+		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8)); 							// UUID_SCALE_3
+
+		put(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_SERVICE_SCALE_2
+		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_SCALE_5
+		put(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"), new Details("", FORMAT.UINT8));							// UUID_SCALE_6
+		
+	}};
+
+	/**
+	 * Map of each descriptor 	
+	 */
+	public static final Map<UUID, Details> UUID_DESCRIPTORS = new HashMap<UUID, Details>() {{
+		put(UUID.fromString("00002901-0000-1000-8000-00805f9b34fb"), new Details("Descrição", FORMAT.UTF8S));					// UUID_USER_DESCRIPTION
+		put(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), new Details("Características", FORMAT.UINT8));				// UUID_CLIENT_CHARACTERISTICS
+	}};
+    
+
+</resources>
