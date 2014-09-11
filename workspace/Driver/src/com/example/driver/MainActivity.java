@@ -85,6 +85,7 @@ public class MainActivity extends ListActivity{
     			return;
     		}
     		else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
+    			showDialogInfo(intent.getExtras());
     			for (Map<String, String> element : list) {
     				if (element.get("Address").equals(intent.getStringExtra("address"))) {
     					if (intent.hasExtra("Value1"))
@@ -95,6 +96,7 @@ public class MainActivity extends ListActivity{
     						element.put("Value3", intent.getStringExtra("Value3"));
     					if (intent.hasExtra("Value4"))
     						element.put("Value4", intent.getStringExtra("Value4"));
+    					
     					adapter.notifyDataSetChanged();
     					return;
     				}
@@ -246,9 +248,13 @@ public class MainActivity extends ListActivity{
 		}
 
 		if (id == R.id.action_read) {
-			mainDriver.readTest();
+			mainDriver.readScale();
 		}
-		
+
+		if (id == R.id.action_init_korex) {
+			mainDriver.readKorex();
+		}
+
 		
 		return super.onOptionsItemSelected(item);
 	}

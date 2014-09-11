@@ -22,7 +22,7 @@ public class BtDevice {
 	public Intent intentRead = new Intent(MainDriver.ACTION_UPDATED);
 	
 
-	public enum OPERATION { READ, READ_FINISH, WRITE, SET_NOT};
+	public enum OPERATION { READ, READ_FINISH, WRITE, SET_NOT, SET_IND};
 	public class ProcessIO {
 		public ProcessIO( BluetoothGattCharacteristic characteristic,
 				BluetoothGattDescriptor descriptor, OPERATION operation) {
@@ -79,13 +79,21 @@ public class BtDevice {
 	
 	final UUID UUID_CLIENT_CHARACTERISTICS = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");	// Descriptor
 	
-    public void setNotification(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+    private void setNotification(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
 		gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
 		BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(UUID_CLIENT_CHARACTERISTICS);
 		descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 		addOperation(bluetoothGattCharacteristic, descriptor, BtDevice.OPERATION.WRITE);
     }
-	
+
+    private void setIndication(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+		gatt.setCharacteristicNotification(bluetoothGattCharacteristic, true);
+		BluetoothGattDescriptor descriptor = bluetoothGattCharacteristic.getDescriptor(UUID_CLIENT_CHARACTERISTICS);
+		descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+		addOperation(bluetoothGattCharacteristic, descriptor, BtDevice.OPERATION.WRITE);
+    }
+    
+    
     /**
      * 
      * @param process
@@ -107,7 +115,10 @@ public class BtDevice {
     	} else if (process.operation == OPERATION.SET_NOT) {
     		setNotification(process.characteristic);
     		return false;
-    	}
+		} else if (process.operation == OPERATION.SET_IND) {
+			setIndication(process.characteristic);
+			return false;
+		}
     	return true;
     }
     

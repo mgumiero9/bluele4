@@ -455,8 +455,10 @@ public class MainDriver extends Service implements BluetoothProfile {
 	private void readNotification(BluetoothGattCharacteristic characteristic) {
 		String[] info = DriverUUID.getCharacteristicValue(this, characteristic);
 		
+		Log.d(LOG_NOT, "Size " + info.length + " " + info.toString());
+		
 		for(int i=0; i<info.length; i = i + 2)
-			broadcastUpdate(ACTION_NEW_DATA, info[i], info[i+1]);
+			broadcastUpdate(ACTION_NEW_DATA, "Generic", info[i], info[i+1]);
 	}
 	
 	/**
@@ -475,6 +477,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 				}
 				if (hasProperty(characteristic.getProperties(), BluetoothGattCharacteristic.PROPERTY_INDICATE)) {
 					Log.d(LOG_NOT, "Possible Indication on " + gatt.getDevice().getAddress() + " for " + getString(DriverUUID.uuidToString(characteristic.getUuid())));
+					btDevice.addOperation(characteristic, null, OPERATION.SET_IND);
 				}
 			}
 		}
@@ -737,18 +740,45 @@ public class MainDriver extends Service implements BluetoothProfile {
     
     private final IBinder mBinder = new LocalBinder();
     
-    public void readTest() {
+    public void readScale() {
     	for (BtDevice device: lstDevices.values()) {
-    		if (device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")) != null) {
-    			if (device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")).getCharacteristic(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb")) != null) {
-    				device.addOperation(device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")).getCharacteristic(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb")),
-    							null, OPERATION.READ);
-    				return;
-    			}
-    		}
-			
+    		if (device.gatt != null) {
+	    		if (device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")) != null) {
+	    			if (device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")).getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb")) != null) {
+	    				BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb")).getCharacteristic(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"));
+	    				byte sex = 1; // Masc=1, Fem=0
+	    				byte pos = 1; // 0 to 9
+	    				byte age = 29;
+	    				byte level = 0; // 0-normal, 1-amador, 2=atleta
+	    				byte height = (byte) 185; //
+	    				byte[] snd = new byte[] {(byte) 0xFE, pos, sex, level, height, age, 0x01, 0x00};
+	    				for(int i=1; i<7; i++)
+	    					snd[7] = (byte) (snd[7] ^ snd[i]);
+	    				characteristic.setValue(snd);
+	    				device.addOperation(characteristic, null, OPERATION.WRITE);
+	    				NextOperation(device);
+	    				return;
+	    			}
+	    		}
+    		}			
 		}
     	Log.d("SCALE", "Scale not found");
+    }
+    
+    
+    public void readKorex() {
+    	for (BtDevice device: lstDevices.values()) {
+    		if (device.gatt != null) {
+	    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+	    			if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff06-0451-4000-b000-000000000000")) != null) {
+	    				BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff06-0451-4000-b000-000000000000"));
+	    				characteristic.setValue(new byte[] {0x1A, (byte) 0x84});
+	    				device.addOperation(characteristic, null, OPERATION.WRITE);
+	    				NextOperation(device);
+	    			}
+	    		}
+    		}
+    	}
     }
  	
 }

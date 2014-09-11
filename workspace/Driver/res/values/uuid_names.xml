@@ -8,7 +8,9 @@
 	<string name="SERVICE_HEART_MEASUREMENT">Cardíaco</string> 
 	<string name="SERVICE_BATTERY">Bateria</string> 
 	<string name="SERVICE_RUNNING_SPEED">Corrida</string> 
-	<string name="SERVICE_CYCLING_SPEED">Ciclismo</string> 
+	<string name="SERVICE_CYCLING_SPEED">Ciclismo</string>
+	<string name="SERVICE_SCALE_COMM">Ciclismo</string>
+	<string name="SERVICE_KOREX">Korex</string>
 	
 	
 	<string name="CHAR_DEVICE_NAME">Nome do Dispositivo</string> 
@@ -39,10 +41,16 @@
 	<string name="CHAR_RECONNECTION_ADDRESS">Endereço de Reconexão</string> 
 	<string name="CHAR_ALERT_LEVEL">Nível de Aviso</string> 
 	<string name="CHAR_TEMPERATURE_MEASUREMENT">Temperatura</string> 
-	<string name="CHAR_TEMPERATURE_INTERMEDIARE">Temperatura Intermediária</string> 
+	<string name="CHAR_TEMPERATURE_INTERMEDIARE">Temperatura Intermediária</string>
+	<string name="CHAR_SCALE_READ">Temperatura Intermediária</string> 
+	<string name="CHAR_SCALE_WRITE">Temperatura Intermediária</string>
+	<string name="CHAR_KOREX_DATE">Horário Registrado</string>  
+	
 
 	<string name="DESC_USER_DESCRIPTION">Descrição</string> 
 	<string name="DESC_CLIENT_CHARACTERISTICS">Características</string>
+	
+	
 	
 	<string name="UNKNOWN_NAME">Desconhecido</string>
 	
@@ -70,11 +78,25 @@
 	<string name="HEART_ENERGY">Energia Gasta (J)</string>
 	<string name="HEART_RR">Intervalo RR (s)</string>
 	
-	<!-- Heart -->
+	<!-- Health Temperature -->
 	<string name="TEMP_CELSIUS">Temperatura(oC)</string>
 	<string name="TEMP_FAHREN">Temperatura(F)</string>
 	<string name="TEMP_TIME">Temperatura Timestamp</string>
 	<string name="TEMP_TYPE">Temperatura Tipo</string>
-		
+	
+	<!--  Scale -->
+	<string name="SCALE_GROUP">Grupo</string>
+	<string name="SCALE_CAT">Categoria</string>
+	<string name="SCALE_GEN">Sexo</string>
+	<string name="SCALE_AGE">Idade</string>
+	<string name="SCALE_HEIGHT">Altura (cm)</string>
+	<string name="SCALE_WEIGHT">Peso (Kg)</string>
+	<string name="SCALE_FAT">Gordura (%)</string>
+	<string name="SCALE_BONE">Massa Óssea</string>
+	<string name="SCALE_MUSCLE">Massa Muscular</string>
+	<string name="SCALE_VISC">Nivel de Gordura Visceral</string>
+	<string name="SCALE_WATER">Indice de Água no Corpo</string>
+	<string name="SCALE_CAL">Calorias</string>
+
 			
 </resources>

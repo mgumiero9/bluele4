@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
+import android.util.Log;
 
 public class DriverUUID {
 	
@@ -14,8 +15,8 @@ public class DriverUUID {
 	 * @author asantos
 	 *
 	 */
-	public static enum FORMAT {UTF8S, UINT8, UINT16, UINT8_16, BODY_LOCATION, SENSOR_LOCATION, TEMP, UINT8_P,
-		CONN_PARMS, RUN_FEATURE, CODE, EN_DISA, ADDRESS, CSC, RSC, HEART };
+	public static enum FORMAT {_UTF8S, _UINT8, _UINT16, _UINT8_16, _UINT8_P, BODY_LOCATION, SENSOR_LOCATION, TEMP, 
+		CONN_PARMS, RUN_FEATURE, CODE, EN_DISA, ADDRESS, CSC, RSC, HEART, SCALE, KOR_DATE };
 
 	/**
 	 * Just used for HashMap storage of the each characteristic details 
@@ -50,16 +51,19 @@ public class DriverUUID {
 	 * Map of each service 	
 	 */
 	@SuppressWarnings("serial")
-	public static final Map<UUID, Details> UUID_SERVICES = new HashMap<UUID, Details>() {{
-		put(UUID.fromString("00001800-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_GENERIC_ACCESS, FORMAT.UTF8S));
-		put(UUID.fromString("00001801-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_GENERIC_ATTRIBUTE, FORMAT.UTF8S));
-		put(UUID.fromString("00001802-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_ALERT, FORMAT.UTF8S));
-		put(UUID.fromString("00001809-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_HEALTH, FORMAT.UTF8S));
-		put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_DEVICE_INFORMATION, FORMAT.UTF8S));
-		put(UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_HEART_MEASUREMENT, FORMAT.UTF8S));
-		put(UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_BATTERY, FORMAT.UTF8S));
-		put(UUID.fromString("00001814-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_RUNNING_SPEED, FORMAT.UTF8S));
-		put(UUID.fromString("00001816-0000-1000-8000-00805f9b34fb"), new Details(R.string.SERVICE_CYCLING_SPEED, FORMAT.UINT16));
+	public static final Map<UUID, Integer> UUID_SERVICES = new HashMap<UUID, Integer>() {{
+		put(UUID.fromString("00001800-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_GENERIC_ACCESS);
+		put(UUID.fromString("00001801-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_GENERIC_ATTRIBUTE);
+		put(UUID.fromString("00001802-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_ALERT);
+		put(UUID.fromString("00001809-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_HEALTH);
+		put(UUID.fromString("0000180a-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_DEVICE_INFORMATION);
+		put(UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_HEART_MEASUREMENT);
+		put(UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_BATTERY);
+		put(UUID.fromString("00001814-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_RUNNING_SPEED);
+		put(UUID.fromString("00001816-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_CYCLING_SPEED);
+		put(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"), R.string.SERVICE_SCALE_COMM);
+		put(UUID.fromString("f000ff00-0451-4000-b000-000000000000"), R.string.SERVICE_KOREX);
+		
 	}};
 		
 	/**
@@ -69,59 +73,65 @@ public class DriverUUID {
 	public static final Map<UUID, Details> UUID_CHARACTERISTICS = new HashMap<UUID, Details>() {{
 		
 		// Characteristics - Read
-		put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_DEVICE_NAME, FORMAT.UTF8S));
+		put(UUID.fromString("00002a00-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_DEVICE_NAME, FORMAT._UTF8S));
 		put(UUID.fromString("00002a01-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_APPEARENCE, FORMAT.CODE));
 		put(UUID.fromString("00002a04-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_PREFERRED_PARAMETERS, FORMAT.CONN_PARMS)); 
-		put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SERIAL_NUMBER, FORMAT.UTF8S));
-		put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_HARDWARE_REV, FORMAT.UTF8S));
-		put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_FIRMWARE_REV, FORMAT.UTF8S));
-		put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SOFTWARE_REV, FORMAT.UTF8S));
-		put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_MANUFACTURER, FORMAT.UTF8S));
-		put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_PNP_ID, FORMAT.UINT8_16));
+		put(UUID.fromString("00002a25-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SERIAL_NUMBER, FORMAT._UTF8S));
+		put(UUID.fromString("00002a27-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_HARDWARE_REV, FORMAT._UTF8S));
+		put(UUID.fromString("00002a26-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_FIRMWARE_REV, FORMAT._UTF8S));
+		put(UUID.fromString("00002a28-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SOFTWARE_REV, FORMAT._UTF8S));
+		put(UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_MANUFACTURER, FORMAT._UTF8S));
+		put(UUID.fromString("00002a50-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_PNP_ID, FORMAT._UINT8_16));
 		
 		put(UUID.fromString("00002a54-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_RUNNING_FEATURE, FORMAT.RUN_FEATURE));
 		put(UUID.fromString("00002a53-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_RUNNING_SPEED, FORMAT.RSC));
 		// SERVICE BATTERY
-		put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_BATTERY_LEVEL, FORMAT.UINT8_P));
+		put(UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_BATTERY_LEVEL, FORMAT._UINT8_P));
 		
 		
 		put(UUID.fromString("00002a5b-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CSC_MEASUREMENT, FORMAT.CSC));
 				
-		put(UUID.fromString("00002a5c-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CSC_FEATURE, FORMAT.UINT16));
+		put(UUID.fromString("00002a5c-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CSC_FEATURE, FORMAT._UINT16));
 		// CSC_FEATURE: Bit 0 - Wheel Revolution Data Supported
 		// CSC_FEATURE: Bit 1 - Crank Revolution Data Supported 	
 		// CSC_FEATURE: Bit 2 - Multiple Sensor Locations Supported
 		put(UUID.fromString("00002a5d-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SENSOR_LOCATION, FORMAT.SENSOR_LOCATION));
-		put(UUID.fromString("00002a55-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CONTROL_POINT, FORMAT.UINT16));
+		put(UUID.fromString("00002a55-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CONTROL_POINT, FORMAT._UINT16));
 
 		put(UUID.fromString("00002a38-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_BODY_LOCATION, FORMAT.BODY_LOCATION));
-		put(UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_HEART_CP, FORMAT.UINT8));
+		put(UUID.fromString("00002a39-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_HEART_CP, FORMAT._UINT8));
 		put(UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_HEART_MEASUREMENT, FORMAT.HEART));	
 			
-		put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SYSTEM_ID, FORMAT.UINT8));
-		put(UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CERTIFICATION, FORMAT.UINT8));
-		put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_MODEL, FORMAT.UINT8));
+		put(UUID.fromString("00002a23-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SYSTEM_ID, FORMAT._UINT8));
+		put(UUID.fromString("00002a2a-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_CERTIFICATION, FORMAT._UINT8));
+		put(UUID.fromString("00002a24-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_MODEL, FORMAT._UINT8));
 		
-		put(UUID.fromString("00002a05-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SERVICE_CHANGED, FORMAT.UINT8));
+		put(UUID.fromString("00002a05-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SERVICE_CHANGED, FORMAT._UINT8));
 		
 		put(UUID.fromString("00002a02-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_PRIVACY_FLAG, FORMAT.EN_DISA));
 		put(UUID.fromString("00002a03-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_RECONNECTION_ADDRESS, FORMAT.ADDRESS));
 
-		put(UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_ALERT_LEVEL, FORMAT.UINT8));
+		put(UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_ALERT_LEVEL, FORMAT._UINT8));
 		
 		
 		put(UUID.fromString("00002a1c-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_TEMPERATURE_MEASUREMENT, FORMAT.TEMP));
 		put(UUID.fromString("00002a1e-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_TEMPERATURE_INTERMEDIARE, FORMAT.TEMP));
 
 		
-		put(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
-		put(UUID.fromString("49535343-6daa-4d02-abf6-19569aca69fe"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
-		put(UUID.fromString("49535343-aca3-481c-91ce-d85e28a60318"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
-		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
+		put(UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455"), new Details(R.string.UNKNOWN_NAME, FORMAT._UINT8));
+		put(UUID.fromString("49535343-6daa-4d02-abf6-19569aca69fe"), new Details(R.string.UNKNOWN_NAME, FORMAT._UINT8));
+		put(UUID.fromString("49535343-aca3-481c-91ce-d85e28a60318"), new Details(R.string.UNKNOWN_NAME, FORMAT._UINT8));
+		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details(R.string.UNKNOWN_NAME, FORMAT._UINT8));
 
-		put(UUID.fromString("0000fff0-0000-1000-8000-00805f9b34fb"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
-		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
-		put(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"), new Details(R.string.UNKNOWN_NAME, FORMAT.UINT8));
+		
+		put(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SCALE_READ, FORMAT.SCALE));
+		put(UUID.fromString("0000fff1-0000-1000-8000-00805f9b34fb"), new Details(R.string.CHAR_SCALE_WRITE, FORMAT._UINT8));
+		
+		put(UUID.fromString("f000ff01-0451-4000-b000-000000000000"), new Details(R.string.CHAR_KOREX_DATE, FORMAT.KOR_DATE));
+		put(UUID.fromString("f000ff02-0451-4000-b000-000000000000"), new Details(R.string.CHAR_KOREX_DATE, FORMAT.KOR_DATE));
+		put(UUID.fromString("f000ff03-0451-4000-b000-000000000000"), new Details(R.string.CHAR_KOREX_DATE, FORMAT.KOR_DATE));
+		put(UUID.fromString("f000ff04-0451-4000-b000-000000000000"), new Details(R.string.CHAR_KOREX_DATE, FORMAT.KOR_DATE));
+		put(UUID.fromString("f000ff05-0451-4000-b000-000000000000"), new Details(R.string.CHAR_KOREX_DATE, FORMAT.KOR_DATE));
 		
 	}};
 
@@ -130,13 +140,13 @@ public class DriverUUID {
 	 */
 	@SuppressWarnings("serial")
 	public static final Map<UUID, Details> UUID_DESCRIPTORS = new HashMap<UUID, Details>() {{
-		put(UUID.fromString("00002901-0000-1000-8000-00805f9b34fb"), new Details(R.string.DESC_USER_DESCRIPTION, FORMAT.UTF8S));
-		put(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), new Details(R.string.DESC_CLIENT_CHARACTERISTICS, FORMAT.UINT8));
+		put(UUID.fromString("00002901-0000-1000-8000-00805f9b34fb"), new Details(R.string.DESC_USER_DESCRIPTION, FORMAT._UTF8S));
+		put(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), new Details(R.string.DESC_CLIENT_CHARACTERISTICS, FORMAT._UINT8));
 	}};
 	
 	public static String ServiceName(Context context, UUID uuid) {
 		if (UUID_SERVICES.containsKey(uuid)) {
-			return context.getString(UUID_CHARACTERISTICS.get(uuid).description);
+			return context.getString(UUID_SERVICES.get(uuid));
 		}
 		return uuid.toString();
 	}
@@ -169,7 +179,7 @@ public class DriverUUID {
 		
 		// Single value parameters
 		if (UUID_SERVICES.containsKey(uuid)) {
-			return UUID_SERVICES.get(uuid).description;
+			return UUID_SERVICES.get(uuid);
 		}
 		if (UUID_DESCRIPTORS.containsKey(uuid)) {
 			return UUID_DESCRIPTORS.get(uuid).description;
@@ -187,19 +197,19 @@ public class DriverUUID {
 		
 		if (UUID_CHARACTERISTICS.containsKey(characteristic.getUuid())) {
 			switch(UUID_CHARACTERISTICS.get(characteristic.getUuid()).format) {
-			case UTF8S:
+			case _UTF8S:
 				return new String[] {context.getString(uuidToString(characteristic.getUuid())),
 										characteristic.getStringValue(0)};
-			case UINT8:
+			case _UINT8:
 				return new String[] {context.getString(uuidToString(characteristic.getUuid())),
 										String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0))};
-			case UINT8_P:
+			case _UINT8_P:
 				return new String[] {context.getString(uuidToString(characteristic.getUuid())),
 						String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)) + " %"};
-			case UINT16:
+			case _UINT16:
 				return new String[] {context.getString(uuidToString(characteristic.getUuid())),
 						String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0))};
-			case UINT8_16:
+			case _UINT8_16:
 				if (characteristic.getValue().length == 2)
 					return new String[] {context.getString(uuidToString(characteristic.getUuid())),
 						String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0))};
@@ -307,19 +317,19 @@ public class DriverUUID {
 				}
 				return csc_msg.split(";");
 			case RSC:
-				float instantaneousSpeed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0) / 256;
-				float instantaneousCadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 2);
-				int rsc_pos = 3;
-				String rsc_msg = context.getString(R.string.RSC_SPEED) + ";" + String.valueOf(instantaneousSpeed) + 
-						context.getString(R.string.RSC_CADENCE) + ";" + String.valueOf(instantaneousCadence);
+				float instantaneousSpeed = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 1) / 256;
+				float instantaneousCadence = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 3);
+				int rsc_pos = 4;
+				String rsc_msg = context.getString(R.string.RSC_SPEED) + ";" + String.valueOf(instantaneousSpeed) + ";" + 
+						context.getString(R.string.RSC_CADENCE) + ";" + String.valueOf(instantaneousCadence) + ";";
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x01) == 0x01) {
 					rsc_msg += context.getString(R.string.RSC_STRIDE_LEN) + ";" + 
-							String.valueOf((float)characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, rsc_pos)/100.0);
+							String.valueOf((float)characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, rsc_pos)/100.0) + ";";
 					rsc_pos = rsc_pos + 2;
 				}
 				if ((characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) & 0x02) == 0x02) {
 					rsc_msg += context.getString(R.string.RSC_TOTAL_LEN) + ";" + 
-							String.valueOf((float)characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, rsc_pos)/10.0);
+							String.valueOf((float)characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, rsc_pos)/10.0) + ";";
 				}
 				return rsc_msg.split(";");
 			case HEART:
@@ -334,11 +344,11 @@ public class DriverUUID {
 				}
 				if ((heart_flag & 0x01) == 0x01) {
 					heart_msg += context.getString(R.string.HEART_BEATS) + ";" + 
-							String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, heart_pos));
+							String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, heart_pos) + ";");
 					heart_pos = heart_pos + 2;
 				} else {
 					heart_msg += context.getString(R.string.HEART_BEATS) + ";" + 
-							String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, heart_pos));
+							String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, heart_pos) + ";");
 					heart_pos++;
 				}
 				
@@ -385,6 +395,80 @@ public class DriverUUID {
 								TXT_NOT_DEFINED + ";";
 				}				
 				return temp_msg.split(";");
+			case SCALE:
+				String msg_scale = "";
+				if (characteristic.getValue().length != 16) {
+					Log.e("DRIVER", "Invalid length on scale receiving");
+					return new String[] {};
+				}
+				int scale_type = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+				msg_scale += context.getString(R.string.SCALE_CAT) + ";";
+				switch (characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1) & 0x30)
+				{
+				case 0x10:
+					msg_scale += "Amador;";
+					break;
+				case 0x20:
+					msg_scale += "Atleta;";
+					break;
+				default:
+					msg_scale += "Normal;";
+					break;
+				}
+				msg_scale += context.getString(R.string.SCALE_GROUP) + ";P" + 
+						String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1) & 0xF) + ";";
+
+				msg_scale += context.getString(R.string.SCALE_GEN) + ";";
+				if (characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 2) == 0) {
+					msg_scale += "Feminino;";
+				}
+				else {
+					msg_scale += "Masculino;";
+				}
+				msg_scale += context.getString(R.string.SCALE_HEIGHT) + ";" +
+						String.valueOf(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 3) + ";");
+				
+				float weigth = (float) (characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 4) * 256 + 
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 5));
+				
+				if ((scale_type == 0xCF) || (scale_type == 0xCE))
+					weigth = weigth / 10;
+				else if (scale_type == 0xCB)
+					weigth = weigth / 100;
+				else 
+					weigth = weigth / 1;
+				msg_scale += context.getString(R.string.SCALE_WEIGHT) + ";" + String.valueOf( weigth) + ";";
+				int fat_mass = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 6) * 256 + 
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 7);
+				msg_scale += context.getString(R.string.SCALE_FAT) + ";" + String.valueOf((float) fat_mass / 10) + ";";
+				
+				msg_scale += context.getString(R.string.SCALE_BONE) + ";" + String.valueOf(
+						(float) characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 8) / 10) + ";";
+
+				int muscle_mass = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 9) * 256 + 
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 10);
+				msg_scale += context.getString(R.string.SCALE_MUSCLE) + ";" + String.valueOf((float) muscle_mass / 10) + ";";
+
+				msg_scale += context.getString(R.string.SCALE_VISC) + ";" + String.valueOf(
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 11)) + ";";
+
+				int water = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 12) * 256 + 
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 13);
+				msg_scale += context.getString(R.string.SCALE_WATER) + ";" + String.valueOf((float) water / 10) + ";";
+
+				int cal = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 14) * 256 + 
+						characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 15);
+				msg_scale += context.getString(R.string.SCALE_CAL) + ";" + String.valueOf(cal) + ";";
+
+				return msg_scale.split(";");
+			case KOR_DATE:
+				String kor_date = "";
+				for(int i=0; i<characteristic.getValue().length; i++) {
+					kor_date += characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, i) + " ";
+				}
+				Log.d("KOREX", characteristic.getUuid().toString() + " Recv " + characteristic.getValue().length + " -- " + kor_date);
+				break;
+				
 			}
 		}
 		return new String[] {"?","?"};
