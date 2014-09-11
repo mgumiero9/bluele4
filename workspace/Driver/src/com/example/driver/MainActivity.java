@@ -2,12 +2,8 @@ package com.example.driver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -17,10 +13,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.DropBoxManager.Entry;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,17 +24,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.GridLayout;
-import android.widget.GridLayout.LayoutParams;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class MainActivity extends ListActivity{
 
 	private static MainDriver mainDriver;
-	private static String address = null;
-
+	
 	ArrayList<Map<String, String>> list;
 	SimpleAdapter adapter;
 	
@@ -222,15 +212,6 @@ public class MainActivity extends ListActivity{
 		return list;
 	}
 
-/*	private HashMap<String, String> putData(String address, String[] purpose) {
-		HashMap<String, String> item = new HashMap<String, String>();
-		item.put("Address", address);
-		item.put("Name", purpose[0]);
-		item.put("Value1", purpose[1]);
-		item.put("Value2", purpose[2]);
-		return item;
-	}*/
-		 
 	private void showDialogInfo(Bundle list) {
 		
 		for (String key : list.keySet()) {
@@ -264,6 +245,11 @@ public class MainActivity extends ListActivity{
 			adapter.notifyDataSetChanged();
 		}
 
+		if (id == R.id.action_read) {
+			mainDriver.readTest();
+		}
+		
+		
 		return super.onOptionsItemSelected(item);
 	}
 	

@@ -26,7 +26,6 @@
 <fullyQualifiedTypeName name="com.example.driver.R"/>
 <fullyQualifiedTypeName name="android.view.View.OnClickListener"/>
 <fullyQualifiedTypeName name="java.lang.reflect.ParameterizedType"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice.OPERATION"/>
 <fullyQualifiedTypeName name="java.text.BreakIterator"/>
 <fullyQualifiedTypeName name="android.app.Dialog"/>
 <fullyQualifiedTypeName name="android.app.AlertDialog"/>
@@ -37,7 +36,6 @@
 <fullyQualifiedTypeName name="android.view.LayoutInflater"/>
 <fullyQualifiedTypeName name="com.example.driver.MainActivity.DeviceDetails"/>
 <fullyQualifiedTypeName name="android.app.DialogFragment"/>
-<fullyQualifiedTypeName name="com.example.driver.BtDevice.ProcessIO"/>
 <fullyQualifiedTypeName name="android.os.Handler"/>
 <fullyQualifiedTypeName name="com.example.driver.DriverOperation"/>
 <fullyQualifiedTypeName name="com.example.driver.ReadWriteTimeoutCallback"/>
@@ -49,15 +47,17 @@
 <fullyQualifiedTypeName name="com.example.driver.BtDevice"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="java.util.Arrays"/>
-<fullyQualifiedTypeName name="java.lang.String"/>
 <fullyQualifiedTypeName name="android.text.method.DateTimeKeyListener"/>
 <fullyQualifiedTypeName name="java.util.Map"/>
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="com.example.driver.R.string"/>
 <fullyQualifiedTypeName name="android.content.Context"/>
 <fullyQualifiedTypeName name="android.text.GetChars"/>
 <fullyQualifiedTypeName name="com.example.driver.DriverUUID.FORMAT"/>
-<fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
+<fullyQualifiedTypeName name="java.lang.String"/>
+<fullyQualifiedTypeName name="com.example.driver.R.string"/>
 <fullyQualifiedTypeName name="com.example.driver.DriverUUID"/>
+<fullyQualifiedTypeName name="android.bluetooth.BluetoothGattCharacteristic"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice.ProcessIO"/>
+<fullyQualifiedTypeName name="com.example.driver.BtDevice.OPERATION"/>
 </qualifiedTypeNameHistroy>

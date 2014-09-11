@@ -13,16 +13,16 @@
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="storeParameters" key="selection"/>
+		<item value="intentRead" key="selection"/>
 		<list key="findhistory">
+			<item value="intentRead"/>
+			<item value="List&lt;Bl"/>
+			<item value="getD"/>
+			<item value="list"/>
+			<item value="listDevice"/>
 			<item value="storeParameters"/>
 			<item value="uuidTo"/>
 			<item value="enum"/>
-			<item value="Control Point"/>
-			<item value="LOG_INFO"/>
-			<item value="Funcionalidades"/>
-			<item value="UUID_HEART_MEASUREMENT"/>
-			<item value="2a37"/>
 		</list>
 		<list key="replacehistory">
 			<item value="ACTION_"/>

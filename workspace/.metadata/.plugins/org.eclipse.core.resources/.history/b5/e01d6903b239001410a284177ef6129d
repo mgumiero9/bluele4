@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="SERVICE_GENERIC_ACCESS">Acesso Genérico</string>
+	<string name="SERVICE_GENERIC_ATTRIBUTE">Atributos Genéricos</string>
+	<string name="SERVICE_ALERT">Alertas</string>
+	<string name="SERVICE_HEALTH">Saúde</string>
+	<string name="SERVICE_DEVICE_INFORMATION">Informações</string> 
+	<string name="SERVICE_HEART_MEASUREMENT">Cardíaco</string> 
+	<string name="SERVICE_BATTERY">Bateria</string> 
+	<string name="SERVICE_RUNNING_SPEED">Corrida</string> 
+	<string name="SERVICE_CYCLING_SPEED">Ciclismo</string> 
+	
+	
+	<string name="CHAR_DEVICE_NAME">Nome do Dispositivo</string> 
+	<string name="CHAR_APPEARENCE">Aparência</string> 
+	<string name="CHAR_PREFERRED_PARAMETERS">Parâmetros Preferenciais</string>  
+	<string name="CHAR_SERIAL_NUMBER">Serial Number</string> 
+	<string name="CHAR_HARDWARE_REV">Hardware Rev.</string> 
+	<string name="CHAR_FIRMWARE_REV">Firmware Rev.</string> 
+	<string name="CHAR_SOFTWARE_REV">Software Rev.</string> 
+	<string name="CHAR_MANUFACTURER">Fabricante</string> 
+	<string name="CHAR_PNP_ID">Plug\'n Play ID</string> 
+	
+	<string name="CHAR_RUNNING_FEATURE">Funcionalidade de Corrida</string> 
+	<string name="CHAR_RUNNING_SPEED">Velocidade de Corrida</string> 
+	<string name="CHAR_BATTERY_LEVEL">Bateria</string> 
+	<string name="CHAR_CSC_MEASUREMENT">Medições de Ciclismo</string> 
+	<string name="CHAR_CSC_FEATURE">Funcionalidade de Ciclismo</string> 
+	<string name="CHAR_SENSOR_LOCATION">Localização do Sensor</string> 
+	<string name="CHAR_CONTROL_POINT">Ponto de Controle</string> 
+	<string name="CHAR_BODY_LOCATION">Localização no Corpo</string> 
+	<string name="CHAR_HEART_CP">Ponto de Controle Cardíaco</string> 
+	<string name="CHAR_HEART_MEASUREMENT">Medições Cardíacas</string> 	
+	<string name="CHAR_SYSTEM_ID">System ID</string> 
+	<string name="CHAR_CERTIFICATION">Certificação</string> 
+	<string name="CHAR_MODEL">Modelo</string> 
+	<string name="CHAR_SERVICE_CHANGED">Mudanças de Serviço</string> 
+	<string name="CHAR_PRIVACY_FLAG">Dados de Privacidade</string> 
+	<string name="CHAR_RECONNECTION_ADDRESS">Endereço de Reconexão</string> 
+	<string name="CHAR_ALERT_LEVEL">Nível de Aviso</string> 
+	<string name="CHAR_TEMPERATURE_MEASUREMENT">Temperatura</string> 
+	<string name="CHAR_TEMPERATURE_INTERMEDIARE">Temperatura Intermediária</string> 
+
+	<string name="DESC_USER_DESCRIPTION">Descrição</string> 
+	<string name="DESC_CLIENT_CHARACTERISTICS">Características</string>
+	
+	<string name="UNKNOWN_NAME">Desconhecido</string>
+	
+	
+	<string name="CONN_MIN_INTERVAL">Menor Intervalo de Conexão</string>
+	<string name="CONN_MAX_INTERVAL">Maior Intervalo de Conexão</string>
+	<string name="CONN_LATENCY">Latência</string>
+	<string name="CONN_MULT_TIMEOUT">Multiplicador Timeout de Supervisão</string> 
+	
+	<!-- CSC -->
+	<string name="CSC_CRANK_REV">Giros Pedal</string>
+	<string name="CSC_CRANK_SPPED">Velocidade Pedal (rpm)</string>
+	<string name="CSC_WHEEL_REV">Giros Roda</string>
+	<string name="CSC_WHEEL_SPEED">Velocidade Roda (rpm)</string>
+	
+</resources>

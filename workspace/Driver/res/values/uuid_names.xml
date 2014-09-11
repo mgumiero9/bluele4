@@ -45,4 +45,36 @@
 	<string name="DESC_CLIENT_CHARACTERISTICS">Características</string>
 	
 	<string name="UNKNOWN_NAME">Desconhecido</string>
+	
+	
+	<string name="CONN_MIN_INTERVAL">Menor Intervalo de Conexão</string>
+	<string name="CONN_MAX_INTERVAL">Maior Intervalo de Conexão</string>
+	<string name="CONN_LATENCY">Latência</string>
+	<string name="CONN_MULT_TIMEOUT">Multiplicador Timeout de Supervisão</string> 
+	
+	<!-- CSC -->
+	<string name="CSC_CRANK_REV">Giros Pedal</string>
+	<string name="CSC_CRANK_SPPED">Velocidade Pedal (rps)</string>
+	<string name="CSC_WHEEL_REV">Giros Roda</string>
+	<string name="CSC_WHEEL_SPEED">Velocidade Roda (rps)</string>
+
+	<!-- RSC -->
+	<string name="RSC_SPEED">Velocidade Instântanea (m/s)</string>
+	<string name="RSC_CADENCE">Cadência (ciclos/min)</string>
+	<string name="RSC_STRIDE_LEN">Largura Passo (m)</string>
+	<string name="RSC_TOTAL_LEN">Distância Percorrida (m)</string>
+		
+	<!-- Heart -->
+	<string name="HEART_CONTACT">Contato do Sensor</string>
+	<string name="HEART_BEATS">Batimento (bpm)</string>
+	<string name="HEART_ENERGY">Energia Gasta (J)</string>
+	<string name="HEART_RR">Intervalo RR (s)</string>
+	
+	<!-- Heart -->
+	<string name="TEMP_CELSIUS">Temperatura(oC)</string>
+	<string name="TEMP_FAHREN">Temperatura(F)</string>
+	<string name="TEMP_TIME">Temperatura Timestamp</string>
+	<string name="TEMP_TYPE">Temperatura Tipo</string>
+		
+			
 </resources>

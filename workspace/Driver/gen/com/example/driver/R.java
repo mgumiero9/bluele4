@@ -26,25 +26,25 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
-        public static final int action_clear=0x7f080013;
-        public static final int action_discovery=0x7f080012;
-        public static final int action_settings=0x7f080011;
-        public static final int btnConfig=0x7f08000f;
-        public static final int btnInfo=0x7f080010;
-        public static final int chkDev=0x7f08000a;
-        public static final int deviceParameter=0x7f080004;
-        public static final int deviceValue=0x7f080005;
-        public static final int grid_layout=0x7f080006;
-        public static final int listView=0x7f080003;
-        public static final int textView3=0x7f080001;
-        public static final int txtAddress=0x7f080007;
-        public static final int txtCon=0x7f080009;
-        public static final int txtName=0x7f080008;
-        public static final int txtValue1=0x7f08000b;
-        public static final int txtValue2=0x7f08000c;
-        public static final int txtValue3=0x7f08000d;
-        public static final int txtValue4=0x7f08000e;
-        public static final int valor=0x7f080002;
+        public static final int action_clear=0x7f080012;
+        public static final int action_discovery=0x7f080011;
+        public static final int action_read=0x7f080013;
+        public static final int action_settings=0x7f080010;
+        public static final int btnConfig=0x7f08000e;
+        public static final int btnInfo=0x7f08000f;
+        public static final int chkDev=0x7f080009;
+        public static final int deviceParameter=0x7f080003;
+        public static final int deviceValue=0x7f080004;
+        public static final int grid_layout=0x7f080005;
+        public static final int listView=0x7f080002;
+        public static final int txtAddress=0x7f080006;
+        public static final int txtCon=0x7f080008;
+        public static final int txtName=0x7f080007;
+        public static final int txtValue1=0x7f08000a;
+        public static final int txtValue2=0x7f08000b;
+        public static final int txtValue3=0x7f08000c;
+        public static final int txtValue4=0x7f08000d;
+        public static final int valor=0x7f080001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -84,9 +84,31 @@ public final class R {
         public static final int CHAR_SYSTEM_ID=0x7f050027;
         public static final int CHAR_TEMPERATURE_INTERMEDIARE=0x7f05002f;
         public static final int CHAR_TEMPERATURE_MEASUREMENT=0x7f05002e;
+        public static final int CONN_LATENCY=0x7f050035;
+        public static final int CONN_MAX_INTERVAL=0x7f050034;
+        public static final int CONN_MIN_INTERVAL=0x7f050033;
+        public static final int CONN_MULT_TIMEOUT=0x7f050036;
+        /**  CSC 
+         */
+        public static final int CSC_CRANK_REV=0x7f050037;
+        public static final int CSC_CRANK_SPPED=0x7f050038;
+        public static final int CSC_WHEEL_REV=0x7f050039;
+        public static final int CSC_WHEEL_SPEED=0x7f05003a;
         public static final int DESC_CLIENT_CHARACTERISTICS=0x7f050031;
         public static final int DESC_USER_DESCRIPTION=0x7f050030;
         public static final int Discovery=0x7f050006;
+        public static final int HEART_BEATS=0x7f050040;
+        /**  Heart 
+         */
+        public static final int HEART_CONTACT=0x7f05003f;
+        public static final int HEART_ENERGY=0x7f050041;
+        public static final int HEART_RR=0x7f050042;
+        public static final int RSC_CADENCE=0x7f05003c;
+        /**  RSC 
+         */
+        public static final int RSC_SPEED=0x7f05003b;
+        public static final int RSC_STRIDE_LEN=0x7f05003d;
+        public static final int RSC_TOTAL_LEN=0x7f05003e;
         public static final int SERVICE_ALERT=0x7f05000d;
         public static final int SERVICE_BATTERY=0x7f050011;
         public static final int SERVICE_CYCLING_SPEED=0x7f050013;
@@ -96,6 +118,12 @@ public final class R {
         public static final int SERVICE_HEALTH=0x7f05000e;
         public static final int SERVICE_HEART_MEASUREMENT=0x7f050010;
         public static final int SERVICE_RUNNING_SPEED=0x7f050012;
+        /**  Heart 
+         */
+        public static final int TEMP_CELSIUS=0x7f050043;
+        public static final int TEMP_FAHREN=0x7f050044;
+        public static final int TEMP_TIME=0x7f050045;
+        public static final int TEMP_TYPE=0x7f050046;
         public static final int UNKNOWN_NAME=0x7f050032;
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
