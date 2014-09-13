@@ -10,13 +10,18 @@ import android.content.Intent;
 import android.util.Log;
 
 public class BtDevice {
+	private ProcessIO lastOperation;
+	
 	public BluetoothGatt gatt = null;
 	public String address = null;
-	public int state = 0;
+	public int state = MainDriver.STATE_DISCONNECTED;
+	public boolean connecting = false;
 	public boolean enable = false;
 	private int retries = 0;
 	public LinkedList<ProcessIO> operations = new LinkedList<ProcessIO>();
-	private ProcessIO lastOperation;
+	
+	
+	
 	public boolean updating = false;
 	public ReadWriteTimeoutCallback reply;
 	public Intent intentRead = new Intent(MainDriver.ACTION_UPDATED);
@@ -38,7 +43,7 @@ public class BtDevice {
 	public Runnable ReadWriteTimeout = new Runnable() {
 		@Override
 		public void run() {
-			Log.d("BT DEVICE", "Read/Write Operation Timeout on address " + gatt.getDevice().getAddress() + ". Trying " + retries);
+			Log.d("BT DEVICE", "Read/Write Operation Timeout on address " + address + ". Trying " + retries);
 			retries++;
 			// Reinsert the operation
 			
@@ -47,21 +52,14 @@ public class BtDevice {
 					reply.callbackTimeout();
 				else
 					reply.callbackFinish();
-			} else
+			} else {
+				Log.e("BT_DEVICE", "Error on read/write operation on device " + address);
 				reply.callbackNextOper();
+			}
 				
 		}
 	};
 	
-	/**
-	 * States connecting or disconnecting has time limit
-	 */
-	public Runnable ConnectingTime = new Runnable() {
-		@Override
-		public void run() {
-		}
-	};
-
 	public void clearOperation() {
 		operations.clear();
 	}
@@ -75,7 +73,6 @@ public class BtDevice {
 		if (process != null)
 			operations.add(process);
 	}
-
 	
 	final UUID UUID_CLIENT_CHARACTERISTICS = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");	// Descriptor
 	
@@ -126,7 +123,7 @@ public class BtDevice {
      * 
      * @return
      */
-    public boolean execLastOperation() {
+    private boolean execLastOperation() {
     	if (lastOperation == null)
     		return false;
     	if (lastOperation.characteristic == null)
@@ -146,7 +143,7 @@ public class BtDevice {
 		retries = 0;
 		reply = callback;
 		Log.d("OPER", "Next Operation");
-		//mHandler.removeCallbacks(ReadWriteTimeout);
+
         if (!operations.isEmpty())
         {
 	    	ProcessIO newProcess = operations.poll();

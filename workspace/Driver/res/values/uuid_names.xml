@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="DEVICE_ADDRESS">Endereço</string>
+    <string name="DEVICE_NAME">Nome do Dispositivo</string>
+    
 	<string name="SERVICE_GENERIC_ACCESS">Acesso Genérico</string>
 	<string name="SERVICE_GENERIC_ATTRIBUTE">Atributos Genéricos</string>
 	<string name="SERVICE_ALERT">Alertas</string>
@@ -11,6 +14,7 @@
 	<string name="SERVICE_CYCLING_SPEED">Ciclismo</string>
 	<string name="SERVICE_SCALE_COMM">Ciclismo</string>
 	<string name="SERVICE_KOREX">Korex</string>
+	<string name="SERVICE_BAROMETER">Barômetro</string>
 	
 	
 	<string name="CHAR_DEVICE_NAME">Nome do Dispositivo</string> 
@@ -45,7 +49,14 @@
 	<string name="CHAR_SCALE_READ">Temperatura Intermediária</string> 
 	<string name="CHAR_SCALE_WRITE">Temperatura Intermediária</string>
 	<string name="CHAR_KOREX_DATE">Horário Registrado</string>  
-	
+	<string name="CHAR_KOREX_ALARM_CP">Calorias</string>
+	<string name="CHAR_KOREX_PEDO_MEAS">Calorias</string>
+	<string name="CHAR_KOREX_PEDO_CFG">Calorias</string>
+	<string name="CHAR_KOREX_LED_CP">Calorias</string>
+	<string name="CHAR_KOREX_PAIR">Calorias</string>
+	<string name="CHAR_BARO_MEASUREMENT">Medição Barômetro</string>
+	<string name="CHAR_BARO_REFERENCE">Referência Barômetro</string>
+			
 
 	<string name="DESC_USER_DESCRIPTION">Descrição</string> 
 	<string name="DESC_CLIENT_CHARACTERISTICS">Características</string>
@@ -98,5 +109,14 @@
 	<string name="SCALE_WATER">Indice de Água no Corpo</string>
 	<string name="SCALE_CAL">Calorias</string>
 
-			
+	<!--  Korex Band -->
+	<string name="KOREX_DATE">Relógio</string>
+	<string name="KOREX_EXDATE">Exercício Registrado</string>
+	<string name="KOREX_STEP">Passos</string>
+	<string name="KOREX_STATE">Estado</string>
+	<string name="KOREX_CAL">Calorias Gastas</string>
+	
+	<string name="BARO_PRESSURE">Pressão Atmosférica (mbar)</string>
+	<string name="BARO_ALTITUDE">Altitude (m)</string>
+	<string name="BARO_REFERENCE">Pressão de Referência (mbar)</string>		
 </resources>

@@ -30,6 +30,7 @@ import android.widget.TextView;
 public class MainActivity extends ListActivity{
 
 	private static MainDriver mainDriver;
+	private String address = "";
 	
 	ArrayList<Map<String, String>> list;
 	SimpleAdapter adapter;
@@ -69,11 +70,8 @@ public class MainActivity extends ListActivity{
     		}
     		else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
     			Map<String, String> newMap = new HashMap<String, String>();
-    			newMap.put("Address", intent.getStringExtra("address").substring(0,17));
-    			if (intent.getStringExtra("address").length() >=21)
-    				newMap.put("Name", intent.getStringExtra("address").substring(17, 21));
-    			else 
-    				newMap.put("Name", intent.getStringExtra("address").substring(17));
+    			newMap.put("Address", intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)));
+				newMap.put("Name", intent.getStringExtra(getString(R.string.DEVICE_NAME)));
     			newMap.put("Connection", "OFF");
     			newMap.put("Value1", "?");
     			newMap.put("Value2", "?");
@@ -87,7 +85,7 @@ public class MainActivity extends ListActivity{
     		else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
     			showDialogInfo(intent.getExtras());
     			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
     					if (intent.hasExtra("Value1"))
     						element.put("Value1", intent.getStringExtra("Value1"));
     					if (intent.hasExtra("Value2"))
@@ -105,7 +103,7 @@ public class MainActivity extends ListActivity{
     		} 
     		else if (action.equals(MainDriver.ACTION_CONNECTED)) {
     			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
     					element.put("Connection", "ON");
     					adapter.notifyDataSetChanged();
     					return;
@@ -114,7 +112,7 @@ public class MainActivity extends ListActivity{
     		}
     		else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
     			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra("address"))) {
+    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
     					element.put("Connection", "OFF");
     					adapter.notifyDataSetChanged();
     					return;
@@ -154,7 +152,7 @@ public class MainActivity extends ListActivity{
 
                 TextView txtView = (TextView) v.findViewById(R.id.txtAddress);
                 if (txtView != null) {
-                	final String address = txtView.getText().toString();
+                	address = txtView.getText().toString();
 	                Button btnConfig = (Button) v.findViewById(R.id.btnConfig);
 	                Button btnInfo = (Button) v.findViewById(R.id.btnInfo);
 	                CheckBox chkDev = (CheckBox) v.findViewById(R.id.chkDev);
@@ -185,7 +183,6 @@ public class MainActivity extends ListActivity{
 						
 						@Override
 						public void onClick(View v) {
-							// Call dialog for details
 							mainDriver.readAll(address);
 							
 						}
@@ -251,10 +248,35 @@ public class MainActivity extends ListActivity{
 			mainDriver.readScale();
 		}
 
-		if (id == R.id.action_init_korex) {
-			mainDriver.readKorex();
+		if (id == R.id.action_read_pair) {
+			mainDriver.applyCommand(address, MainDriver.GET_PAIR_CODE, "");
 		}
 
+		if (id == R.id.action_set_pair) {
+			mainDriver.applyCommand(address, MainDriver.SET_PAIR_CODE, "26504");
+		}
+
+		if (id == R.id.action_get_korex) {
+			mainDriver.applyCommand(address, MainDriver.GET_REGISTERED_DATA, "");
+		}
+		if (id == R.id.action_LED_Blue) {
+			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,0,0,255");
+		}
+		if (id == R.id.action_LED_Red) {
+			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,255,0,0");
+		}
+		if (id == R.id.action_LED_Green) {
+			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,0,255,0");
+		}
+		if (id == R.id.action_LED_Off) {
+			mainDriver.applyCommand(address, MainDriver.SET_LED, "0,0,0,0");
+		}
+		if (id == R.id.action_correct_clock) {
+			mainDriver.applyCommand(address, MainDriver.SET_ADJUST_CLOCK, "");
+		}
+		if (id == R.id.action_alarm) {
+			mainDriver.applyCommand(address, MainDriver.SET_ALARM, "");
+		}
 		
 		return super.onOptionsItemSelected(item);
 	}

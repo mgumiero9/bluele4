@@ -12,5 +12,9 @@
     <string name="clear_list">Clear List</string>
     <string name="config">Config</string>
     <string name="detalhes">Detalhes</string>
-
+    <string name="read_scale">Ler Balança</string>
+    <string name="read_pair">Read Korex ID</string>
+    <string name="set_pair">Set Korex ID</string>
+    <string name="read_korex">Get Korex Data</string>
+    
 </resources>

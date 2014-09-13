@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="SERVICE_GENERIC_ACCESS">Acesso Genérico</string>
+	<string name="SERVICE_GENERIC_ATTRIBUTE">Atributos Genéricos</string>
+	<string name="SERVICE_ALERT">Alertas</string>
+	<string name="SERVICE_HEALTH">Saúde</string>
+	<string name="SERVICE_DEVICE_INFORMATION">Informações</string> 
+	<string name="SERVICE_HEART_MEASUREMENT">Cardíaco</string> 
+	<string name="SERVICE_BATTERY">Bateria</string> 
+	<string name="SERVICE_RUNNING_SPEED">Corrida</string> 
+	<string name="SERVICE_CYCLING_SPEED">Ciclismo</string>
+	<string name="SERVICE_SCALE_COMM">Ciclismo</string>
+	<string name="SERVICE_KOREX">Korex</string>
+	
+	
+	<string name="CHAR_DEVICE_NAME">Nome do Dispositivo</string> 
+	<string name="CHAR_APPEARENCE">Aparência</string> 
+	<string name="CHAR_PREFERRED_PARAMETERS">Parâmetros Preferenciais</string>  
+	<string name="CHAR_SERIAL_NUMBER">Serial Number</string> 
+	<string name="CHAR_HARDWARE_REV">Hardware Rev.</string> 
+	<string name="CHAR_FIRMWARE_REV">Firmware Rev.</string> 
+	<string name="CHAR_SOFTWARE_REV">Software Rev.</string> 
+	<string name="CHAR_MANUFACTURER">Fabricante</string> 
+	<string name="CHAR_PNP_ID">Plug\'n Play ID</string> 
+	
+	<string name="CHAR_RUNNING_FEATURE">Funcionalidade de Corrida</string> 
+	<string name="CHAR_RUNNING_SPEED">Velocidade de Corrida</string> 
+	<string name="CHAR_BATTERY_LEVEL">Bateria</string> 
+	<string name="CHAR_CSC_MEASUREMENT">Medições de Ciclismo</string> 
+	<string name="CHAR_CSC_FEATURE">Funcionalidade de Ciclismo</string> 
+	<string name="CHAR_SENSOR_LOCATION">Localização do Sensor</string> 
+	<string name="CHAR_CONTROL_POINT">Ponto de Controle</string> 
+	<string name="CHAR_BODY_LOCATION">Localização no Corpo</string> 
+	<string name="CHAR_HEART_CP">Ponto de Controle Cardíaco</string> 
+	<string name="CHAR_HEART_MEASUREMENT">Medições Cardíacas</string> 	
+	<string name="CHAR_SYSTEM_ID">System ID</string> 
+	<string name="CHAR_CERTIFICATION">Certificação</string> 
+	<string name="CHAR_MODEL">Modelo</string> 
+	<string name="CHAR_SERVICE_CHANGED">Mudanças de Serviço</string> 
+	<string name="CHAR_PRIVACY_FLAG">Dados de Privacidade</string> 
+	<string name="CHAR_RECONNECTION_ADDRESS">Endereço de Reconexão</string> 
+	<string name="CHAR_ALERT_LEVEL">Nível de Aviso</string> 
+	<string name="CHAR_TEMPERATURE_MEASUREMENT">Temperatura</string> 
+	<string name="CHAR_TEMPERATURE_INTERMEDIARE">Temperatura Intermediária</string>
+	<string name="CHAR_SCALE_READ">Temperatura Intermediária</string> 
+	<string name="CHAR_SCALE_WRITE">Temperatura Intermediária</string>
+	<string name="CHAR_KOREX_DATE">Horário Registrado</string>  
+	
+
+	<string name="DESC_USER_DESCRIPTION">Descrição</string> 
+	<string name="DESC_CLIENT_CHARACTERISTICS">Características</string>
+	
+	
+	
+	<string name="UNKNOWN_NAME">Desconhecido</string>
+	
+	
+	<string name="CONN_MIN_INTERVAL">Menor Intervalo de Conexão</string>
+	<string name="CONN_MAX_INTERVAL">Maior Intervalo de Conexão</string>
+	<string name="CONN_LATENCY">Latência</string>
+	<string name="CONN_MULT_TIMEOUT">Multiplicador Timeout de Supervisão</string> 
+	
+	<!-- CSC -->
+	<string name="CSC_CRANK_REV">Giros Pedal</string>
+	<string name="CSC_CRANK_SPPED">Velocidade Pedal (rps)</string>
+	<string name="CSC_WHEEL_REV">Giros Roda</string>
+	<string name="CSC_WHEEL_SPEED">Velocidade Roda (rps)</string>
+
+	<!-- RSC -->
+	<string name="RSC_SPEED">Velocidade Instântanea (m/s)</string>
+	<string name="RSC_CADENCE">Cadência (ciclos/min)</string>
+	<string name="RSC_STRIDE_LEN">Largura Passo (m)</string>
+	<string name="RSC_TOTAL_LEN">Distância Percorrida (m)</string>
+		
+	<!-- Heart -->
+	<string name="HEART_CONTACT">Contato do Sensor</string>
+	<string name="HEART_BEATS">Batimento (bpm)</string>
+	<string name="HEART_ENERGY">Energia Gasta (J)</string>
+	<string name="HEART_RR">Intervalo RR (s)</string>
+	
+	<!-- Health Temperature -->
+	<string name="TEMP_CELSIUS">Temperatura(oC)</string>
+	<string name="TEMP_FAHREN">Temperatura(F)</string>
+	<string name="TEMP_TIME">Temperatura Timestamp</string>
+	<string name="TEMP_TYPE">Temperatura Tipo</string>
+	
+	<!--  Scale -->
+	<string name="SCALE_GROUP">Grupo</string>
+	<string name="SCALE_CAT">Categoria</string>
+	<string name="SCALE_GEN">Sexo</string>
+	<string name="SCALE_AGE">Idade</string>
+	<string name="SCALE_HEIGHT">Altura (cm)</string>
+	<string name="SCALE_WEIGHT">Peso (Kg)</string>
+	<string name="SCALE_FAT">Gordura (%)</string>
+	<string name="SCALE_BONE">Massa Óssea</string>
+	<string name="SCALE_MUSCLE">Massa Muscular</string>
+	<string name="SCALE_VISC">Nivel de Gordura Visceral</string>
+	<string name="SCALE_WATER">Indice de Água no Corpo</string>
+	<string name="SCALE_CAL">Calorias</string>
+
+	<!--  Korex Band -->
+	<string name="KOREX_DATE">Relógio</string>
+			
+</resources>

@@ -2,13 +2,17 @@ package com.example.driver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.example.driver.BtDevice.OPERATION;
 import com.example.driver.DriverUUID;
 
+import android.R.integer;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -22,8 +26,10 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
 
@@ -33,7 +39,7 @@ import android.util.Log;
  * 		initialize() 		when application starts.
  * 		close()				when application stops.
  * 		
- * 		startDiscovery() 	to see which devices are available. ACTIO_FIND_DEVICE will be fired for each device found.
+ * 		startDiscovery() 	to see which devices are available. ACTION_FIND_DEVICE will be fired for each device found.
  * 							the discovery is stopped 10 seconds after its start. Any moment, stopDiscovery() stops the process.
  * 							the key for device operations is its address (MAC Address)
  * 		
@@ -48,15 +54,26 @@ import android.util.Log;
  * 		wait for ACTION_NEW_DATA
  * 							if everything is right (device connected, operating and properly configured) new data will be
  * 							automatically received.
+ * 		
+ * 		execute(...)		some devices have configurations and/or special values not read by notification. To request
+ * 							this values or adjust configurations its necessary call execute with related parameters.
+ * 				RESET COUNTERS	devices with accumulative data which a
+ * 							 	
+ * 
  * 
  * 		disconnect(address)	after sometime devices disconnect automatically but, if disconnect is not called, MainDriver
  * 							will keep trying reconnect. So disconnect must be called when exercise ends.
  * 							
  * The devices address list must be memorize to facilitate user operation but discovery must be executed each time application starts.
  *  
- * Organization
- * 		All methods which fire ACTIONs are labeled broadcast*
- * 		
+ * 	All methods which fire ACTIONs are labeled broadcast*
+ * 		ACTION_STOP_DISCOVERY	has no additional data and indicates end of discovering for timeout or other reason.
+ * 		ACTION_FIND_DEVICE		has two extras. Keys address and name with device MAC address and device name as values. 
+ * 		ACTION_CONNECTED		has one extra. Key address with device MAC address as value.
+ * 		ACTION_DISCONNECTED		has one extra. Key address with device MAC address as value.
+ * 		ACTION_NEW_DATA			has variable extras. For sure it has key addres with the device MAC Address.
+ * 								others key/values are characteristic descriptions and values read from device.
+ * 
  * 
  * Speed calculation considers only one device for each parameters (CSC and RSC counts). Changes must be made for two or more devices capturing 
  * 	simultaneous.
@@ -65,21 +82,28 @@ import android.util.Log;
  * @author asantos
  *
  */
+@SuppressLint("UseSparseArrays")
 public class MainDriver extends Service implements BluetoothProfile {
 
-	/**
-	 * Message types to clients
-	 * ACTION_STOP_DISCOVERY - discovery was interrupted by time or by user
-	 * ACTION_FIND_DEVICE - a new device was found in discovery process (address)
-	 * ACTION_NEW_DATA - new data was received from devices
-	 */
-	final static String ACTION_STOP_DISCOVERY 	= "STOP_DISCOVERY";
-	final static String ACTION_FIND_DEVICE 		= "FIND_DEVICE";
-	final static String ACTION_NEW_DATA 		= "NEW_DATA";
-	final static String ACTION_CONNECTED 		= "CONNECTED";
-	final static String ACTION_DISCONNECTED  	= "DISCONNECTED";
-	final static String ACTION_UPDATED		  	= "UPDATED";
-	
+	// Classification for broadcast traffic
+	final static String ACTION_STOP_DISCOVERY 	= "STOP";
+	final static String ACTION_FIND_DEVICE 		= "FIND";
+	final static String ACTION_NEW_DATA 		= "NEW";
+	final static String ACTION_CONNECTED 		= "CONN";
+	final static String ACTION_DISCONNECTED  	= "DISC";
+	final static String ACTION_UPDATED		  	= "UPDA";
+
+	// Classification for execution of commands or special requests	
+	final static int SET_RESET_COUNTERS				= 0;
+	final static int SET_CALIBRATION			 	= 1;
+	final static int SET_SENSOR_POSITION 			= 2;
+	final static int SET_REQUEST_SUPPORTED_POSITION = 3;
+	final static int GET_REGISTERED_DATA			= 4;
+	final static int GET_PAIR_CODE					= 5;
+	final static int SET_PAIR_CODE					= 6;
+	final static int SET_LED						= 7;
+	final static int SET_ADJUST_CLOCK				= 8;
+	final static int SET_ALARM						= 9;
 	
 	/**
 	 * Register callback and interface (probably on)
@@ -124,22 +148,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 	}
 	
 	/**
-	 * Stop the discovering process
-	 */
-	public void stopDiscovery() {
-		if (LeDiscovering) {
-			mDiscoveryHandler.removeCallbacks(DiscoveringTime);
-			broadcastUpdate(ACTION_STOP_DISCOVERY, "Adapter", "");
-		}
-		if (mBluetoothAdapter != null)
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
-		LeDiscovering = false;
-	}
-
-	/**
 	 * Why would be necessary disconnect ?
 	 * @param address
-	 * @return
+	 * @return true indicating device was found and command executed
 	 */
 	public boolean disconnect(String address) {
 		BtDevice device = lstDevices.get(address);
@@ -158,9 +169,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 	
 	/**
 	 * Connect to device with address specified
-	 * The devices is get from Bluetooth adapter and insert in DeviceList when necessary
-	 * 
-	 * 
+	 * The devices is get from Bluetooth adapter and insert in DeviceList if necessary
+	 * Discovery is stopped, if enabled, before connection.
+	 * Device has flag enable for retry connection on error.
+	 * @param address
+	 * @return true indicating device was found and command executed
 	 */
 	public boolean connect(String address) {
 		if (mBluetoothAdapter.getRemoteDevice(address) == null) {
@@ -171,7 +184,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED, address));
 		BtDevice device = lstDevices.get(address);
 		
-		stopDiscovery(); // Its necessary stopDiscovery before any connection
+		stopDiscovery();
 		if (!device.enable) {
 			device.enable = true;
 			if ((device.state != STATE_CONNECTED) && (device.state != STATE_CONNECTING)) {
@@ -212,12 +225,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return lstDevices.get(device.getAddress()).state;
 		return 0;
 	}
-	
-	final static int SET_ACCUMULATIVE_VALUE = 0;
-	final static int SET_SENSOR_CALIBRATION = 1;
-	final static int SET_SENSOR_POSITION = 2;
-	final static int SET_REQUEST_SUPPORTED_POSITION = 3;
-		
+			
 	/**
 	 * Timeout for Read/Write Parameters and Connection. From command to callback.
 	 */
@@ -254,6 +262,20 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 	};
 	
+	
+	/**
+	 * Stop the discovering process
+	 */
+	private void stopDiscovery() {
+		if (LeDiscovering) {
+			mDiscoveryHandler.removeCallbacks(DiscoveringTime);
+			broadcastUpdate(ACTION_STOP_DISCOVERY, "Adapter", "");
+		}
+		if (mBluetoothAdapter != null)
+			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+		LeDiscovering = false;
+	}
+
 	/**
 	 * Repeat connect/disconnect commands if there is no answer in TIMEOUT_CONNECTION ms
 	 * @author asantos
@@ -268,18 +290,26 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 		@Override
 		public void run() {
-			if ((device.state != STATE_CONNECTED) && (device.enable)) {
+			// Verify if the real state is according to enable value and retry operation when necessary
+			if ((device.state != STATE_DISCONNECTED) && !device.enable)
+			{
+				Log.d(LOG_MAIN, "Disconnecting timeout " + device.address + ". Trying again...");
+				device.gatt.disconnect();
+				device.state = STATE_DISCONNECTING;
+				mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
+			}
+			if ((device.state != STATE_CONNECTED) && device.enable) {
 				Log.d(LOG_MAIN, "Connecting timeout " + device.address + ". Trying again...");
-				connect(device.address);
+				device.gatt = mBluetoothAdapter.getRemoteDevice(device.address).connectGatt(null, true, mGattCallback);
+				device.state = STATE_CONNECTING;
 				mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
 			}
 		}
-		
 	}
 	
 	
 	/**
-	 * Each device is stored in a local (should be local?) list (should be hash?).
+	 * Each device is stored in a local list and informed to MainActivity
 	 */
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback = 
 			new BluetoothAdapter.LeScanCallback() {
@@ -305,53 +335,45 @@ public class MainDriver extends Service implements BluetoothProfile {
 		@Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status,
                 int newState) {
-			if (status == BluetoothGatt.GATT_SUCCESS) {
-				if (!lstDevices.containsKey(gatt.getDevice().getAddress())) {
-					lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState, gatt.getDevice().getAddress()));
-				}
-				BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
+
+			// The error 257 should be treated. Some tests stops because this error code
+			// Disable and Enable Bluetooth seems to solve the error
+			Log.e(LOG_MAIN, "Connection State Error (" + status + ") State=" + newState);
+			
 				
-				// On connection : list services
-				switch(newState) {
-				case STATE_CONNECTED:
-					mHandler.removeCallbacks(device.ConnectingTime);
-					broadcastUpdate(ACTION_CONNECTED, device.address, "");
-					if ((device.gatt.getServices() == null) || (device.gatt.getServices().isEmpty())){
-						Log.d(LOG_SERVICE, device.address + ": Discovering services");
-						device.gatt.discoverServices();
-					} else {
-						listServices(gatt, device.updating);
-					}
-					device.state = newState;
-					NextOperation(device);
-					break;
-				case STATE_DISCONNECTED:
-					mHandler.removeCallbacks(device.ConnectingTime);
-					device.operations.clear();
-					if (device.enable) {
-						device.state = STATE_CONNECTING;
-						device.gatt = mBluetoothAdapter.getRemoteDevice(device.address).connectGatt(null, true, this);
-						mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
-					}
-					else
-						device.state = newState;
-					broadcastUpdate(ACTION_DISCONNECTED, device.address, "");
-					break;
-				case STATE_DISCONNECTING:
-					Log.d(LOG_MAIN, "Device " + device.address + " DISCONNECTING");
-					device.clearOperation();
-					device.state = newState;
-					break;
-				case STATE_CONNECTING:
-					Log.d(LOG_MAIN, "Device " + device.address + " CONNECTING");
-					device.operations.clear();
-					device.state = newState;
-					break;
-				}
+			if (!lstDevices.containsKey(gatt.getDevice().getAddress())) {
+				lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState, gatt.getDevice().getAddress()));
 			}
-			else
-				// The error 257 should be treated. Some tests stops because this error code
-				Log.e(LOG_MAIN, "Connection State Error (" + status + ")");
+			BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
+			
+			// Device just connects
+			if(newState ==  STATE_CONNECTED) {
+				// Spread the connected state
+				broadcastUpdate(ACTION_CONNECTED, device.address); 
+				// Update available services if necessary
+				if ((device.gatt.getServices() == null) || (device.gatt.getServices().isEmpty())){
+					Log.d(LOG_SERVICE, device.address + ": Discovering services");
+					device.gatt.discoverServices();
+				}
+				// Update device values (when updating is set)
+				else {
+					listServices(gatt, device.updating);
+				}
+				// Update local state and start call pending operations 
+				device.state = newState;
+				NextOperation(device);
+			}
+				
+			// Device just disconnects
+			if (newState == STATE_DISCONNECTED) {
+				// Clear operations. They will be called again on reconnection
+				device.operations.clear();
+				// Update local state
+				device.state = newState;
+				// Spread the information
+				broadcastUpdate(ACTION_DISCONNECTED, device.address);
+			}
+			
         }
 
         /**
@@ -360,12 +382,14 @@ public class MainDriver extends Service implements BluetoothProfile {
          */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        	// Is it possible notification without registration?
+			BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
 
         	if (status == BluetoothGatt.GATT_SUCCESS) {
-				enableNotifications(gatt);
-				listServices(gatt, lstDevices.get(gatt.getDevice().getAddress()).updating);
+				enableNotifications(device);
+				listServices(gatt, device.updating);
             } else {
-            	// Never found any error
+            	// Never found any error, but there is nothing to do besides try again
                 Log.e(LOG_MAIN, "onServicesDiscovered received: " + status);
                 gatt.discoverServices();
             }
@@ -379,6 +403,7 @@ public class MainDriver extends Service implements BluetoothProfile {
         public void onCharacteristicWrite(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic, int status) {
         	Log.d(LOG_MAIN, "Characteristic Written (" + status + ")");
+        	NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
         }
 
         /**
@@ -393,10 +418,6 @@ public class MainDriver extends Service implements BluetoothProfile {
             	Log.e(LOG_MAIN, "Dev" + gatt.getDevice().getAddress() + "Error Read Characteristic " +  characteristic.getUuid().toString());
             	return;
             }
-            if (characteristic.getUuid().equals(UUID.fromString("0000fff4-0000-1000-8000-00805f9b34fb"))) {
-            	Log.d("SCALE", "Read " + characteristic.getValue()[0] + " " + characteristic.getValue()[1]);
-            }
-            
 	    	if (lstDevices.containsKey(gatt.getDevice().getAddress())) {
 	    		storeParameters(lstDevices.get(gatt.getDevice().getAddress()), characteristic);
     			NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
@@ -406,11 +427,11 @@ public class MainDriver extends Service implements BluetoothProfile {
    
 		public void onCharacteristicChanged(BluetoothGatt gatt,
 		        BluetoothGattCharacteristic characteristic) {
-			readNotification(characteristic);
+			readNotification(gatt.getDevice().getAddress(), characteristic);
 		}
 		
 		/**
-		 * Fired after .readDescriptor
+		 * Fired after .readDescriptor. Just confirm last operation and call next.
 		 */
 	    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
                 int status) {
@@ -420,7 +441,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	    }
 	    
 	    /**
-	     * Fired after .writeDescriptor (needed for notification setup)
+	     * Fired after .writeDescriptor (needed for notification setup). Just confirm last operation and call next.
 	     */
 	    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor,
                 int status) {
@@ -437,6 +458,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	     *               transaction was executed successfully
 	     */
 	    public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
+	    	Log.d(LOG_MAIN, "Reliable Write Done!!!!!!!!!!");
 	    }
 
 	    /**
@@ -452,32 +474,29 @@ public class MainDriver extends Service implements BluetoothProfile {
      * Verify size to avoid exceptions
 	 * @param characteristic
 	 */
-	private void readNotification(BluetoothGattCharacteristic characteristic) {
-		String[] info = DriverUUID.getCharacteristicValue(this, characteristic);
-		
-		Log.d(LOG_NOT, "Size " + info.length + " " + info.toString());
-		
-		for(int i=0; i<info.length; i = i + 2)
-			broadcastUpdate(ACTION_NEW_DATA, "Generic", info[i], info[i+1]);
+	private void readNotification(String address, BluetoothGattCharacteristic characteristic) {
+		SimpleArrayMap<Integer, String> data = DriverUUID.getCharacteristicValue(characteristic);
+		Bundle list = new Bundle();
+		for (int i=0; i< data.size(); i++) {
+			list.putString(getString(data.keyAt(i)), data.valueAt(i));
+		}
+		broadcastUpdate(ACTION_NEW_DATA, address, list);
 	}
 	
 	/**
 	 * Identify any notification service/characteristic and add to operations
 	 * @param gatt
 	 */
- 	private void enableNotifications(BluetoothGatt gatt) {
-    	BtDevice btDevice = lstDevices.get(gatt.getDevice().getAddress());
-    	if (btDevice == null)
-    		return;
-		for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
+ 	private void enableNotifications(BtDevice device) {
+		for (BluetoothGattService bluetoothGattService : device.gatt.getServices()) {
 			for(BluetoothGattCharacteristic characteristic: bluetoothGattService.getCharacteristics()) {
 				if (hasProperty(characteristic.getProperties(), BluetoothGattCharacteristic.PROPERTY_NOTIFY)) {
-					Log.d(LOG_NOT, "Set Notification on " + gatt.getDevice().getAddress() + " for " + getString(DriverUUID.uuidToString(characteristic.getUuid())));
-					btDevice.addOperation(characteristic, null, OPERATION.SET_NOT);
+					Log.d(LOG_NOT, "Set Notification on " + device.address + " for " + getString(DriverUUID.uuidToString(characteristic.getUuid())));
+					device.addOperation(characteristic, null, OPERATION.SET_NOT);
 				}
 				if (hasProperty(characteristic.getProperties(), BluetoothGattCharacteristic.PROPERTY_INDICATE)) {
-					Log.d(LOG_NOT, "Possible Indication on " + gatt.getDevice().getAddress() + " for " + getString(DriverUUID.uuidToString(characteristic.getUuid())));
-					btDevice.addOperation(characteristic, null, OPERATION.SET_IND);
+					Log.d(LOG_NOT, "Possible Indication on " + device.address + " for " + getString(DriverUUID.uuidToString(characteristic.getUuid())));
+					device.addOperation(characteristic, null, OPERATION.SET_IND);
 				}
 			}
 		}
@@ -576,23 +595,24 @@ public class MainDriver extends Service implements BluetoothProfile {
     	
     	device.updating = true;
 
-    	if (device.gatt == null) {
+    	if (device.enable == true) {
+    		if (device.state == STATE_CONNECTED) {
+    			listServices(device.gatt, device.updating);
+    			NextOperation(device);
+    		}
+    	}
+    	else {
     		stopDiscovery();
     		device.gatt = mBluetoothAdapter.getRemoteDevice(address).connectGatt(null, true, mGattCallback);
 			device.state = STATE_CONNECTING;
+			device.enable = true;
 			mHandler.postDelayed(new ConnectingTimeout(device), TIMEOUT_CONNECTION);
-    	} else {
-    		listServices(device.gatt, device.updating);
-    		NextOperation(device);
     	}
-		device.intentRead.putExtra("address", device.gatt.getDevice().getAddress());
     	return true;
     }
     
-    
-
 	/**
-	 * 
+	 * Used for ACTION_FIND_DEVICE
 	 * @param action
 	 * @param parameter
 	 * @param value
@@ -602,32 +622,46 @@ public class MainDriver extends Service implements BluetoothProfile {
 		final Intent intent = new Intent(action);
 		if(action.equals(ACTION_FIND_DEVICE)) {
 			lstDevices.put(parameter,  new BtDevice(STATE_DISCONNECTED, parameter));
-			intent.putExtra("address", parameter + value);
+			intent.putExtra(getString(R.string.DEVICE_ADDRESS), parameter);
+			intent.putExtra(getString(R.string.DEVICE_NAME), value);
 			sendBroadcast(intent);
 		}
-		if((action.equals(ACTION_DISCONNECTED) || action.equals(ACTION_CONNECTED))) {
-			intent.putExtra("address", parameter);
+	}
+	
+	/**
+	 * Used for ACTION_CONNECTED and ACTION_DISCONNECTED
+	 * @param action
+	 * @param address
+	 */
+	private void broadcastUpdate(final String action, final String address) {
+		final Intent intent = new Intent(action);
+		if(action.equals(ACTION_CONNECTED)) {
+			intent.putExtra(getString(R.string.DEVICE_ADDRESS), address);
+			sendBroadcast(intent);
+		}
+		if(action.equals(ACTION_DISCONNECTED)) {
+			intent.putExtra(getString(R.string.DEVICE_ADDRESS), address);
 			sendBroadcast(intent);
 		}
 	}
 
 	/**
-	 * 
+	 * Used for ACTION_NEW_DATA
 	 * @param action
 	 * @param address
 	 * @param parameter
 	 * @param value
 	 */
-	private void broadcastUpdate(final String action, final String address,
-		final String parameter, final String value) {
+	private void broadcastUpdate(final String action, final String address, final Bundle list) {
 		final Intent intent = new Intent(action);
-		intent.putExtra("address", address);
-		intent.putExtra(parameter, value);
+		intent.putExtra(getString(R.string.DEVICE_ADDRESS), address);
+		intent.putExtras(list);
 		sendBroadcast(intent);
 	}
 	
 	/**
-	 * 
+	 * Finish of a complete device reading. Parameters were stored in IntentRead and sent to MainActivity here.
+	 * The reading is considered finished when there is no more pending operations.
 	 * @param device
 	 */
 	private void broadcastRead(BtDevice device) {
@@ -636,37 +670,142 @@ public class MainDriver extends Service implements BluetoothProfile {
 	}
 	
 	/**
+	 * Called when characteristics values are received without notification.
+	 * The values are stored and, when there is no more pending operations, sent to MainActivity.
 	 * 
 	 * @param device
 	 * @param characteristic
 	 */
 	private void storeParameters(BtDevice device, BluetoothGattCharacteristic characteristic) {
-		String[] msg = DriverUUID.getCharacteristicValue(this, characteristic);
-		for(int i=0; i<msg.length; i=i+2)
-			device.intentRead.putExtra(msg[i], msg[i+1]);
+		SimpleArrayMap<Integer, String> msg = DriverUUID.getCharacteristicValue(characteristic);
+		for(int i=0; i<msg.size(); i++)
+			device.intentRead.putExtra(getString(msg.keyAt(i)), msg.valueAt(i));
 	}
 
 	/**
+	 * Commands
+	 * 
+	 * 
 	 * 
 	 * @param address
 	 * @param command
 	 * @param parameter
 	 * @return
 	 */
-	private boolean applyCommand(final String address, final int command, final String parameter) {
+	public boolean applyCommand(final String address, final int command, final String parameter) {
 		BtDevice device = lstDevices.get(address);
 		if (device == null)
 			return false;
+		if (device.state != STATE_CONNECTED)
+			return false;
 
 		switch(command) {
-		case SET_ACCUMULATIVE_VALUE :
+		case SET_CALIBRATION :
 			break;
 		case SET_REQUEST_SUPPORTED_POSITION :
 			break;
-		case SET_SENSOR_CALIBRATION :
+		case SET_RESET_COUNTERS :
 			break;
 		case SET_SENSOR_POSITION :
 			break;
+		case GET_REGISTERED_DATA:
+			// Find service
+			if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+				BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff03-0451-4000-b000-000000000000"));
+				if (characteristic != null) {
+					device.addOperation(characteristic, null, OPERATION.READ);
+					NextOperation(device);
+					device.updating = true;
+					return true;
+				}
+			}
+			break;
+		case GET_PAIR_CODE:
+    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+    			BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff06-0451-4000-b000-000000000000"));
+    			if (characteristic != null) {
+    				characteristic.setValue(new byte[] {0x01});
+    				device.addOperation(characteristic, null, OPERATION.WRITE);
+    				NextOperation(device);
+    				return true;
+    			}
+    		}
+    		break;
+		case SET_PAIR_CODE:
+    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+    			BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff06-0451-4000-b000-000000000000"));
+    			if (characteristic != null) {
+    				Integer code = Integer.valueOf(parameter);
+    				Log.d(LOG_MAIN, "Setting ID to " + code);
+    				characteristic.setValue(new byte[] {0x00});
+    				device.addOperation(characteristic, null, OPERATION.WRITE);
+    				NextOperation(device);
+    				return true;
+    			}
+    		}
+    		break;
+		case SET_LED:
+			String[] values = parameter.split(",");
+			if (values.length != 4) {
+				Log.e(LOG_MAIN, "LED with incorrect parameter");
+				return false;
+			}
+    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+    			BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff04-0451-4000-b000-000000000000"));
+    			if (characteristic != null) {
+    				characteristic.setValue(new byte[4]);
+    				characteristic.setValue(Integer.valueOf(values[0]), BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+    				characteristic.setValue(Integer.valueOf(values[1]), BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+    				characteristic.setValue(Integer.valueOf(values[2]), BluetoothGattCharacteristic.FORMAT_UINT8, 2);
+    				characteristic.setValue(Integer.valueOf(values[3]), BluetoothGattCharacteristic.FORMAT_UINT8, 3);
+    				device.addOperation(characteristic, null, OPERATION.WRITE);
+    				NextOperation(device);
+    				return true;
+    			}
+    		}
+    		break;
+    		
+		case SET_ADJUST_CLOCK:
+			Calendar c = Calendar.getInstance(); 
+    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+    			BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff05-0451-4000-b000-000000000000"));
+    			if (characteristic != null) {
+    				characteristic.setValue(new byte[6]);
+    				characteristic.setValue(c.get(Calendar.YEAR) - 2000, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+    				characteristic.setValue(c.get(Calendar.MONTH) - 1, BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+    				characteristic.setValue(c.get(Calendar.DAY_OF_MONTH) - 1, BluetoothGattCharacteristic.FORMAT_UINT8, 2);
+    				characteristic.setValue(c.get(Calendar.HOUR_OF_DAY), BluetoothGattCharacteristic.FORMAT_UINT8, 3);
+    				characteristic.setValue(c.get(Calendar.MINUTE), BluetoothGattCharacteristic.FORMAT_UINT8, 4);
+    				characteristic.setValue(c.get(Calendar.SECOND), BluetoothGattCharacteristic.FORMAT_UINT8, 5);
+    				
+    				Log.d("KOREX", String.valueOf(c.get(Calendar.YEAR) - 2000) + "/" + 
+    						String.valueOf(c.get(Calendar.MONTH) - 1) + "/" +
+    						String.valueOf(c.get(Calendar.DAY_OF_MONTH) - 1) + " " + c.get(Calendar.HOUR_OF_DAY) + ":" +
+    						c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND));
+    				
+    				device.addOperation(characteristic, null, OPERATION.WRITE);
+    				NextOperation(device);
+    				return true;
+    			}
+    		}
+			break;
+		case SET_ALARM:
+    		if (device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")) != null) {
+    			BluetoothGattCharacteristic characteristic = device.gatt.getService(UUID.fromString("f000ff00-0451-4000-b000-000000000000")).getCharacteristic(UUID.fromString("f000ff01-0451-4000-b000-000000000000"));
+    			if (characteristic != null) {
+    				characteristic.setValue(new byte[3]);
+    				characteristic.setValue(255, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+    				characteristic.setValue(41, BluetoothGattCharacteristic.FORMAT_UINT8, 1);
+    				characteristic.setValue(0, BluetoothGattCharacteristic.FORMAT_UINT8, 2);
+    				device.addOperation(characteristic, null, OPERATION.WRITE);
+    				NextOperation(device);
+    				return true;
+    				
+    			}
+    		}
+			break;
+			
+				
 		}
 		return false;
 	}
@@ -731,7 +870,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	
     @Override
     public boolean onUnbind(Intent intent) {
-        // After using a given device, you should make sure that BluetoothGatt.close() is called
+        // After using a given device, yoADJUST_CLOCKu should make sure that BluetoothGatt.close() is called
         // such that resources are cleaned up properly.  In this particular example, close() is
         // invoked when the UI is disconnected from the Service.
         close();
