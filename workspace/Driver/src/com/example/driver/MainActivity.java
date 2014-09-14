@@ -1,9 +1,14 @@
 package com.example.driver;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.driver.R.id;
+
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -14,8 +19,12 @@ import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.app.Fragment;
+import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,206 +32,158 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class MainActivity extends ListActivity{
+public class MainActivity extends Activity {
 
 	private static MainDriver mainDriver;
-	private String address = "";
-	
-	ArrayList<Map<String, String>> list;
-	SimpleAdapter adapter;
-	
-	 // Code to manage Service lifecycle.
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
- 
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            mainDriver = ((MainDriver.LocalBinder) service).getService();
-            if (!mainDriver.initialize()) {
-                Log.d("MAIN_THREAD", "Unable to initialize Bluetooth");
-                finish();
-            }
-        }
- 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-        	Log.d("MAIN_THREAD", "Service Disconnected");
-            mainDriver = null;
-        }
-    };	
-    
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-    	@Override
-    	public void onReceive(Context context, Intent intent) {
-    		final String action = intent.getAction();
-    		//final String mAddress = intent.;
-    		if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
-    			return;
-    		}
-    		else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
-    			Map<String, String> newMap = new HashMap<String, String>();
-    			newMap.put("Address", intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)));
-				newMap.put("Name", intent.getStringExtra(getString(R.string.DEVICE_NAME)));
-    			newMap.put("Connection", "OFF");
-    			newMap.put("Value1", "?");
-    			newMap.put("Value2", "?");
-    			newMap.put("Value3", "?");
-    			newMap.put("Value4", "?");
-    			list.add(newMap);
-    			Log.d("LIST", "List Size " + list.size() );
-    			adapter.notifyDataSetChanged();
-    			return;
-    		}
-    		else if (action.equals(MainDriver.ACTION_NEW_DATA)) {
-    			showDialogInfo(intent.getExtras());
-    			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
-    					if (intent.hasExtra("Value1"))
-    						element.put("Value1", intent.getStringExtra("Value1"));
-    					if (intent.hasExtra("Value2"))
-    						element.put("Value2", intent.getStringExtra("Value2"));
-    					if (intent.hasExtra("Value3"))
-    						element.put("Value3", intent.getStringExtra("Value3"));
-    					if (intent.hasExtra("Value4"))
-    						element.put("Value4", intent.getStringExtra("Value4"));
-    					
-    					adapter.notifyDataSetChanged();
-    					return;
-    				}
-    			}
-    			return;
-    		} 
-    		else if (action.equals(MainDriver.ACTION_CONNECTED)) {
-    			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
-    					element.put("Connection", "ON");
-    					adapter.notifyDataSetChanged();
-    					return;
-    				}
-    			}
-    		}
-    		else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
-    			for (Map<String, String> element : list) {
-    				if (element.get("Address").equals(intent.getStringExtra(getString(R.string.DEVICE_ADDRESS)))) {
-    					element.put("Connection", "OFF");
-    					adapter.notifyDataSetChanged();
-    					return;
-    				}
-    			}
-    		}
-    		else if (action.equals(MainDriver.ACTION_UPDATED)) {
-    			// Call Dialog
-    			showDialogInfo(intent.getExtras());
-    		}
-    	}
-    };
+	protected String address = "";
+	protected Fragment viewDevices = new DevicesView();
+	protected Fragment viewDetails = new DetailsView();
 
-    @Override
+	protected ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+	protected ArrayList<Map<String, String>> listValues = new ArrayList<Map<String, String>>();
+	protected Map<String, String> hashValues = new HashMap<String, String>();
 
-    /**
-     * 
-     */
-    protected void onCreate(Bundle savedInstanceState) {
+	protected SimpleAdapter adapter;
+	protected SimpleAdapter listAdapter;
+
+	// Code to manage Service lifecycle.
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+		@Override
+		public void onServiceConnected(ComponentName componentName,
+				IBinder service) {
+			mainDriver = ((MainDriver.LocalBinder) service).getService();
+			if (!mainDriver.initialize()) {
+				Log.d("MAIN_THREAD", "Unable to initialize Bluetooth");
+				finish();
+			}
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			Log.d("MAIN_THREAD", "Service Disconnected");
+			mainDriver = null;
+		}
+	};
+
+	// Handles various events fired by the Service.
+	// ACTION_GATT_CONNECTED: connected to a GATT server.
+	// ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+	// ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+	// ACTION_DATA_AVAILABLE: received data from the device. This can be a
+	// result of read
+	// or notification operations.
+	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
+		@SuppressWarnings("serial")
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			final String action = intent.getAction();
+			// final String mAddress = intent.;
+			if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
+				return;
+			} else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
+				Map<String, String> newMap = new HashMap<String, String>();
+				for (String key : intent.getExtras().keySet())
+					Log.d("EXTRAS",
+							key + " = " + intent.getExtras().getString(key));
+				newMap.put(
+						"Address",
+						intent.getExtras().getString(
+								getString(R.string.DEVICE_ADDRESS)));
+				newMap.put(
+						"Name",
+						intent.getExtras().getString(
+								getString(R.string.DEVICE_NAME)));
+				newMap.put("Connection", "OFF");
+				Log.d("MAP", "Map Size " + newMap.size());
+				list.add(newMap);
+				adapter.notifyDataSetChanged();
+				return;
+			} else if (action.equals(MainDriver.ACTION_NEW_DATA)
+					|| action.equals(MainDriver.ACTION_UPDATED)) {
+				// showDialogInfo(intent.getExtras());
+				String address = "(-)";
+				for (String key : intent.getExtras().keySet())
+					Log.d("EXTRAS",
+							key + " = " + intent.getExtras().getString(key));
+				if (intent.getExtras().getString(
+						getString(R.string.DEVICE_ADDRESS)) != null) {
+					address = "( "
+							+ intent.getExtras().getString(
+									getString(R.string.DEVICE_ADDRESS)) + " )";
+					intent.getExtras().remove(
+							getString(R.string.DEVICE_ADDRESS));
+				}
+				for (String key : intent.getExtras().keySet()) {
+					hashValues.put(key, intent.getExtras().getString(key)
+							+ address);
+				}
+				listValues.clear();
+				// Map<String, String> newValue = new HashMap<String, String>();
+				for (final String key : hashValues.keySet()) {
+					Log.d("ADD",
+							"Parameter = " + key + " Value="
+									+ hashValues.get(key));
+					listValues.add(new HashMap<String, String>() {
+						{
+							put("Parameter", key);
+							put("Value", hashValues.get(key));
+						}
+					});
+
+				}
+				listAdapter.notifyDataSetChanged();
+				return;
+			} else if (action.equals(MainDriver.ACTION_CONNECTED)) {
+				for (Map<String, String> element : list) {
+					if (element.get("Address").equals(
+							intent.getExtras().getString(
+									getString(R.string.DEVICE_ADDRESS)))) {
+						element.put("Connection", "ON");
+						adapter.notifyDataSetChanged();
+						return;
+					}
+				}
+			} else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
+				for (Map<String, String> element : list) {
+					if (element.get("Address").equals(
+							intent.getExtras().getString(
+									getString(R.string.DEVICE_ADDRESS)))) {
+						element.put("Connection", "OFF");
+						adapter.notifyDataSetChanged();
+						return;
+					}
+				}
+			}
+		}
+	};
+
+	@Override
+	/**
+	 * 
+	 */
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	    list = buildData();
-	    String[] from = { "Address", "Name", "Connection", "Value1", "Value2", "Value3", "Value4"};
-	    int[] to = { R.id.txtAddress, R.id.txtName, R.id.txtCon , R.id.txtValue1, R.id.txtValue2, R.id.txtValue3, R.id.txtValue4};
 
-	    adapter = new SimpleAdapter(this, list, R.layout.row, from, to)
-	    {
-	    	@Override
-	    	public void notifyDataSetChanged() {
-	    		super.notifyDataSetChanged();
-	    	}
-	    	
-            @Override
-            public View getView (int position, View convertView, ViewGroup parent)
-            {
-                View v = super.getView(position, convertView, parent);
+		Intent mainDriverIntent = new Intent(this, MainDriver.class);
+		bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-                TextView txtView = (TextView) v.findViewById(R.id.txtAddress);
-                if (txtView != null) {
-                	address = txtView.getText().toString();
-	                Button btnConfig = (Button) v.findViewById(R.id.btnConfig);
-	                Button btnInfo = (Button) v.findViewById(R.id.btnInfo);
-	                CheckBox chkDev = (CheckBox) v.findViewById(R.id.chkDev);
-	                
-	                chkDev.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-						
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-							if (isChecked) {
-								mainDriver.connect(address);
-							} else {
-								mainDriver.disconnect(address);
-							}
-							
-						}
-					});
-	                
-                	btnConfig.setOnClickListener(new OnClickListener() {
-					
-						@Override
-						public void onClick(View v) {
-							Log.d("MAIN ACT", "Botao Config Clicked");
-							
-						}
-					});
-                	
-                	btnInfo.setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							mainDriver.readAll(address);
-							
-						}
-					});
-                }
-        	    
+		setContentView(R.layout.activity_main);
 
-        	    // Trying divide uniformly
-        		//GridLayout.LayoutParams params = (LayoutParams) v.getLayoutParams();
-        		//params.width = (parent.getWidth()/parent.getColumnCount()) -params.rightMargin - params.leftMargin;
-        		//child.setLayoutParams(params);
-
-        	    return v;
-	        };
-	    };
-	    
-	    setListAdapter(adapter);
-
-	    Intent mainDriverIntent = new Intent(this, MainDriver.class);
-        bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
-
-	}
-
-	private ArrayList<Map<String, String>> buildData() {
-		ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		return list;
-	}
-
-	private void showDialogInfo(Bundle list) {
+		// if (savedInstanceState == null) {
+		getFragmentManager().beginTransaction().add(R.id.container, viewDetails).commit();
+		getFragmentManager().beginTransaction().remove(viewDetails).commit();
+		getFragmentManager().beginTransaction().add(R.id.container, viewDevices).commit();
 		
-		for (String key : list.keySet()) {
-			Log.d("DETALHES", "Info: " + key + " = " + list.getString(key));	
-		}
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		// }
+
 	}
 
 	@Override
@@ -231,87 +192,241 @@ public class MainActivity extends ListActivity{
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+
+		if (id == R.id.action_devices) {
+
+			FragmentTransaction transaction = getFragmentManager()
+					.beginTransaction();
+			transaction.remove(viewDetails);
+			transaction.add(R.id.container, viewDevices);
+			transaction.commit();
 			return true;
 		}
-		if (id == R.id.action_discovery) {
-			Log.d("MAIN_THREAD","Starting Discovery");
-			mainDriver.startDiscovery();
+		if (id == R.id.action_details) {
+			FragmentTransaction transaction = getFragmentManager()
+					.beginTransaction();
+			transaction.remove(viewDevices);
+			transaction.add(R.id.container, viewDetails);
+			transaction.commit();
+			return true;
 		}
-		
-		if (id == R.id.action_clear) {
-			list.clear();
-			adapter.notifyDataSetChanged();
-		}
-
-		if (id == R.id.action_read) {
-			mainDriver.readScale();
-		}
-
-		if (id == R.id.action_read_pair) {
-			mainDriver.applyCommand(address, MainDriver.GET_PAIR_CODE, "");
+		if (id == R.id.action_real_all) {
+			mainDriver.readAll(address);
+			return true;
 		}
 
-		if (id == R.id.action_set_pair) {
-			mainDriver.applyCommand(address, MainDriver.SET_PAIR_CODE, "26504");
-		}
-
-		if (id == R.id.action_get_korex) {
-			mainDriver.applyCommand(address, MainDriver.GET_REGISTERED_DATA, "");
-		}
-		if (id == R.id.action_LED_Blue) {
-			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,0,0,255");
-		}
-		if (id == R.id.action_LED_Red) {
-			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,255,0,0");
-		}
-		if (id == R.id.action_LED_Green) {
-			mainDriver.applyCommand(address, MainDriver.SET_LED, "1,0,255,0");
-		}
-		if (id == R.id.action_LED_Off) {
-			mainDriver.applyCommand(address, MainDriver.SET_LED, "0,0,0,0");
-		}
-		if (id == R.id.action_correct_clock) {
-			mainDriver.applyCommand(address, MainDriver.SET_ADJUST_CLOCK, "");
-		}
-		if (id == R.id.action_alarm) {
-			mainDriver.applyCommand(address, MainDriver.SET_ALARM, "");
-		}
-		
 		return super.onOptionsItemSelected(item);
 	}
-	
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("MAIN THREAD", "onResume");
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-    }	
-    
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MainDriver.ACTION_CONNECTED);
-        intentFilter.addAction(MainDriver.ACTION_DISCONNECTED);
-        intentFilter.addAction(MainDriver.ACTION_FIND_DEVICE);
-        intentFilter.addAction(MainDriver.ACTION_NEW_DATA);
-        intentFilter.addAction(MainDriver.ACTION_STOP_DISCOVERY);
-        intentFilter.addAction(MainDriver.ACTION_UPDATED);
-        return intentFilter;
-    }    
-    
-	@Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
-    }
- 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(mServiceConnection);
-        mainDriver = null;
-    }
 
-    
-    
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.d("MAIN THREAD", "onResume");
+		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+	}
+
+	private static IntentFilter makeGattUpdateIntentFilter() {
+		final IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(MainDriver.ACTION_CONNECTED);
+		intentFilter.addAction(MainDriver.ACTION_DISCONNECTED);
+		intentFilter.addAction(MainDriver.ACTION_FIND_DEVICE);
+		intentFilter.addAction(MainDriver.ACTION_NEW_DATA);
+		intentFilter.addAction(MainDriver.ACTION_STOP_DISCOVERY);
+		intentFilter.addAction(MainDriver.ACTION_UPDATED);
+		return intentFilter;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unregisterReceiver(mGattUpdateReceiver);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(mServiceConnection);
+		mainDriver = null;
+	}
+
+	public class DevicesView extends Fragment {
+
+		public DevicesView() {
+
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_main, container,
+					false);
+
+			final ListView listview = (ListView) rootView
+					.findViewById(R.id.listDevices);
+			Log.d("LIST", "1");
+
+			adapter = new SimpleAdapter(getBaseContext(), list, R.layout.row,
+					new String[] { "Address", "Name", "Connection" },
+					new int[] { R.id.txtAddress, R.id.txtName, R.id.txtCon }) {
+				@Override
+				public void notifyDataSetChanged() {
+					Log.d("ADAPTER", "Notify");
+					super.notifyDataSetChanged();
+				}
+
+				@Override
+				public View getView(int position, View convertView,
+						ViewGroup parent) {
+					View v = super.getView(position, convertView, parent);
+
+					TextView txtView = (TextView) v
+							.findViewById(R.id.txtAddress);
+					if (txtView != null) {
+						address = txtView.getText().toString();
+						CheckBox chkDev = (CheckBox) v
+								.findViewById(R.id.chkDev);
+						if (chkDev != null) {
+							chkDev.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+								@Override
+								public void onCheckedChanged(
+										CompoundButton buttonView,
+										boolean isChecked) {
+									if (isChecked) {
+										mainDriver.connect(address);
+									} else {
+										mainDriver.disconnect(address);
+									}
+
+								}
+							});
+						}
+					}
+
+					return v;
+				};
+			};
+
+			listview.setAdapter(adapter);
+			setHasOptionsMenu(true);
+			return rootView;
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.menu_main, menu);
+			super.onCreateOptionsMenu(menu, inflater);
+
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			int id = item.getItemId();
+
+			if (id == R.id.action_discovery) {
+				mainDriver.startDiscovery();
+			}
+
+			if (id == R.id.action_clear) {
+				list.clear();
+				adapter.notifyDataSetChanged();
+			}
+
+			return super.onOptionsItemSelected(item);
+
+		}
+	}
+
+	public class DetailsView extends Fragment {
+
+		public DetailsView() {
+
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.details_fragment,
+					container, false);
+			ListView listView = (ListView) rootView.findViewById(R.id.listInfo);
+
+			listAdapter = new SimpleAdapter(getBaseContext(), listValues,
+					R.layout.row_data, new String[] { "Parameter", "Value" },
+					new int[] { R.id.txtParameter, R.id.txtValue }) {
+				@Override
+				public void notifyDataSetChanged() {
+					Log.d("LIST_ADAPTER", "Changed");
+					super.notifyDataSetChanged();
+				}
+
+				@Override
+				public View getView(int position, View convertView,
+						ViewGroup parent) {
+					View v = super.getView(position, convertView, parent);
+					return v;
+				};
+			};
+
+			listView.setAdapter(listAdapter);
+			setHasOptionsMenu(true);
+			return rootView;
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.menu_device, menu);
+			super.onCreateOptionsMenu(menu, inflater);
+
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			int id = item.getItemId();
+
+			if (id == R.id.action_read) {
+				mainDriver.readScale();
+			}
+
+			if (id == R.id.action_read_pair) {
+				mainDriver.applyCommand(address, MainDriver.GET_PAIR_CODE, "");
+			}
+
+			if (id == R.id.action_set_pair) {
+				mainDriver.applyCommand(address, MainDriver.SET_PAIR_CODE,
+						"26504");
+			}
+
+			if (id == R.id.action_get_korex) {
+				mainDriver.applyCommand(address,
+						MainDriver.GET_REGISTERED_DATA, "");
+			}
+			if (id == R.id.action_LED_Blue) {
+				mainDriver.applyCommand(address, MainDriver.SET_LED,
+						"1,0,0,255");
+			}
+			if (id == R.id.action_LED_Red) {
+				mainDriver.applyCommand(address, MainDriver.SET_LED,
+						"1,255,0,0");
+			}
+			if (id == R.id.action_LED_Green) {
+				mainDriver.applyCommand(address, MainDriver.SET_LED,
+						"1,0,255,0");
+			}
+			if (id == R.id.action_LED_Off) {
+				mainDriver.applyCommand(address, MainDriver.SET_LED, "0,0,0,0");
+			}
+			if (id == R.id.action_correct_clock) {
+				mainDriver.applyCommand(address, MainDriver.SET_ADJUST_CLOCK,
+						"");
+			}
+			if (id == R.id.action_alarm) {
+				mainDriver.applyCommand(address, MainDriver.SET_ALARM, "");
+			}
+
+			return super.onOptionsItemSelected(item);
+
+		}
+
+	}
+
 }

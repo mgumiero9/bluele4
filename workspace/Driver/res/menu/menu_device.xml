@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.driver.MainActivity" >
+    <item
+        android:id="@+id/action_devices"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_devices">
+    </item>
+    <item android:id="@+id/action_read" android:title="@string/read_scale"></item>
+    <item android:id="@+id/action_read_pair" android:title="@string/read_pair"></item>
+    <item android:id="@+id/action_set_pair" android:title="@string/set_pair"></item>
+    <item android:id="@+id/action_get_korex" android:title="@string/read_korex"></item>
+    <item android:id="@+id/action_LED_Red" android:title="@string/red"></item>
+    <item android:id="@+id/action_LED_Blue" android:title="@string/blue"></item>
+    <item android:id="@+id/action_LED_Green" android:title="@string/green"></item>
+    <item android:id="@+id/action_LED_Off" android:title="@string/off"></item>
+    <item android:id="@+id/action_correct_clock" android:title="@string/set_clock"></item>
+    <item android:id="@+id/action_alarm" android:title="@string/set_alarm"></item>
+    
+
+</menu>

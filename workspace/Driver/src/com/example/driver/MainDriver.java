@@ -654,8 +654,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 */
 	private void broadcastUpdate(final String action, final String address, final Bundle list) {
 		final Intent intent = new Intent(action);
-		intent.putExtra(getString(R.string.DEVICE_ADDRESS), address);
 		intent.putExtras(list);
+		intent.putExtra(getString(R.string.DEVICE_ADDRESS), address);
 		sendBroadcast(intent);
 	}
 	

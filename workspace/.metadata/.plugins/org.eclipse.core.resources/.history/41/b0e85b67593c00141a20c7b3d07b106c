@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Driver</string>
+    
+    <string name="start_discovery">Start</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="notify">Notify</string>
+    <string name="Discovery">action_menu</string>
+    <string name="discovery_menu">Discovery</string>
+    <string name="clear_list">Clear List</string>
+    <string name="config">Config</string>
+    <string name="detalhes">Detalhes</string>
+    <string name="read_scale">Ler Balança</string>
+    <string name="read_pair">Read Korex ID</string>
+    <string name="set_pair">Set Korex ID</string>
+    <string name="read_korex">Get Korex Data</string>
+    
+    <string name="set_clock">Ajustar Relógio</string>
+    <string name="set_alarm">Ajustar Alarme</string>
+    <string name="green">Verde</string>
+    <string name="red">Vermelho</string>
+    <string name="blue">Azul</string>
+    <string name="off">Apagado</string>
+    
+    <string name="menu_devices">Lista de Dispositivos</string>
+    <string name="menu_details">Dados dos Dispostivos</string>
+    <string name="menu_details">Ler Tudo</string>
+    
+</resources>

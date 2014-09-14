@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.driver.MainActivity" >
+    
+    <item
+        android:id="@+id/action_details"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_details">
+    </item>
+    <item android:id="@+id/action_discovery" android:title="@string/discovery_menu"></item>
+    <item android:id="@+id/action_clear" android:title="@string/clear_list"></item>
+    <item android:id="@+id/action_real_all" android:title="@string/menu_read_all"></item>
+
+</menu>
