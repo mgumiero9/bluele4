@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 	private static MainDriver mainDriver;
 	protected Map<String, String> hashValues = new HashMap<String, String>();
 	protected String address = "";
-	private DevicesView devicesView = new DevicesView();
+	private DevicesView deviceView = new DevicesView();
 	private DetailsView detailsView = new DetailsView();
 	
 
@@ -90,12 +90,12 @@ public class MainActivity extends Activity {
 				newMap.put("Connection", "OFF");
 				Log.d("MAP", "Map Size " + newMap.size());
 				
-				devicesView.getList().add(newMap);
-				devicesView.getAdapter().notifyDataSetChanged();
+				deviceView.getList().add(newMap);
+				deviceView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_NEW_DATA)
 					|| action.equals(MainDriver.ACTION_UPDATED)) {
-
+				// showDialogInfo(intent.getExtras());
 				String address = "(-)";
 				for (String key : intent.getExtras().keySet())
 					Log.d("EXTRAS",
@@ -112,13 +112,13 @@ public class MainActivity extends Activity {
 					hashValues.put(key, intent.getExtras().getString(key)
 							+ address);
 				}
-				detailsView.getList().clear();
-				Map<String, String> newValue = new HashMap<String, String>();
+				//DetailsView.getList().clear();
+				// Map<String, String> newValue = new HashMap<String, String>();
 				for (final String key : hashValues.keySet()) {
 					Log.d("ADD",
 							"Parameter = " + key + " Value="
 									+ hashValues.get(key));
-					detailsView.getList().add(new HashMap<String, String>() {
+					DetailsView.getList().add(new HashMap<String, String>() {
 						{
 							put("Parameter", key);
 							put("Value", hashValues.get(key));
@@ -126,25 +126,25 @@ public class MainActivity extends Activity {
 					});
 
 				}
-				detailsView.getAdapter().notifyDataSetChanged();
+				DetailsView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_CONNECTED)) {
-				for (Map<String, String> element : devicesView.getList()) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "ON");
-						devicesView.getAdapter().notifyDataSetChanged();
+						DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
 			} else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
-				for (Map<String, String> element : devicesView.getList()) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "OFF");
-						devicesView.getAdapter().notifyDataSetChanged();
+						//DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
@@ -166,9 +166,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		// if (savedInstanceState == null) {
-		getFragmentManager().beginTransaction().add(R.id.container, detailsView).commit();
-		getFragmentManager().beginTransaction().remove(detailsView).commit();
-		getFragmentManager().beginTransaction().add(R.id.container, devicesView).commit();
+		getFragmentManager().beginTransaction().add(R.id.container, deviceView).commit();
 		
 		// }
 
@@ -185,14 +183,14 @@ public class MainActivity extends Activity {
 
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, devicesView);
+			transaction.replace(R.id.container, (Fragment) new DevicesView());
 			transaction.commit();
 			return true;
 		}
 		if (id == R.id.action_details) {
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, detailsView);
+			transaction.replace(R.id.container, new DetailsView());
 			transaction.commit();
 			return true;
 		}
@@ -428,14 +426,6 @@ public class MainActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 
 		}
-		public ArrayList<Map<String, String>> getList() {
-			return list;
-		}
-		
-		public SimpleAdapter getAdapter() {
-			return adapter;
-		}
-
 		
 	}
 		

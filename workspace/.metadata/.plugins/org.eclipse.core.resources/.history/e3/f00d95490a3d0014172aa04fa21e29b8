@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 	private static MainDriver mainDriver;
 	protected Map<String, String> hashValues = new HashMap<String, String>();
 	protected String address = "";
-	private DevicesView devicesView = new DevicesView();
+	private DevicesView deviceView = new DevicesView();
 	private DetailsView detailsView = new DetailsView();
 	
 
@@ -90,8 +90,8 @@ public class MainActivity extends Activity {
 				newMap.put("Connection", "OFF");
 				Log.d("MAP", "Map Size " + newMap.size());
 				
-				devicesView.getList().add(newMap);
-				devicesView.getAdapter().notifyDataSetChanged();
+				deviceView.getList().add(newMap);
+				deviceView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_NEW_DATA)
 					|| action.equals(MainDriver.ACTION_UPDATED)) {
@@ -129,22 +129,22 @@ public class MainActivity extends Activity {
 				detailsView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_CONNECTED)) {
-				for (Map<String, String> element : devicesView.getList()) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "ON");
-						devicesView.getAdapter().notifyDataSetChanged();
+						DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
 			} else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
-				for (Map<String, String> element : devicesView.getList()) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "OFF");
-						devicesView.getAdapter().notifyDataSetChanged();
+						//DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
@@ -166,9 +166,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		// if (savedInstanceState == null) {
-		getFragmentManager().beginTransaction().add(R.id.container, detailsView).commit();
-		getFragmentManager().beginTransaction().remove(detailsView).commit();
-		getFragmentManager().beginTransaction().add(R.id.container, devicesView).commit();
+		getFragmentManager().beginTransaction().add(R.id.container, deviceView).commit();
 		
 		// }
 
@@ -185,14 +183,14 @@ public class MainActivity extends Activity {
 
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, devicesView);
+			transaction.replace(R.id.container, (Fragment) new DevicesView());
 			transaction.commit();
 			return true;
 		}
 		if (id == R.id.action_details) {
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, detailsView);
+			transaction.replace(R.id.container, new DetailsView());
 			transaction.commit();
 			return true;
 		}

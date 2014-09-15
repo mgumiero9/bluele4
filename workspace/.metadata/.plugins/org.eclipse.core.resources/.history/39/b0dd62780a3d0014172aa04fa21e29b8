@@ -166,9 +166,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		// if (savedInstanceState == null) {
-		getFragmentManager().beginTransaction().add(R.id.container, detailsView).commit();
-		getFragmentManager().beginTransaction().remove(detailsView).commit();
-		getFragmentManager().beginTransaction().add(R.id.container, devicesView).commit();
+		getFragmentManager().beginTransaction().add(R.id.container, deviceView).commit();
 		
 		// }
 
@@ -185,14 +183,14 @@ public class MainActivity extends Activity {
 
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, devicesView);
+			transaction.replace(R.id.container, (Fragment) new DevicesView());
 			transaction.commit();
 			return true;
 		}
 		if (id == R.id.action_details) {
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.replace(R.id.container, detailsView);
+			transaction.replace(R.id.container, new DetailsView());
 			transaction.commit();
 			return true;
 		}
