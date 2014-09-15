@@ -5,13 +5,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.example.driver.BtDevice.OPERATION;
 import com.example.driver.DriverUUID;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;

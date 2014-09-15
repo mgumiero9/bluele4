@@ -1,15 +1,11 @@
 package com.example.driver;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.driver.R.id;
-
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -20,19 +16,15 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.app.Fragment;
-import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SimpleAdapter;
@@ -41,16 +33,11 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
 	private static MainDriver mainDriver;
-	protected String address = "";
-	protected Fragment viewDevices = new DevicesView();
-	protected Fragment viewDetails = new DetailsView();
-
-	protected ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-	protected ArrayList<Map<String, String>> listValues = new ArrayList<Map<String, String>>();
 	protected Map<String, String> hashValues = new HashMap<String, String>();
-
-	protected SimpleAdapter adapter;
-	protected SimpleAdapter listAdapter;
+	protected String address = "";
+	private DevicesView deviceView = new DevicesView();
+	private DetailsView detailsView = new DetailsView();
+	
 
 	// Code to manage Service lifecycle.
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -85,7 +72,7 @@ public class MainActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
 			// final String mAddress = intent.;
-			if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
+/*			if (action.equals(MainDriver.ACTION_STOP_DISCOVERY)) {
 				return;
 			} else if (action.equals(MainDriver.ACTION_FIND_DEVICE)) {
 				Map<String, String> newMap = new HashMap<String, String>();
@@ -102,8 +89,9 @@ public class MainActivity extends Activity {
 								getString(R.string.DEVICE_NAME)));
 				newMap.put("Connection", "OFF");
 				Log.d("MAP", "Map Size " + newMap.size());
-				list.add(newMap);
-				adapter.notifyDataSetChanged();
+								
+				//DevicesView.getList().add(newMap);
+				//DevicesView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_NEW_DATA)
 					|| action.equals(MainDriver.ACTION_UPDATED)) {
@@ -124,13 +112,13 @@ public class MainActivity extends Activity {
 					hashValues.put(key, intent.getExtras().getString(key)
 							+ address);
 				}
-				listValues.clear();
+				//DetailsView.getList().clear();
 				// Map<String, String> newValue = new HashMap<String, String>();
 				for (final String key : hashValues.keySet()) {
 					Log.d("ADD",
 							"Parameter = " + key + " Value="
 									+ hashValues.get(key));
-					listValues.add(new HashMap<String, String>() {
+					DetailsView.getList().add(new HashMap<String, String>() {
 						{
 							put("Parameter", key);
 							put("Value", hashValues.get(key));
@@ -138,29 +126,29 @@ public class MainActivity extends Activity {
 					});
 
 				}
-				listAdapter.notifyDataSetChanged();
+				DetailsView.getAdapter().notifyDataSetChanged();
 				return;
 			} else if (action.equals(MainDriver.ACTION_CONNECTED)) {
-				for (Map<String, String> element : list) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "ON");
-						adapter.notifyDataSetChanged();
+						DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
 			} else if (action.equals(MainDriver.ACTION_DISCONNECTED)) {
-				for (Map<String, String> element : list) {
+				for (Map<String, String> element : DevicesView.getList()) {
 					if (element.get("Address").equals(
 							intent.getExtras().getString(
 									getString(R.string.DEVICE_ADDRESS)))) {
 						element.put("Connection", "OFF");
-						adapter.notifyDataSetChanged();
+						//DevicesView.getAdapter().notifyDataSetChanged();
 						return;
 					}
 				}
-			}
+			} */
 		}
 	};
 
@@ -178,9 +166,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		// if (savedInstanceState == null) {
-		getFragmentManager().beginTransaction().add(R.id.container, viewDetails).commit();
-		getFragmentManager().beginTransaction().remove(viewDetails).commit();
-		getFragmentManager().beginTransaction().add(R.id.container, viewDevices).commit();
+		getFragmentManager().beginTransaction().add(R.id.container, deviceView).commit();
 		
 		// }
 
@@ -197,16 +183,14 @@ public class MainActivity extends Activity {
 
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.remove(viewDetails);
-			transaction.add(R.id.container, viewDevices);
+			transaction.replace(R.id.container, (Fragment) new DevicesView());
 			transaction.commit();
 			return true;
 		}
 		if (id == R.id.action_details) {
 			FragmentTransaction transaction = getFragmentManager()
 					.beginTransaction();
-			transaction.remove(viewDevices);
-			transaction.add(R.id.container, viewDetails);
+			transaction.replace(R.id.container, new DetailsView());
 			transaction.commit();
 			return true;
 		}
@@ -249,8 +233,13 @@ public class MainActivity extends Activity {
 		mainDriver = null;
 	}
 
-	public class DevicesView extends Fragment {
+	public static class DevicesView extends Fragment {
 
+		protected ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		protected String address = "";
+		private SimpleAdapter adapter;
+		
+		
 		public DevicesView() {
 
 		}
@@ -264,8 +253,7 @@ public class MainActivity extends Activity {
 			final ListView listview = (ListView) rootView
 					.findViewById(R.id.listDevices);
 			Log.d("LIST", "1");
-
-			adapter = new SimpleAdapter(getBaseContext(), list, R.layout.row,
+			adapter  = new SimpleAdapter(getActivity(), list, R.layout.row,
 					new String[] { "Address", "Name", "Connection" },
 					new int[] { R.id.txtAddress, R.id.txtName, R.id.txtCon }) {
 				@Override
@@ -335,10 +323,15 @@ public class MainActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 
 		}
+		
 	}
 
-	public class DetailsView extends Fragment {
+	public static class DetailsView extends Fragment {
 
+		private String address = "";
+		private ArrayList<Map<String, String>> listValues = new ArrayList<Map<String, String>>();
+		protected SimpleAdapter adapter;
+		
 		public DetailsView() {
 
 		}
@@ -349,8 +342,7 @@ public class MainActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.details_fragment,
 					container, false);
 			ListView listView = (ListView) rootView.findViewById(R.id.listInfo);
-
-			listAdapter = new SimpleAdapter(getBaseContext(), listValues,
+			adapter = new SimpleAdapter(getActivity(), listValues,
 					R.layout.row_data, new String[] { "Parameter", "Value" },
 					new int[] { R.id.txtParameter, R.id.txtValue }) {
 				@Override
@@ -367,7 +359,7 @@ public class MainActivity extends Activity {
 				};
 			};
 
-			listView.setAdapter(listAdapter);
+			listView.setAdapter(adapter);
 			setHasOptionsMenu(true);
 			return rootView;
 		}
@@ -426,7 +418,7 @@ public class MainActivity extends Activity {
 			return super.onOptionsItemSelected(item);
 
 		}
-
+		
 	}
-
+		
 }
