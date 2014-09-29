@@ -1,14 +1,14 @@
 package com.example.driver;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
-public class DriverUUID {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class  DriverUUID {
 	
 	/**
 	 * 

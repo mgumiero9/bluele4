@@ -80,7 +80,7 @@ import java.util.UUID;
  *
  */
 @SuppressLint("UseSparseArrays")
-public class MainDriver extends Service implements BluetoothProfile {
+public class MainDriver2 extends Service implements BluetoothProfile {
 
 	// Classification for broadcast traffic
 	final static String ACTION_STOP_DISCOVERY 	= "STOP";
@@ -90,7 +90,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	final static String ACTION_DISCONNECTED  	= "DISC";
 	final static String ACTION_UPDATED		  	= "UPDA";
 
-	// Classification for execution of commands or special requests	
+	// Classification for execution of commands or special requests
 	final static int SET_RESET_COUNTERS				= 0;
 	final static int SET_CALIBRATION			 	= 1;
 	final static int SET_SENSOR_POSITION 			= 2;
@@ -101,7 +101,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	final static int SET_LED						= 7;
 	final static int SET_ADJUST_CLOCK				= 8;
 	final static int SET_ALARM						= 9;
-	
+
 	/**
 	 * Register callback and interface (probably on)
 	 */
@@ -115,18 +115,18 @@ public class MainDriver extends Service implements BluetoothProfile {
                 return false;
             }
         }
- 
+
         mBluetoothAdapter = mBluetoothManager.getAdapter();
 
         if (mBluetoothAdapter == null) {
             Log.e(LOG_MAIN, "Unable to obtain a BluetoothAdapter.");
             return false;
         }
-        
-        
+
+
 		return true;
 	}
-	
+
 	/**
 	 * Start Discovery process.
 	 * The process is stopped by time (10s hardcoded) or
@@ -143,7 +143,7 @@ public class MainDriver extends Service implements BluetoothProfile {
         }
 		return false;
 	}
-	
+
 	/**
 	 * Why would be necessary disconnect ?
 	 * @param address
@@ -163,7 +163,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Connect to device with address specified
 	 * The devices is get from Bluetooth adapter and insert in DeviceList if necessary
@@ -180,7 +180,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		if (!lstDevices.containsKey(address))
 			lstDevices.put(address, new BtDevice(STATE_DISCONNECTED, address));
 		BtDevice device = lstDevices.get(address);
-		
+
 		stopDiscovery();
 		if (!device.enable) {
 			device.enable = true;
@@ -194,7 +194,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		return false;
 	}
 
-	
+
 	@Override
 	public List<BluetoothDevice> getConnectedDevices() {
 		List<BluetoothDevice> devices = new ArrayList<BluetoothDevice>();
@@ -222,33 +222,33 @@ public class MainDriver extends Service implements BluetoothProfile {
 			return lstDevices.get(device.getAddress()).state;
 		return 0;
 	}
-			
+
 	/**
 	 * Timeout for Read/Write Parameters and Connection. From command to callback.
 	 */
 	final static int TIMEOUT_CONNECTION   = 10000;
 	final static int TIMEOUT_READWRITE   = 1000;
 
-	
+
 	private static final String LOG_MAIN = "DRIVER";
 	private static final String LOG_SERVICE = "DRV SERVICE";
 	private static final String LOG_NOT = "DRV NOTIFICATION";
-	
-	
+
+
 	private static final long SCAN_PERIOD = 10000;
-	
+
 	private BluetoothAdapter mBluetoothAdapter = null;
 	private BluetoothManager mBluetoothManager = null;
 	private boolean LeDiscovering = false;
-	
+
 	private Handler mHandler = new Handler();
 	private Handler mDiscoveryHandler = new Handler();
 	private HashMap<String,BtDevice> lstDevices = new HashMap<String, BtDevice>();
-	
+
 	private final static boolean hasProperty(int value, int property) {
 		return ((value & property) == property);
 	}
-	
+
 	/**
 	 * After SCAN_PERIOD, the discovering process is automatically stopped
 	 */
@@ -258,8 +258,8 @@ public class MainDriver extends Service implements BluetoothProfile {
 			stopDiscovery();
 		}
 	};
-	
-	
+
+
 	/**
 	 * Stop the discovering process
 	 */
@@ -279,9 +279,9 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 *
 	 */
 	private class ConnectingTimeout implements Runnable {
-		
+
 		BtDevice device;
-		
+
 		ConnectingTimeout(BtDevice btDevice) {
 			device = btDevice;
 		}
@@ -303,12 +303,12 @@ public class MainDriver extends Service implements BluetoothProfile {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Each device is stored in a local list and informed to MainActivity
 	 */
-	private final BluetoothAdapter.LeScanCallback mLeScanCallback = 
+	private final BluetoothAdapter.LeScanCallback mLeScanCallback =
 			new BluetoothAdapter.LeScanCallback() {
 				@Override
 				public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
@@ -323,7 +323,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 	 * All device callbacks are handle here
 	 */
 	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-    	
+
 		/**
 		 * When the device is connected for the first time, scan for services
 		 * Afterwards is just enable notifications
@@ -336,17 +336,17 @@ public class MainDriver extends Service implements BluetoothProfile {
 			// The error 257 should be treated. Some tests stops because this error code
 			// Disable and Enable Bluetooth seems to solve the error
 			Log.e(LOG_MAIN, "Connection State Error (" + status + ") State=" + newState);
-			
-				
+
+
 			if (!lstDevices.containsKey(gatt.getDevice().getAddress())) {
 				lstDevices.put(gatt.getDevice().getAddress(), new BtDevice(newState, gatt.getDevice().getAddress()));
 			}
 			BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
-			
+
 			// Device just connects
 			if(newState ==  STATE_CONNECTED) {
 				// Spread the connected state
-				broadcastUpdate(ACTION_CONNECTED, device.address); 
+				broadcastUpdate(ACTION_CONNECTED, device.address);
 				// Update available services if necessary
 				if ((device.gatt.getServices() == null) || (device.gatt.getServices().isEmpty())){
 					Log.d(LOG_SERVICE, device.address + ": Discovering services");
@@ -356,11 +356,11 @@ public class MainDriver extends Service implements BluetoothProfile {
 				else {
 					listServices(gatt, device.updating);
 				}
-				// Update local state and start call pending operations 
+				// Update local state and start call pending operations
 				device.state = newState;
 				NextOperation(device);
 			}
-				
+
 			// Device just disconnects
 			if (newState == STATE_DISCONNECTED) {
 				// Clear operations. They will be called again on reconnection
@@ -370,7 +370,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 				// Spread the information
 				broadcastUpdate(ACTION_DISCONNECTED, device.address);
 			}
-			
+
         }
 
         /**
@@ -394,7 +394,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 
         /**
          * How manipulate configuration???
-         * 
+         *
          * @see android.bluetooth.BluetoothGattCallback#onCharacteristicWrite(android.bluetooth.BluetoothGatt, android.bluetooth.BluetoothGattCharacteristic, int)
          */
         public void onCharacteristicWrite(BluetoothGatt gatt,
@@ -410,7 +410,7 @@ public class MainDriver extends Service implements BluetoothProfile {
         public void onCharacteristicRead(BluetoothGatt gatt,
                 BluetoothGattCharacteristic characteristic,
                 int status) {
-        	
+
             if (status != BluetoothGatt.GATT_SUCCESS) {
             	Log.e(LOG_MAIN, "Dev" + gatt.getDevice().getAddress() + "Error Read Characteristic " +  characteristic.getUuid().toString());
             	return;
@@ -420,13 +420,13 @@ public class MainDriver extends Service implements BluetoothProfile {
     			NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    	}
         }
-        
-   
+
+
 		public void onCharacteristicChanged(BluetoothGatt gatt,
 		        BluetoothGattCharacteristic characteristic) {
 			readNotification(gatt.getDevice().getAddress(), characteristic);
 		}
-		
+
 		/**
 		 * Fired after .readDescriptor. Just confirm last operation and call next.
 		 */
@@ -436,7 +436,7 @@ public class MainDriver extends Service implements BluetoothProfile {
     			NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    	}
 	    }
-	    
+
 	    /**
 	     * Fired after .writeDescriptor (needed for notification setup). Just confirm last operation and call next.
 	     */
@@ -446,12 +446,12 @@ public class MainDriver extends Service implements BluetoothProfile {
     			NextOperation(lstDevices.get(gatt.getDevice().getAddress()));
 	    	}
 	    }
-	    
+
 	    /**
 	     * Callback invoked when a reliable write transaction has been completed. None until now.
 	     *
-	     * @param gatt GATT client invoked {@link BluetoothGatt#executeReliableWrite}
-	     * @param status {@link BluetoothGatt#GATT_SUCCESS} if the reliable write
+	     * @param gatt GATT client invoked {@link android.bluetooth.BluetoothGatt#executeReliableWrite}
+	     * @param status {@link android.bluetooth.BluetoothGatt#GATT_SUCCESS} if the reliable write
 	     *               transaction was executed successfully
 	     */
 	    public void onReliableWriteCompleted(BluetoothGatt gatt, int status) {
@@ -479,7 +479,7 @@ public class MainDriver extends Service implements BluetoothProfile {
 		}
 		broadcastUpdate(ACTION_NEW_DATA, address, list);
 	}
-	
+
 	/*
 	 * Identify any notification service/characteristic and add to operations
 	 * @param gatt
@@ -536,11 +536,11 @@ public class MainDriver extends Service implements BluetoothProfile {
     	}
 		*/
 	}
-		
+
 	/**
 	 * Queue read for each parameter when update is true
 	 * Or just list parameters for debug
-	 * For notification is better store the Services UUID or scan each time 
+	 * For notification is better store the Services UUID or scan each time
 	 * @param gatt
 	 * @param update
 	 */
@@ -548,27 +548,27 @@ public class MainDriver extends Service implements BluetoothProfile {
     	BtDevice device = lstDevices.get(gatt.getDevice().getAddress());
     	if (device == null)
     		return;
-    	
+
     	Log.d(LOG_SERVICE, "Listing Services " + device.updating);
-    	
+
 		for (BluetoothGattService bluetoothGattService : gatt.getServices()) {
 			Log.d(LOG_SERVICE, "Service " + getString(DriverUUID.uuidToString(bluetoothGattService.getUuid())));
 			for(BluetoothGattCharacteristic bluetoothGattCharacteristic: bluetoothGattService.getCharacteristics()) {
 				if(bluetoothGattCharacteristic.getDescriptors().isEmpty()) {
 					Log.d(LOG_SERVICE, "Characteristic:" + getString(DriverUUID.uuidToString(bluetoothGattCharacteristic.getUuid())) + "(" + bluetoothGattCharacteristic.getProperties() + ")");
 					if ((device.updating) && (hasProperty(bluetoothGattCharacteristic.getProperties(), BluetoothGattCharacteristic.PROPERTY_READ))) {
-						device.addOperation(bluetoothGattCharacteristic, null, BtDevice.OPERATION.READ);
+						device.addOperation(bluetoothGattCharacteristic, null, OPERATION.READ);
 					}
 				}
 				else {
 					// Dont work for CSC but test for scale
 					if ((device.updating) && (hasProperty(bluetoothGattCharacteristic.getProperties(), BluetoothGattCharacteristic.PROPERTY_READ))) {
-						device.addOperation(bluetoothGattCharacteristic, null, BtDevice.OPERATION.READ);
+						device.addOperation(bluetoothGattCharacteristic, null, OPERATION.READ);
 					}
     				for(BluetoothGattDescriptor bluetoothGattDescriptor: bluetoothGattCharacteristic.getDescriptors()) {
 					Log.d(LOG_SERVICE, "Characteristic:" + getString(DriverUUID.uuidToString(bluetoothGattCharacteristic.getUuid())) + " Descriptor:" + getString(DriverUUID.uuidToString(bluetoothGattDescriptor.getUuid()))  + "(" + bluetoothGattCharacteristic.getProperties()  + ")");
     					if (device.updating) {
-    						device.addOperation(bluetoothGattCharacteristic, bluetoothGattDescriptor, BtDevice.OPERATION.READ);
+    						device.addOperation(bluetoothGattCharacteristic, bluetoothGattDescriptor, OPERATION.READ);
     					}
     				}
 				}
@@ -836,8 +836,8 @@ public class MainDriver extends Service implements BluetoothProfile {
  	 
 
     public class LocalBinder extends Binder {
-        MainDriver getService() {
-            return MainDriver.this;
+        MainDriver2 getService() {
+            return MainDriver2.this;
         }
     }
     

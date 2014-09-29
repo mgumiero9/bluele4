@@ -65,8 +65,8 @@ public final class R {
     }
     public static final class menu {
         public static final int main=0x7f070000;
-        public static final int menu_device=0x7f070001;
-        public static final int menu_main=0x7f070002;
+        public static final int menu_device =0x7f070001;
+        public static final int menu_main =0x7f070002;
     }
     public static final class string {
         public static final int BARO_ALTITUDE=0x7f050074;

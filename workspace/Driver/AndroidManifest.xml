@@ -4,11 +4,16 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-	<uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+
 	<uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
-    
-    
+
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="21" />
@@ -25,6 +30,24 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".MainActivity$loadCHRChronometer"
+            android:label="@string/app_name"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".TrainingHelper"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".GPS"
+            android:label="@string/app_name" >
         </activity>
         <service android:name=".MainDriver" android:enabled="true"/>
     </application>

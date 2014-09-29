@@ -27,5 +27,6 @@
     <string name="menu_devices">Lista de Dispositivos</string>
     <string name="menu_details">Dados dos Dispostivos</string>
     <string name="menu_read_all">Ler Tudo</string>
-    
+    <string name="devices">Devices Nearby</string>
+
 </resources>
