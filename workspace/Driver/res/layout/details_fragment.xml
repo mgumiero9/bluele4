@@ -10,25 +10,6 @@
     tools:context=".MainActivity"
     >
 
-    <TextView
-        android:id="@+id/nearbyDevicesTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10sp"
-        android:textAlignment="center"
-        android:layout_gravity="top"
-        android:textSize="20sp"
-        android:visibility="invisible"
-        android:text="@string/devices"
-        />
-
-    <ListView
-        android:id="@+id/listInfo"
-        android:paddingTop="200sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -71,8 +52,73 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="50sp"/>
+            android:textSize="40sp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/batteryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10sp"
+                android:padding="5sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:visibility="visible"
+                android:text="Battery Level: "
+                />
+
+            <TextView
+                android:id="@+id/battery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10sp"
+                android:padding="5sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:visibility="visible"
+                android:text="@string/CHAR_BATTERY_LEVEL"
+                />
+
+        </LinearLayout>
+
+
+
+
     </LinearLayout>
+
+
+
+
+
+
+
+    <TextView
+        android:id="@+id/nearbyDevicesTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10sp"
+        android:textAlignment="center"
+        android:layout_gravity="top"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        android:text="@string/devices"
+        />
+
+
+
+    <ListView
+        android:id="@+id/listInfo"
+        android:paddingTop="300sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+
 
 
 

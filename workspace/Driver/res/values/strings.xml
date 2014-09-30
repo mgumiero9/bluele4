@@ -29,4 +29,26 @@
     <string name="menu_read_all">Ler Tudo</string>
     <string name="devices">Devices Nearby</string>
 
+    <string-array name="sports">
+        <item>Bike ride</item>
+        <item>Bike race</item>
+        <item>Bike training</item>
+        <item>Walk</item>
+        <item>Run race</item>
+        <item>Run training</item>
+        <item>Aerobic exercises</item>
+        <item>Bodybuilding</item>
+    </string-array>
+
+    <array name="sports_icons">
+        <item>@drawable/sport_bike</item>
+        <item>@drawable/sport_bike</item>
+        <item>@drawable/sport_bike_training</item>
+        <item>@drawable/sport_walking</item>
+        <item>@drawable/sport_run_race</item>
+        <item>@drawable/sport_run_training</item>
+        <item>@drawable/sport_gymnastics</item>
+        <item>@drawable/sport_bodybuilding</item>
+    </array>
+
 </resources>

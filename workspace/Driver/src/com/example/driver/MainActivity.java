@@ -1,10 +1,7 @@
 package com.example.driver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -15,7 +12,7 @@ import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.app.Fragment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,10 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity {
 
@@ -37,7 +38,17 @@ public class MainActivity extends Activity {
 	protected String address = "";
 	private DevicesView devicesView = new DevicesView();
 	private DetailsView detailsView = new DetailsView();
-	
+
+    private android.widget.Chronometer CHRchronometer;
+
+
+    public void runStartChronometer(View view){
+
+        Log.v("XXXXXXXXXXXXXXX","xxxxxxxxxxxxxxxxx");
+        //loadCHRChronometer.CHRchronometer.start();
+        loadCHRChronometer.startChronometer();
+
+    }
 
 	// Code to manage Service lifecycle.
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -51,6 +62,7 @@ public class MainActivity extends Activity {
 				finish();
 			}
 		}
+
 
 		@Override
 		public void onServiceDisconnected(ComponentName componentName) {
@@ -89,7 +101,7 @@ public class MainActivity extends Activity {
 								getString(R.string.DEVICE_NAME)));
 				newMap.put("Connection", "OFF");
 				Log.d("MAP", "Map Size " + newMap.size());
-				
+
 				devicesView.getList().add(newMap);
 				devicesView.getAdapter().notifyDataSetChanged();
 				return;
@@ -118,6 +130,10 @@ public class MainActivity extends Activity {
 					Log.d("ADD",
 							"Parameter = " + key + " Value="
 									+ hashValues.get(key));
+
+                    // this will capture key and value
+                    addDeviceParameters(key, hashValues.get(key));
+
 					detailsView.getList().add(new HashMap<String, String>() {
 						{
 							put("Parameter", key);
@@ -158,7 +174,7 @@ public class MainActivity extends Activity {
 	 */
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		Intent mainDriverIntent = new Intent(this, MainDriver.class);
 		bindService(mainDriverIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -169,8 +185,6 @@ public class MainActivity extends Activity {
 		getFragmentManager().beginTransaction().add(R.id.container, detailsView).commit();
 		getFragmentManager().beginTransaction().remove(detailsView).commit();
 		getFragmentManager().beginTransaction().add(R.id.container, devicesView).commit();
-		
-		// }
 
 	}
 
@@ -200,6 +214,12 @@ public class MainActivity extends Activity {
 			mainDriver.readAll(address);
 			return true;
 		}
+        if (id == R.id.chronometer) {
+        Intent myIntent = new Intent(MainActivity.this, TrainingHelper.class);
+        //myIntent.putExtra("key", value); //Optional parameters
+        MainActivity.this.startActivity(myIntent);
+            return true;
+        }
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -257,7 +277,7 @@ public class MainActivity extends Activity {
 			Log.d("LIST", "1");
 			adapter  = new SimpleAdapter(getActivity(), list, R.layout.row,
 					new String[] { "Address", "Name", "Connection" },
-					new int[] { R.id.txtAddress, R.id.txtName, R.id.txtCon }) {
+					new int[] {R.id.txtAddress, R.id.txtName, R.id.txtCon }) {
 				@Override
 				public void notifyDataSetChanged() {
 					Log.d("ADAPTER", "Notify");
@@ -346,6 +366,15 @@ public class MainActivity extends Activity {
 
 		}
 
+        //mainDriver.startDiscovery();
+
+        //mList = devicesView.getList();
+
+        //Log.v("XXXXX",list.toString());
+
+
+        // }
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
@@ -355,6 +384,7 @@ public class MainActivity extends Activity {
 			adapter = new SimpleAdapter(getActivity(), list,
 					R.layout.row_data, new String[] { "Parameter", "Value" },
 					new int[] { R.id.txtParameter, R.id.txtValue }) {
+
 				@Override
 				public void notifyDataSetChanged() {
 					Log.d("LIST_ADAPTER", "Changed");
@@ -369,7 +399,7 @@ public class MainActivity extends Activity {
 				};
 			};
 
-			listView.setAdapter(adapter);
+            listView.setAdapter(adapter);
 			setHasOptionsMenu(true);
 			return rootView;
 		}
@@ -438,5 +468,66 @@ public class MainActivity extends Activity {
 
 		
 	}
-		
+
+    public static class loadCHRChronometer extends Activity implements View.OnClickListener {
+
+        private static android.widget.Chronometer CHRchronometer;
+        private String format;
+
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.details_fragment);
+
+            CHRchronometer = (android.widget.Chronometer) findViewById(R.id.CHRchronometer);
+            findViewById(R.id.CHRstart_button).setOnClickListener(this);
+            findViewById(R.id.CHRstop_button).setOnClickListener(this);
+
+            //format = "%tH:%tM:%tS";
+            //chronometer.setFormat(format);
+
+        }
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()) {
+                case R.id.CHRstart_button:
+                    CHRchronometer.setBase(SystemClock.elapsedRealtime());
+                    CHRchronometer.start();
+                    break;
+                case R.id.CHRstop_button:
+                    CHRchronometer.stop();
+                    break;
+            }
+        }
+
+        public static void startChronometer() {
+
+            CHRchronometer.setBase(SystemClock.elapsedRealtime());
+            CHRchronometer.start();
+
+        }
+    }
+
+    public void addDeviceParameters(String Key, String Value) {
+
+        String mKey;
+        String mValue;
+        String mAddress;
+
+        mKey = Key;
+        mValue = Value.substring(0,Value.indexOf('('));
+        mAddress = Value.substring(Value.indexOf('('),1 + Value.indexOf(')'));
+
+        Log.v("addDeviceParameters",mKey + " = " + mValue + " no Endereço = " + mAddress);
+
+
+
+        GenerateDeviceOnScreen.populateDevParameters(mKey, mValue, mAddress);
+
+    }
 }
+
+
+
+

@@ -122,8 +122,7 @@ public class MainDriver extends Service implements BluetoothProfile {
             Log.e(LOG_MAIN, "Unable to obtain a BluetoothAdapter.");
             return false;
         }
-        
-        
+
 		return true;
 	}
 	

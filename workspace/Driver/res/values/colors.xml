@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_highlight">#ffffffff</color>
+    <color name="text_default">#ff727272</color>
+    <color name="header_schedule_past">#FF565354</color>
+    <color name="header_schedule_today">@color/orange_bg</color>
+    <color name="header_schedule_future">#FF79ca1d</color>
+    <color name="default_bg">#ff1c191a</color>
+    <color name="orange_bg">#fff05122</color>
+    <color name="underlying_shadow_bg">#B0000000</color>
+    <color name="btn_text">@color/text_highlight</color>
+    <color name="grey_btn_bg">#ff464646</color>
+    <color name="grey_btn_bg_sel">#9b9696</color>
+    <color name="orange_btn_bg">@color/orange_bg</color>
+    <color name="orange_btn_bg_sel">#fff49e84</color>
+    <color name="panel_bg">#ff2e2d2d</color>
+    <color name="panel_divider">#ff424242</color>
+    <color name="light_panel_bg">#ffe3e3e3</color>
+    <color name="light_panel_text">#ff5d5c5d</color>
+    <color name="index_bg_start">#ff1c191a</color>
+    <color name="index_bg_end">#ff262324</color>
+    <color name="control_panel_bg_start">#ff2a2829</color>
+    <color name="control_panel_bg_center">#ff211e1f</color>
+    <color name="control_panel_bg_end">#ff1c191a</color>
+    <color name="orange">#E0D000</color>
+
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/orange_btn_bg_sel"/>
+            <padding android:bottom="@dimen/btn_padding_vert"
+                     android:top="@dimen/btn_padding_vert"
+                     android:left="@dimen/btn_padding_horiz"
+                     android:right="@dimen/btn_padding_horiz"/>
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/orange_btn_bg"/>
+            <stroke android:color="@color/orange_btn_bg_sel" android:width="1dp"/>
+            <padding android:bottom="@dimen/btn_padding_vert"
+                     android:top="@dimen/btn_padding_vert"
+                     android:left="@dimen/btn_padding_horiz"
+                     android:right="@dimen/btn_padding_horiz"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/orange_btn_bg"/>
+            <padding android:bottom="@dimen/btn_padding_vert"
+                     android:top="@dimen/btn_padding_vert"
+                     android:left="@dimen/btn_padding_horiz"
+                     android:right="@dimen/btn_padding_horiz"/>
+        </shape>
+    </item>
+</selector>
